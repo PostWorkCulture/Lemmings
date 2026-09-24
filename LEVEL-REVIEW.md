@@ -30,3 +30,13 @@ All 20 maps have automated complete-crowd rescue solutions and deterministic rep
 ## Difficulty pass
 
 All levels now show Easy, Medium, Hard or Extreme in groups of five. Levels 6-20 extend below the original viewport. Medium has one extra chamber, Hard two, and Extreme three. Each chamber varies the barrier position, crossing width and travel direction. Cracked barriers require bashing; steel lintels and raised landings distinguish horizontal Platformer crossings from Builder staircases. Deeper transitions alternate mining and digging. The proven routes use three to four route skills in Medium, and all five excavation/construction types in Hard and Extreme, plus Blocker/Walker crowd control. Human difficulty remains a playtesting judgement, not a guarantee established by automated rescue tests.
+
+## Distinct extreme finales
+
+16. Under the Big Top: a narrowing ring course with circus canopies and swinging trapezes.
+17. Chimney Chase: clustered short towers opening onto a long final rooftop, with windows and cables.
+18. The Championship Circuit: two broad stadium circuits, terraces and floodlights.
+19. Orbital Maintenance: four compact offset service pods with moving machinery and status lights.
+20. Heart of Prism Falls: a wide basin narrowing into an asymmetric crystal gorge with waterfalls.
+
+Each finale has a separately authored footprint, crossing placement, descent spacing, solid underside shapes and exact skill budget. All require 20/20; deterministic solution tests verify solvability, while subjective difficulty remains a playtesting judgement. Rebuild with `node scripts/expand-campaign.mjs`, which reapplies `scripts/author-extremes.mjs`.

@@ -91,3 +91,7 @@ The full requested skill catalogue is staged in [SKILL-CATALOGUE.md](SKILL-CATAL
 Use the mouse wheel, scrollbar, or the up/down buttons in the information panel to explore tall levels. The depth indicator shows your position. Terrain collision, editing, picking and hazards use each map's full height. Cracked rock barriers are bashable; blue-grey lintels are steel. Horizontal bridges fit beneath low lintels, while stairs reach raised landings.
 
 `src/levels.js` assembles the introductory/world definitions from `levels-base-for-authoring.js` and the authored extended layouts in `difficulty-layouts.js`. `scripts/expand-campaign.mjs` rebuilds those extended layouts and their canonical test routes from the base definitions.
+
+## Living scenery
+
+All twenty worlds have animated ambient scenery, visible even before Play: birds, swaying trees, windmills, dolphins, falling background rocks, rolling snowballs, gears, satellites, candy wheels, fountains, flags, a Ferris wheel and butterflies. Tall maps retain movement at lower depths. Ambient animation stops with Pause and follows 2x speed during play. These additions are decorative and do not change level collision or rescue routes.

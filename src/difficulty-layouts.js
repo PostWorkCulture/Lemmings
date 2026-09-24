@@ -2234,7 +2234,7 @@ export const DIFFICULT_LAYOUTS=[
   },
   {
     "id": 15,
-    "name": "The Great Bounce",
+    "name": "Under the Big Top",
     "world": "Starlight Circus",
     "theme": "circus",
     "total": 20,
@@ -2243,15 +2243,15 @@ export const DIFFICULT_LAYOUTS=[
     "spawnY": 250,
     "dir": 1,
     "interval": 90,
-    "exitX": 100,
-    "exitY": 716,
+    "exitX": 165,
+    "exitY": 696,
     "stock": {
       "block": 1,
-      "build": 1,
-      "dig": 2,
       "platform": 3,
+      "dig": 2,
       "bash": 3,
-      "mine": 1
+      "mine": 1,
+      "build": 1
     },
     "terrain": [
       [
@@ -2279,7 +2279,7 @@ export const DIFFICULT_LAYOUTS=[
         665,
         300,
         295,
-        44,
+        36,
         1
       ],
       [
@@ -2290,129 +2290,129 @@ export const DIFFICULT_LAYOUTS=[
         2
       ],
       [
-        610,
+        627,
         450,
-        350,
-        50,
+        333,
+        26,
         1
       ],
       [
-        40,
+        330,
         450,
-        505,
-        50,
+        235,
+        28,
         1
       ],
       [
-        946,
-        385,
-        14,
-        90,
-        2
-      ],
-      [
-        40,
-        385,
+        948,
+        395,
         12,
-        90,
+        75,
         2
       ],
       [
-        702,
-        374,
-        38,
-        76,
+        330,
+        395,
+        12,
+        75,
+        2
+      ],
+      [
+        758,
+        386,
+        32,
+        64,
         1
       ],
       [
-        539,
+        560,
         422,
-        74,
+        70,
         4,
         2
       ],
       [
-        40,
+        250,
         595,
-        460,
-        50,
+        280,
+        34,
         1
       ],
       [
-        570,
+        600,
         571,
-        390,
-        50,
+        180,
+        28,
         1
       ],
       [
-        40,
-        530,
-        14,
-        90,
-        2
-      ],
-      [
-        948,
-        506,
+        250,
+        540,
         12,
-        90,
+        75,
         2
       ],
       [
-        185,
-        519,
-        50,
-        76,
-        1
-      ],
-      [
-        555,
-        716,
-        405,
-        50,
-        1
-      ],
-      [
-        40,
-        716,
-        440,
-        50,
-        1
-      ],
-      [
-        946,
-        651,
-        14,
-        90,
-        2
-      ],
-      [
-        40,
-        651,
+        768,
+        516,
         12,
-        90,
+        75,
         2
       ],
       [
-        728,
-        640,
-        62,
-        76,
+        398.4,
+        531,
+        38,
+        64,
         1
       ],
       [
-        474,
-        688,
-        84,
+        429,
+        696,
+        371,
+        26,
+        1
+      ],
+      [
+        100,
+        696,
+        267,
+        28,
+        1
+      ],
+      [
+        788,
+        641,
+        12,
+        75,
+        2
+      ],
+      [
+        100,
+        641,
+        12,
+        75,
+        2
+      ],
+      [
+        586,
+        632,
+        44,
+        64,
+        1
+      ],
+      [
+        362,
+        668,
+        70,
         4,
         2
       ]
     ],
     "hints": [
-      "The exit is below the surface. Plan the whole 4-stage route before releasing the crowd.",
-      "Cracked barriers are soft rock: tunnel through them with a Basher. Blue-grey lintels and pillars are steel.",
-      "Use horizontal bridges under low lintels, stairs to raised landings, and controlled digging or mining to reach the next chamber. Hold the crowd until the route is ready."
+      "A narrowing aerial ring leads to a wide final performance stage.",
+      "Keep the crowd safe while a scout prepares tunnels and crossings. All twenty must reach the exit.",
+      "Use the levers to disable traps. Mine or dig into the next area; the narrow chambers do not share the same crossing positions."
     ],
     "objects": [
       {
@@ -2426,40 +2426,40 @@ export const DIFFICULT_LAYOUTS=[
       },
       {
         "type": "rubble",
-        "x": 702,
-        "y": 374,
-        "w": 38,
-        "h": 76
+        "x": 758,
+        "y": 386,
+        "w": 32,
+        "h": 64
       },
       {
         "type": "rubble",
-        "x": 185,
-        "y": 519,
-        "w": 50,
-        "h": 76
+        "x": 398.4,
+        "y": 531,
+        "w": 38,
+        "h": 64
       },
       {
         "type": "switch",
-        "x": 247,
+        "x": 448.4,
         "y": 595,
-        "target": "lower-trap-15"
+        "target": "finale-15"
       },
       {
-        "id": "lower-trap-15",
+        "id": "finale-15",
         "type": "crusher",
-        "x": 452,
-        "y": 525,
-        "w": 30,
-        "h": 70,
-        "period": 220,
-        "active": 80
+        "x": 485,
+        "y": 530,
+        "w": 28,
+        "h": 65,
+        "period": 240,
+        "active": 70
       },
       {
         "type": "rubble",
-        "x": 728,
-        "y": 640,
-        "w": 62,
-        "h": 76
+        "x": 586,
+        "y": 632,
+        "w": 44,
+        "h": 64
       }
     ],
     "hazard": "water",
@@ -2521,14 +2521,167 @@ export const DIFFICULT_LAYOUTS=[
             358
           ]
         ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            662,
+            475
+          ],
+          [
+            925,
+            475
+          ],
+          [
+            843.45,
+            504
+          ],
+          [
+            726.9,
+            490
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            365,
+            477
+          ],
+          [
+            530,
+            477
+          ],
+          [
+            482.75,
+            506
+          ],
+          [
+            400.5,
+            492
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            285,
+            628
+          ],
+          [
+            495,
+            628
+          ],
+          [
+            432,
+            657
+          ],
+          [
+            334,
+            643
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            635,
+            598
+          ],
+          [
+            745,
+            598
+          ],
+          [
+            717,
+            627
+          ],
+          [
+            654,
+            613
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            464,
+            721
+          ],
+          [
+            765,
+            721
+          ],
+          [
+            670.15,
+            750
+          ],
+          [
+            540.3,
+            736
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            135,
+            723
+          ],
+          [
+            332,
+            723
+          ],
+          [
+            273.55,
+            752
+          ],
+          [
+            180.1,
+            738
+          ]
+        ]
       }
     ],
-    "height": 851,
+    "setPieces": [
+      {
+        "form": "circus-rings",
+        "left": 330,
+        "right": 960,
+        "y": 450,
+        "landing": 450,
+        "room": 0
+      },
+      {
+        "form": "circus-rings",
+        "left": 250,
+        "right": 780,
+        "y": 595,
+        "landing": 571,
+        "room": 1
+      },
+      {
+        "form": "circus-rings",
+        "left": 100,
+        "right": 800,
+        "y": 696,
+        "landing": 696,
+        "room": 2
+      }
+    ],
+    "height": 821,
+    "layoutForm": "circus-rings",
     "difficulty": "Extreme"
   },
   {
     "id": 16,
-    "name": "Midnight Express",
+    "name": "Chimney Chase",
     "world": "Moonlit Rooftops",
     "theme": "night",
     "total": 20,
@@ -2537,12 +2690,12 @@ export const DIFFICULT_LAYOUTS=[
     "spawnY": 88,
     "dir": 1,
     "interval": 90,
-    "exitX": 100,
+    "exitX": 125,
     "exitY": 736,
     "stock": {
       "block": 1,
-      "build": 2,
       "dig": 4,
+      "build": 2,
       "bash": 3,
       "platform": 2,
       "mine": 1
@@ -2573,7 +2726,7 @@ export const DIFFICULT_LAYOUTS=[
         695,
         325,
         265,
-        44,
+        36,
         1
       ],
       [
@@ -2619,167 +2772,167 @@ export const DIFFICULT_LAYOUTS=[
         2
       ],
       [
-        555,
+        706,
         470,
-        405,
-        50,
+        254,
+        26,
         1
       ],
       [
-        40,
+        480,
         470,
-        440,
-        50,
+        164,
+        28,
         1
       ],
       [
-        946,
-        405,
-        14,
-        90,
-        2
-      ],
-      [
-        40,
-        405,
+        948,
+        415,
         12,
-        90,
+        75,
         2
       ],
       [
-        765,
-        394,
-        50,
-        76,
+        480,
+        415,
+        12,
+        75,
+        2
+      ],
+      [
+        793.6,
+        406,
+        32,
+        64,
         1
       ],
       [
-        474,
+        639,
         442,
-        84,
+        70,
         4,
         2
       ],
       [
-        40,
-        615,
-        350,
-        50,
+        420,
+        605,
+        243,
+        34,
         1
       ],
       [
-        455,
-        591,
-        505,
-        50,
+        733,
+        581,
+        147,
+        28,
         1
       ],
       [
-        40,
+        420,
         550,
-        14,
-        90,
+        12,
+        75,
         2
       ],
       [
-        948,
+        868,
         526,
         12,
-        90,
+        75,
         2
       ],
       [
-        210,
-        539,
-        62,
-        76,
-        1
-      ],
-      [
-        500,
-        736,
-        460,
-        50,
-        1
-      ],
-      [
-        40,
-        736,
-        390,
-        50,
-        1
-      ],
-      [
-        946,
-        671,
-        14,
-        90,
-        2
-      ],
-      [
-        40,
-        671,
-        12,
-        90,
-        2
-      ],
-      [
-        727,
-        660,
+        548.8,
+        541,
         38,
-        76,
+        64,
         1
       ],
       [
-        424,
+        465,
+        736,
+        455,
+        26,
+        1
+      ],
+      [
+        60,
+        736,
+        343,
+        28,
+        1
+      ],
+      [
+        908,
+        681,
+        12,
+        75,
+        2
+      ],
+      [
+        60,
+        681,
+        12,
+        75,
+        2
+      ],
+      [
+        706,
+        672,
+        44,
+        64,
+        1
+      ],
+      [
+        398,
         708,
-        79,
+        70,
         4,
         2
       ]
     ],
     "hints": [
-      "The exit is below the surface. Plan the whole 4-stage route before releasing the crowd.",
-      "Cracked barriers are soft rock: tunnel through them with a Basher. Blue-grey lintels and pillars are steel.",
-      "Use horizontal bridges under low lintels, stairs to raised landings, and controlled digging or mining to reach the next chamber. Hold the crowd until the route is ready."
+      "A cluster of narrow chimney towers opens onto a long final rooftop.",
+      "Keep the crowd safe while a scout prepares tunnels and crossings. All twenty must reach the exit.",
+      "Use the levers to disable traps. Mine or dig into the next area; the narrow chambers do not share the same crossing positions."
     ],
     "objects": [
       {
         "type": "rubble",
-        "x": 765,
-        "y": 394,
-        "w": 50,
-        "h": 76
+        "x": 793.6,
+        "y": 406,
+        "w": 32,
+        "h": 64
       },
       {
         "type": "rubble",
-        "x": 210,
-        "y": 539,
-        "w": 62,
-        "h": 76
+        "x": 548.8,
+        "y": 541,
+        "w": 38,
+        "h": 64
       },
       {
         "type": "switch",
-        "x": 284,
-        "y": 615,
-        "target": "lower-trap-16"
+        "x": 598.8,
+        "y": 605,
+        "target": "finale-16"
       },
       {
-        "id": "lower-trap-16",
+        "id": "finale-16",
         "type": "crusher",
-        "x": 342,
-        "y": 545,
-        "w": 30,
-        "h": 70,
-        "period": 220,
-        "active": 80
+        "x": 618,
+        "y": 540,
+        "w": 28,
+        "h": 65,
+        "period": 240,
+        "active": 70
       },
       {
         "type": "rubble",
-        "x": 727,
-        "y": 660,
-        "w": 38,
-        "h": 76
+        "x": 706,
+        "y": 672,
+        "w": 44,
+        "h": 64
       }
     ],
     "hazard": "water",
@@ -2882,14 +3035,167 @@ export const DIFFICULT_LAYOUTS=[
             386
           ]
         ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            741,
+            495
+          ],
+          [
+            925,
+            495
+          ],
+          [
+            925,
+            558
+          ],
+          [
+            741,
+            558
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            515,
+            497
+          ],
+          [
+            609,
+            497
+          ],
+          [
+            609,
+            560
+          ],
+          [
+            515,
+            560
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            455,
+            638
+          ],
+          [
+            628,
+            638
+          ],
+          [
+            628,
+            701
+          ],
+          [
+            455,
+            701
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            768,
+            608
+          ],
+          [
+            845,
+            608
+          ],
+          [
+            845,
+            671
+          ],
+          [
+            768,
+            671
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            500,
+            761
+          ],
+          [
+            885,
+            761
+          ],
+          [
+            885,
+            824
+          ],
+          [
+            500,
+            824
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            95,
+            763
+          ],
+          [
+            368,
+            763
+          ],
+          [
+            368,
+            826
+          ],
+          [
+            95,
+            826
+          ]
+        ]
       }
     ],
-    "height": 871,
+    "setPieces": [
+      {
+        "form": "rooftop-towers",
+        "left": 480,
+        "right": 960,
+        "y": 470,
+        "landing": 470,
+        "room": 0
+      },
+      {
+        "form": "rooftop-towers",
+        "left": 420,
+        "right": 880,
+        "y": 605,
+        "landing": 581,
+        "room": 1
+      },
+      {
+        "form": "rooftop-towers",
+        "left": 60,
+        "right": 920,
+        "y": 736,
+        "landing": 736,
+        "room": 2
+      }
+    ],
+    "height": 861,
+    "layoutForm": "rooftop-towers",
     "difficulty": "Extreme"
   },
   {
     "id": 17,
-    "name": "The Obstacle Course",
+    "name": "The Championship Circuit",
     "world": "Lemming Games",
     "theme": "sports",
     "total": 20,
@@ -2898,15 +3204,15 @@ export const DIFFICULT_LAYOUTS=[
     "spawnY": 250,
     "dir": 1,
     "interval": 90,
-    "exitX": 100,
-    "exitY": 716,
+    "exitX": 895,
+    "exitY": 596,
     "stock": {
       "block": 1,
-      "build": 1,
-      "dig": 2,
-      "bash": 4,
-      "platform": 2,
-      "mine": 1
+      "bash": 3,
+      "dig": 1,
+      "platform": 1,
+      "mine": 1,
+      "build": 1
     },
     "terrain": [
       [
@@ -2934,7 +3240,7 @@ export const DIFFICULT_LAYOUTS=[
         640,
         300,
         320,
-        44,
+        36,
         1
       ],
       [
@@ -2952,129 +3258,94 @@ export const DIFFICULT_LAYOUTS=[
         2
       ],
       [
-        500,
-        450,
-        460,
+        840,
+        420,
         50,
+        10,
         1
       ],
       [
-        40,
-        450,
-        390,
-        50,
+        515,
+        475,
+        445,
+        26,
         1
       ],
       [
-        946,
-        385,
-        14,
-        90,
-        2
+        120,
+        475,
+        315,
+        28,
+        1
       ],
       [
-        40,
-        385,
+        948,
+        420,
         12,
-        90,
+        75,
         2
       ],
       [
-        728,
-        374,
-        62,
-        76,
+        120,
+        420,
+        12,
+        75,
+        2
+      ],
+      [
+        725,
+        411,
+        65,
+        64,
         1
       ],
       [
-        424,
-        422,
-        79,
+        430,
+        447,
+        88,
         4,
         2
       ],
       [
-        40,
-        595,
-        405,
-        50,
+        60,
+        620,
+        477,
+        34,
         1
       ],
       [
-        520,
-        571,
-        440,
-        50,
+        617,
+        596,
+        343,
+        28,
         1
       ],
       [
-        40,
-        530,
-        14,
-        90,
+        60,
+        565,
+        12,
+        75,
         2
       ],
       [
         948,
-        506,
+        541,
         12,
-        90,
+        75,
         2
       ],
       [
-        235,
-        519,
-        38,
-        76,
+        230,
+        556,
+        65,
+        64,
         1
-      ],
-      [
-        610,
-        716,
-        350,
-        50,
-        1
-      ],
-      [
-        40,
-        716,
-        505,
-        50,
-        1
-      ],
-      [
-        946,
-        651,
-        14,
-        90,
-        2
-      ],
-      [
-        40,
-        651,
-        12,
-        90,
-        2
-      ],
-      [
-        690,
-        640,
-        50,
-        76,
-        1
-      ],
-      [
-        539,
-        688,
-        74,
-        4,
-        2
       ]
     ],
     "hints": [
-      "The exit is below the surface. Plan the whole 4-stage route before releasing the crowd.",
-      "Cracked barriers are soft rock: tunnel through them with a Basher. Blue-grey lintels and pillars are steel.",
-      "Use horizontal bridges under low lintels, stairs to raised landings, and controlled digging or mining to reach the next chamber. Hold the crowd until the route is ready."
+      "Two broad stadium circuits demand long tunnels, a low crossing and an uphill finish.",
+      "Keep the crowd safe while a scout prepares tunnels and crossings. All twenty must reach the exit.",
+      "Use the levers to disable traps. Mine or dig into the next area; the narrow chambers do not share the same crossing positions."
     ],
     "objects": [
       {
@@ -3096,41 +3367,41 @@ export const DIFFICULT_LAYOUTS=[
         "dir": 1
       },
       {
-        "type": "rubble",
-        "x": 728,
-        "y": 374,
-        "w": 62,
-        "h": 76
+        "type": "pole",
+        "x": 865,
+        "y": 420,
+        "bottom": 475,
+        "dir": 1
       },
       {
         "type": "rubble",
-        "x": 235,
-        "y": 519,
-        "w": 38,
-        "h": 76
+        "x": 725,
+        "y": 411,
+        "w": 65,
+        "h": 64
+      },
+      {
+        "type": "rubble",
+        "x": 230,
+        "y": 556,
+        "w": 65,
+        "h": 64
       },
       {
         "type": "switch",
-        "x": 285,
-        "y": 595,
-        "target": "lower-trap-17"
+        "x": 307,
+        "y": 620,
+        "target": "finale-17"
       },
       {
-        "id": "lower-trap-17",
+        "id": "finale-17",
         "type": "crusher",
-        "x": 397,
-        "y": 525,
-        "w": 30,
-        "h": 70,
-        "period": 220,
-        "active": 80
-      },
-      {
-        "type": "rubble",
-        "x": 690,
-        "y": 640,
-        "w": 50,
-        "h": 76
+        "x": 492,
+        "y": 555,
+        "w": 28,
+        "h": 65,
+        "period": 240,
+        "active": 70
       }
     ],
     "hazard": "water",
@@ -3192,14 +3463,117 @@ export const DIFFICULT_LAYOUTS=[
             363
           ]
         ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            550,
+            500
+          ],
+          [
+            925,
+            500
+          ],
+          [
+            804.25,
+            529
+          ],
+          [
+            648.5,
+            515
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            155,
+            502
+          ],
+          [
+            400,
+            502
+          ],
+          [
+            324.75,
+            531
+          ],
+          [
+            214.5,
+            517
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            95,
+            653
+          ],
+          [
+            502,
+            653
+          ],
+          [
+            370.05,
+            682
+          ],
+          [
+            203.1,
+            668
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            652,
+            623
+          ],
+          [
+            925,
+            623
+          ],
+          [
+            839.95,
+            652
+          ],
+          [
+            719.9,
+            638
+          ]
+        ]
       }
     ],
-    "height": 851,
+    "setPieces": [
+      {
+        "form": "stadium-bowl",
+        "left": 120,
+        "right": 960,
+        "y": 475,
+        "landing": 475,
+        "room": 0
+      },
+      {
+        "form": "stadium-bowl",
+        "left": 60,
+        "right": 960,
+        "y": 620,
+        "landing": 596,
+        "room": 1
+      }
+    ],
+    "height": 721,
+    "layoutForm": "stadium-bowl",
     "difficulty": "Extreme"
   },
   {
     "id": 18,
-    "name": "The Gravity Garden",
+    "name": "Orbital Maintenance",
     "world": "Starport Nine",
     "theme": "station",
     "total": 20,
@@ -3208,15 +3582,15 @@ export const DIFFICULT_LAYOUTS=[
     "spawnY": 280,
     "dir": 1,
     "interval": 90,
-    "exitX": 100,
-    "exitY": 716,
+    "exitX": 795,
+    "exitY": 802,
     "stock": {
       "block": 1,
-      "build": 1,
-      "dig": 2,
       "platform": 3,
-      "bash": 3,
-      "mine": 1
+      "dig": 2,
+      "bash": 4,
+      "mine": 2,
+      "build": 2
     },
     "terrain": [
       [
@@ -3244,7 +3618,7 @@ export const DIFFICULT_LAYOUTS=[
         625,
         220,
         335,
-        44,
+        36,
         1
       ],
       [
@@ -3255,136 +3629,171 @@ export const DIFFICULT_LAYOUTS=[
         2
       ],
       [
-        837,
-        345,
-        56,
-        12,
-        1
-      ],
-      [
-        610,
-        450,
-        350,
+        840,
+        340,
         50,
+        10,
         1
       ],
       [
-        40,
-        450,
-        505,
-        50,
-        1
-      ],
-      [
-        946,
-        385,
-        14,
-        90,
-        2
-      ],
-      [
-        40,
-        385,
-        12,
-        90,
-        2
-      ],
-      [
-        727,
-        374,
-        38,
-        76,
-        1
-      ],
-      [
-        539,
-        422,
-        74,
-        4,
-        2
-      ],
-      [
-        40,
-        595,
+        706,
         460,
-        50,
+        254,
+        26,
         1
       ],
       [
-        570,
-        571,
-        390,
-        50,
+        480,
+        460,
+        164,
+        28,
         1
-      ],
-      [
-        40,
-        530,
-        14,
-        90,
-        2
       ],
       [
         948,
-        506,
-        12,
-        90,
-        2
-      ],
-      [
-        260,
-        519,
-        50,
-        76,
-        1
-      ],
-      [
-        555,
-        716,
         405,
-        50,
-        1
-      ],
-      [
-        40,
-        716,
-        440,
-        50,
-        1
-      ],
-      [
-        946,
-        651,
-        14,
-        90,
-        2
-      ],
-      [
-        40,
-        651,
         12,
-        90,
+        75,
         2
       ],
       [
-        753,
-        640,
-        62,
-        76,
+        480,
+        405,
+        12,
+        75,
+        2
+      ],
+      [
+        793.6,
+        396,
+        32,
+        64,
         1
       ],
       [
-        474,
-        688,
-        84,
+        639,
+        432,
+        70,
         4,
         2
+      ],
+      [
+        430,
+        585,
+        254,
+        34,
+        1
+      ],
+      [
+        754,
+        561,
+        156,
+        28,
+        1
+      ],
+      [
+        430,
+        530,
+        12,
+        75,
+        2
+      ],
+      [
+        898,
+        506,
+        12,
+        75,
+        2
+      ],
+      [
+        564.4,
+        521,
+        38,
+        64,
+        1
+      ],
+      [
+        614,
+        701,
+        296,
+        26,
+        1
+      ],
+      [
+        350,
+        701,
+        202,
+        28,
+        1
+      ],
+      [
+        898,
+        646,
+        12,
+        75,
+        2
+      ],
+      [
+        350,
+        646,
+        12,
+        75,
+        2
+      ],
+      [
+        709.2,
+        637,
+        44,
+        64,
+        1
+      ],
+      [
+        547,
+        673,
+        70,
+        4,
+        2
+      ],
+      [
+        290,
+        826,
+        302,
+        34,
+        1
+      ],
+      [
+        662,
+        802,
+        198,
+        28,
+        1
+      ],
+      [
+        290,
+        771,
+        12,
+        75,
+        2
+      ],
+      [
+        848,
+        747,
+        12,
+        75,
+        2
+      ],
+      [
+        449.6,
+        762,
+        50,
+        64,
+        1
       ]
     ],
     "hints": [
-      "The exit is below the surface. Plan the whole 4-stage route before releasing the crowd.",
-      "Cracked barriers are soft rock: tunnel through them with a Basher. Blue-grey lintels and pillars are steel.",
-      "Use horizontal bridges under low lintels, stairs to raised landings, and controlled digging or mining to reach the next chamber. Hold the crowd until the route is ready."
+      "Four compact, offset service pods spiral down the station.",
+      "Keep the crowd safe while a scout prepares tunnels and crossings. All twenty must reach the exit.",
+      "Use the levers to disable traps. Mine or dig into the next area; the narrow chambers do not share the same crossing positions."
     ],
     "objects": [
       {
@@ -3413,46 +3822,53 @@ export const DIFFICULT_LAYOUTS=[
       {
         "type": "pole",
         "x": 865,
-        "y": 345,
-        "bottom": 450,
+        "y": 340,
+        "bottom": 460,
         "dir": 1
       },
       {
         "type": "rubble",
-        "x": 727,
-        "y": 374,
-        "w": 38,
-        "h": 76
+        "x": 793.6,
+        "y": 396,
+        "w": 32,
+        "h": 64
       },
       {
         "type": "rubble",
-        "x": 260,
-        "y": 519,
-        "w": 50,
-        "h": 76
+        "x": 564.4,
+        "y": 521,
+        "w": 38,
+        "h": 64
       },
       {
         "type": "switch",
-        "x": 322,
-        "y": 595,
-        "target": "lower-trap-18"
+        "x": 614.4,
+        "y": 585,
+        "target": "finale-18"
       },
       {
-        "id": "lower-trap-18",
+        "id": "finale-18",
         "type": "laser",
-        "x": 452,
-        "y": 525,
-        "w": 30,
-        "h": 70,
-        "period": 220,
-        "active": 80
+        "x": 639,
+        "y": 520,
+        "w": 28,
+        "h": 65,
+        "period": 240,
+        "active": 70
       },
       {
         "type": "rubble",
-        "x": 753,
-        "y": 640,
-        "w": 62,
-        "h": 76
+        "x": 709.2,
+        "y": 637,
+        "w": 44,
+        "h": 64
+      },
+      {
+        "type": "rubble",
+        "x": 449.6,
+        "y": 762,
+        "w": 50,
+        "h": 64
       }
     ],
     "hazard": "void",
@@ -3514,15 +3930,218 @@ export const DIFFICULT_LAYOUTS=[
             268
           ]
         ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            741,
+            485
+          ],
+          [
+            925,
+            485
+          ],
+          [
+            871.1,
+            496
+          ],
+          [
+            782.2,
+            491
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            515,
+            487
+          ],
+          [
+            609,
+            487
+          ],
+          [
+            586.6,
+            498
+          ],
+          [
+            529.2,
+            493
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            465,
+            618
+          ],
+          [
+            649,
+            618
+          ],
+          [
+            595.1,
+            629
+          ],
+          [
+            506.2,
+            624
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            789,
+            588
+          ],
+          [
+            875,
+            588
+          ],
+          [
+            855.4,
+            599
+          ],
+          [
+            800.8,
+            594
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            649,
+            726
+          ],
+          [
+            875,
+            726
+          ],
+          [
+            806.4,
+            737
+          ],
+          [
+            702.8,
+            732
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            385,
+            728
+          ],
+          [
+            517,
+            728
+          ],
+          [
+            481.3,
+            739
+          ],
+          [
+            410.6,
+            734
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            325,
+            859
+          ],
+          [
+            557,
+            859
+          ],
+          [
+            486.3,
+            870
+          ],
+          [
+            380.6,
+            865
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            697,
+            829
+          ],
+          [
+            825,
+            829
+          ],
+          [
+            790.7,
+            840
+          ],
+          [
+            721.4,
+            835
+          ]
+        ]
       }
     ],
     "gravity": 0.12,
-    "height": 851,
+    "setPieces": [
+      {
+        "form": "orbital-pods",
+        "left": 480,
+        "right": 960,
+        "y": 460,
+        "landing": 460,
+        "room": 0
+      },
+      {
+        "form": "orbital-pods",
+        "left": 430,
+        "right": 910,
+        "y": 585,
+        "landing": 561,
+        "room": 1
+      },
+      {
+        "form": "orbital-pods",
+        "left": 350,
+        "right": 910,
+        "y": 701,
+        "landing": 701,
+        "room": 2
+      },
+      {
+        "form": "orbital-pods",
+        "left": 290,
+        "right": 860,
+        "y": 826,
+        "landing": 802,
+        "room": 3
+      }
+    ],
+    "height": 927,
+    "layoutForm": "orbital-pods",
     "difficulty": "Extreme"
   },
   {
     "id": 19,
-    "name": "Journey to the Rainbow",
+    "name": "Heart of Prism Falls",
     "world": "Prism Falls",
     "theme": "enchanted",
     "total": 20,
@@ -3531,15 +4150,15 @@ export const DIFFICULT_LAYOUTS=[
     "spawnY": 100,
     "dir": 1,
     "interval": 90,
-    "exitX": 100,
-    "exitY": 716,
+    "exitX": 105,
+    "exitY": 706,
     "stock": {
       "block": 1,
-      "build": 1,
-      "dig": 2,
       "platform": 3,
       "bash": 4,
-      "mine": 1
+      "dig": 2,
+      "mine": 1,
+      "build": 1
     },
     "terrain": [
       [
@@ -3574,7 +4193,7 @@ export const DIFFICULT_LAYOUTS=[
         795,
         270,
         165,
-        44,
+        36,
         1
       ],
       [
@@ -3592,136 +4211,136 @@ export const DIFFICULT_LAYOUTS=[
         2
       ],
       [
-        862,
-        395,
-        56,
+        865,
+        390,
+        50,
+        10,
+        1
+      ],
+      [
+        541,
+        445,
+        439,
+        26,
+        1
+      ],
+      [
+        150,
+        445,
+        329,
+        28,
+        1
+      ],
+      [
+        968,
+        390,
         12,
-        1
-      ],
-      [
-        555,
-        450,
-        405,
-        50,
-        1
-      ],
-      [
-        40,
-        450,
-        440,
-        50,
-        1
-      ],
-      [
-        946,
-        385,
-        14,
-        90,
+        75,
         2
       ],
       [
-        40,
-        385,
+        150,
+        390,
         12,
-        90,
+        75,
         2
       ],
       [
-        690,
-        374,
-        50,
-        76,
+        778,
+        381,
+        32,
+        64,
         1
       ],
       [
         474,
-        422,
-        84,
+        417,
+        70,
         4,
         2
       ],
       [
-        40,
-        595,
-        350,
-        50,
-        1
-      ],
-      [
-        455,
-        571,
-        505,
-        50,
-        1
-      ],
-      [
-        40,
-        530,
-        14,
         90,
-        2
+        580,
+        270,
+        34,
+        1
       ],
       [
-        948,
-        506,
+        430,
+        556,
+        170,
+        28,
+        1
+      ],
+      [
+        90,
+        525,
         12,
-        90,
+        75,
         2
       ],
       [
-        185,
-        519,
-        62,
-        76,
-        1
-      ],
-      [
-        500,
-        716,
-        460,
-        50,
-        1
-      ],
-      [
-        40,
-        716,
-        390,
-        50,
-        1
-      ],
-      [
-        946,
-        651,
-        14,
-        90,
-        2
-      ],
-      [
-        40,
-        651,
+        588,
+        501,
         12,
-        90,
+        75,
         2
       ],
       [
-        752,
-        640,
+        232.8,
+        516,
         38,
-        76,
+        64,
         1
       ],
       [
-        424,
-        688,
-        79,
+        308,
+        706,
+        302,
+        26,
+        1
+      ],
+      [
+        40,
+        706,
+        206,
+        28,
+        1
+      ],
+      [
+        598,
+        651,
+        12,
+        75,
+        2
+      ],
+      [
+        40,
+        651,
+        12,
+        75,
+        2
+      ],
+      [
+        406.4,
+        642,
+        44,
+        64,
+        1
+      ],
+      [
+        241,
+        678,
+        70,
         4,
         2
       ]
     ],
     "hints": [
-      "The exit is below the surface. Plan the whole 4-stage route before releasing the crowd.",
-      "Cracked barriers are soft rock: tunnel through them with a Basher. Blue-grey lintels and pillars are steel.",
-      "Use horizontal bridges under low lintels, stairs to raised landings, and controlled digging or mining to reach the next chamber. Hold the crowd until the route is ready."
+      "A broad crystal basin narrows into a waterfall gorge and a secluded final grotto.",
+      "Keep the crowd safe while a scout prepares tunnels and crossings. All twenty must reach the exit.",
+      "Use the levers to disable traps. Mine or dig into the next area; the narrow chambers do not share the same crossing positions."
     ],
     "objects": [
       {
@@ -3743,46 +4362,46 @@ export const DIFFICULT_LAYOUTS=[
       {
         "type": "pole",
         "x": 890,
-        "y": 395,
-        "bottom": 450,
+        "y": 390,
+        "bottom": 445,
         "dir": 1
       },
       {
         "type": "rubble",
-        "x": 690,
-        "y": 374,
-        "w": 50,
-        "h": 76
+        "x": 778,
+        "y": 381,
+        "w": 32,
+        "h": 64
       },
       {
         "type": "rubble",
-        "x": 185,
-        "y": 519,
-        "w": 62,
-        "h": 76
+        "x": 232.8,
+        "y": 516,
+        "w": 38,
+        "h": 64
       },
       {
         "type": "switch",
-        "x": 259,
-        "y": 595,
-        "target": "lower-trap-19"
+        "x": 282.8,
+        "y": 580,
+        "target": "finale-19"
       },
       {
-        "id": "lower-trap-19",
+        "id": "finale-19",
         "type": "crusher",
-        "x": 342,
-        "y": 525,
-        "w": 30,
-        "h": 70,
-        "period": 220,
-        "active": 80
+        "x": 315,
+        "y": 515,
+        "w": 28,
+        "h": 65,
+        "period": 240,
+        "active": 70
       },
       {
         "type": "rubble",
-        "x": 752,
-        "y": 640,
-        "w": 38,
-        "h": 76
+        "x": 406.4,
+        "y": 642,
+        "w": 44,
+        "h": 64
       }
     ],
     "hazard": "water",
@@ -3873,9 +4492,162 @@ export const DIFFICULT_LAYOUTS=[
             323
           ]
         ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            576,
+            470
+          ],
+          [
+            945,
+            470
+          ],
+          [
+            826.35,
+            521
+          ],
+          [
+            672.7,
+            496
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            185,
+            472
+          ],
+          [
+            444,
+            472
+          ],
+          [
+            363.85,
+            523
+          ],
+          [
+            248.7,
+            498
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            125,
+            613
+          ],
+          [
+            325,
+            613
+          ],
+          [
+            265.5,
+            664
+          ],
+          [
+            171,
+            639
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            465,
+            583
+          ],
+          [
+            565,
+            583
+          ],
+          [
+            540.5,
+            634
+          ],
+          [
+            481,
+            609
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            343,
+            731
+          ],
+          [
+            575,
+            731
+          ],
+          [
+            504.3,
+            782
+          ],
+          [
+            398.6,
+            757
+          ]
+        ]
+      },
+      {
+        "type": 1,
+        "points": [
+          [
+            75,
+            733
+          ],
+          [
+            211,
+            733
+          ],
+          [
+            173.9,
+            784
+          ],
+          [
+            101.8,
+            759
+          ]
+        ]
       }
     ],
-    "height": 851,
+    "setPieces": [
+      {
+        "form": "crystal-cascade",
+        "left": 150,
+        "right": 980,
+        "y": 445,
+        "landing": 445,
+        "room": 0
+      },
+      {
+        "form": "crystal-cascade",
+        "left": 90,
+        "right": 600,
+        "y": 580,
+        "landing": 556,
+        "room": 1
+      },
+      {
+        "form": "crystal-cascade",
+        "left": 40,
+        "right": 610,
+        "y": 706,
+        "landing": 706,
+        "room": 2
+      }
+    ],
+    "height": 831,
+    "layoutForm": "crystal-cascade",
     "difficulty": "Extreme"
   }
 ];

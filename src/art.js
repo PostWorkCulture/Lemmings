@@ -124,8 +124,8 @@ export function magicalEntrance(c,tick,level,spawned=0,lastSpawnTick=null){
   }
   c.restore();
 }
-export function scenery(c,tick,level,spawned=0,lastSpawnTick=null) {
-  worldScenery(c,tick,level);
+export function scenery(c,tick,level,spawned=0,lastSpawnTick=null,sceneryTick=tick) {
+  worldScenery(c,sceneryTick,level);
   magicalEntrance(c,tick,level,spawned,lastSpawnTick);
   // Golden splayed arch and twin torches from the supplied classic exit reference.
   exitArch(c,level.exitX,level.exitY,tick);

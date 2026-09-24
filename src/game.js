@@ -1,3 +1,4 @@
+import {ambientWorld,finaleLandmarks} from './ambient-art.js';
 import {SKILLS,SKILL_ORDER} from './skills.js';
 import {drawObjects,skillEquipment} from './object-art.js';
 import { isUnlocked,isPerfect } from './progress.js';
@@ -13,6 +14,7 @@ if(!isUnlocked(initialLevel,best))initialLevel=0;
 const game=new Game(initialLevel),terrain=document.createElement('canvas');let background=makeBackground(game.level.theme,game.height);terrain.width=WIDTH;terrain.height=game.height;
 const soundtrack=new Soundtrack($('#soundtrack'));
 let pendingLevel=null;
+let sceneryTick=0;
 let selected='walk',started=false,paused=false,speed=1,last=0,accumulator=0,renderedRevision=-1,hover=null,pointer=null,toastTimer,hintIndex=0,dialogPause=false;
 function message(text){$('#message').textContent=text;$('#message').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#message').classList.remove('visible'),5000);}
 function select(skill){if(skill!=='walk'&&game.stock[skill]<=0&&!(skill==='block'&&game.units.some(u=>u.state==='block')))return;selected=skill;document.querySelectorAll('.skill').forEach(b=>{const active=b.dataset.skill===skill;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});}
@@ -88,7 +90,7 @@ function showLevels(){
   if(level.id%5===0){const heading=document.createElement('h3');heading.className='difficulty-heading';heading.textContent=`${level.difficulty} - Levels ${level.id+1}-${level.id+5}`;list.append(heading);}
   const unlocked=isUnlocked(level.id,best),perfect=isPerfect(level.id,perfectRescues);
   const button=document.createElement('button');button.disabled=!unlocked;button.className='level-card'+(level.id===game.levelIndex?' current':'');button.setAttribute('aria-label',`Level ${level.id+1}: ${level.name}`);
-  const preview=document.createElement('canvas');preview.width=200;preview.height=94;preview.setAttribute('aria-hidden','true');const c=preview.getContext('2d');const previewScale=Math.min(200/WIDTH,94/level.height);c.translate((200-WIDTH*previewScale)/2,0);c.scale(previewScale,previewScale);c.drawImage(makeBackground(level.theme,level.height),0,0);const t=document.createElement('canvas');t.width=WIDTH;t.height=level.height;const previewGame=new Game(level.id);renderTerrain(previewGame,t);hazards(c,0,level.theme,level.height);c.drawImage(t,0,0);drawObjects(c,previewGame);scenery(c,0,level);button.append(preview);
+  const preview=document.createElement('canvas');preview.width=200;preview.height=94;preview.setAttribute('aria-hidden','true');const c=preview.getContext('2d');const previewScale=Math.min(200/WIDTH,94/level.height);c.translate((200-WIDTH*previewScale)/2,0);c.scale(previewScale,previewScale);c.drawImage(makeBackground(level.theme,level.height),0,0);const t=document.createElement('canvas');t.width=WIDTH;t.height=level.height;const previewGame=new Game(level.id);renderTerrain(previewGame,t);hazards(c,0,level.theme,level.height);ambientWorld(c,180,level);finaleLandmarks(c,180,level);c.drawImage(t,0,0);drawObjects(c,previewGame);scenery(c,0,level);button.append(preview);
   const info=document.createElement('span');const title=document.createElement('strong');title.textContent=`${String(level.id+1).padStart(2,'0')} · ${level.name}`;const sub=document.createElement('small');sub.textContent=`${level.difficulty} · ${level.world} · Rescue ${level.target}/${level.total}${best[level.id]?` · Best ${best[level.id]}/${level.total}`:''}`;info.append(title,sub);button.append(info);
   if(!unlocked){sub.textContent=`${level.difficulty} · ${level.world} · Complete level ${level.id} to unlock`;button.setAttribute('aria-label',`Level ${level.id+1}: ${level.name}, locked`);}
   if(perfect){const medal=document.createElement('span');medal.className='gold-star';medal.setAttribute('role','img');medal.setAttribute('aria-label','Gold star: 20 of 20 rescued');medal.title='Perfect rescue: 20/20 saved';medal.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 15 8.3 22 9.3 17 14.2 18.2 21.2 12 17.9 5.8 21.2 7 14.2 2 9.3 9 8.3Z" fill="#efc653" stroke="#b98d30" stroke-width="1"/></svg>';button.append(medal);}
@@ -108,7 +110,8 @@ function draw(){
   ctx.imageSmoothingEnabled=false;ctx.drawImage(background,0,0);
   if(renderedRevision!==game.revision){renderTerrain(game,terrain);renderedRevision=game.revision;}
   hazards(ctx,game.tick,game.level.theme,game.height);
-  ctx.drawImage(terrain,0,0);drawObjects(ctx,game);scenery(ctx,game.tick,game.level,game.spawned,game.lastSpawnTick);
+  ambientWorld(ctx,sceneryTick,game.level);finaleLandmarks(ctx,sceneryTick,game.level);
+  ctx.drawImage(terrain,0,0);drawObjects(ctx,game);scenery(ctx,game.tick,game.level,game.spawned,game.lastSpawnTick,sceneryTick);
   for(let i=0;i<16;i++){const t=game.tick/100+i*4,x=80+(i*67)%870+Math.sin(t)*8,y=65+(i*47)%260+Math.cos(t*.7)*5;ctx.globalAlpha=.2+(Math.sin(t)+1)*.2;ctx.fillStyle='#e5db91';ctx.fillRect(x,y,2,2);}ctx.globalAlpha=1;
   exitPortal(ctx,game.level,game.tick,game.units.some(u=>u.state==='exit'));
   if(pointer)hover=pick(pointer.x,pointer.y);else hover=null;
@@ -126,6 +129,7 @@ function draw(){
 }
 function frame(now){
   if(last===0)last=now;const dt=Math.min(now-last,100);last=now;
+  if(!paused&&!game.result&&!document.hidden)sceneryTick+=dt*.06*(started?speed:1);
   if(started&&!paused&&!game.result){accumulator+=dt*speed;while(accumulator>=1000/60){game.step();accumulator-=1000/60;if(game.result){result();break;}}}else accumulator=0;
   draw();sync();requestAnimationFrame(frame);
 }

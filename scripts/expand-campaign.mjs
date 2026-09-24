@@ -30,3 +30,6 @@ for(let id=5;id<20;id++){
 }
 writeFileSync(new URL('../src/difficulty-layouts.js',import.meta.url),'// Authored multi-stage campaign layouts.\nexport const DIFFICULT_LAYOUTS='+JSON.stringify(layouts,null,2)+';\n');
 writeFileSync(new URL('../tests/difficulty-routes.json',import.meta.url),JSON.stringify(routes,null,2));
+
+// Preserve the separately authored extreme finales when rebuilding the campaign.
+await import('./author-extremes.mjs');
