@@ -7,7 +7,7 @@ for(let id=5;id<20;id++){
  for(const r of l.terrain)if(r[4]===1&&r[1]===top&&drop>=r[0]&&drop<r[0]+r[2])r[3]=44;
  l.shapes=l.shapes.filter(s=>!(Math.min(...s.points.map(p=>p[0]))<=drop&&Math.max(...s.points.map(p=>p[0]))>=drop&&(Math.min(...s.points.map(p=>p[1]))>=top||(Math.min(...s.points.map(p=>p[1]))>=top-20&&Math.max(...s.points.map(p=>p[1]))<=top))));
  route.push([drop,top,'dig',initialDir]);
- const rooms=id<10?1:id<15?2:3;let rowY=Math.max(top+145,id>=15?450:id>=10?400:0,...l.terrain.map(r=>r[1]+r[3]+35),...l.shapes.map(s=>Math.max(...s.points.map(p=>p[1]))+20)),dir=-initialDir;
+ const rooms=id<10?2:id<15?3:3;let rowY=Math.max(top+145,id>=15?450:id>=10?400:0,...l.terrain.map(r=>r[1]+r[3]+35),...l.shapes.map(s=>Math.max(...s.points.map(p=>p[1]))+20)),dir=-initialDir;
  if(rowY-top>150){l.terrain.push([drop-28,top+125,56,12,1]);l.objects.push({type:'pole',x:drop,y:top+125,bottom:rowY,dir:initialDir});}
  for(let room=0;room<rooms;room++){
   const bridge=room%2===1?'build':'platform',destinationY=rowY-(bridge==='build'?24:0),mirror=dir===-1;

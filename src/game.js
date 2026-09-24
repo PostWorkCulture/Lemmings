@@ -1,3 +1,4 @@
+import {drawSplats,ImpactAudio} from './impact-effects.js';
 import {ambientWorld,finaleLandmarks} from './ambient-art.js';
 import {SKILLS,SKILL_ORDER} from './skills.js';
 import {drawObjects,skillEquipment} from './object-art.js';
@@ -12,13 +13,13 @@ let perfectRescues={};try{const records=JSON.parse(localStorage.getItem('lemming
 let initialLevel=0;try{initialLevel=Number(localStorage.getItem('lemmings-current-level'))||0;}catch{}
 if(!isUnlocked(initialLevel,best))initialLevel=0;
 const game=new Game(initialLevel),terrain=document.createElement('canvas');let background=makeBackground(game.level.theme,game.height);terrain.width=WIDTH;terrain.height=game.height;
-const soundtrack=new Soundtrack($('#soundtrack'));
+const soundtrack=new Soundtrack($('#soundtrack'));const impactAudio=new ImpactAudio();
 let pendingLevel=null;
 let sceneryTick=0;
 let selected='walk',started=false,paused=false,speed=1,last=0,accumulator=0,renderedRevision=-1,hover=null,pointer=null,toastTimer,hintIndex=0,dialogPause=false;
 function message(text){$('#message').textContent=text;$('#message').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#message').classList.remove('visible'),5000);}
 function select(skill){if(skill!=='walk'&&game.stock[skill]<=0&&!(skill==='block'&&game.units.some(u=>u.state==='block')))return;selected=skill;document.querySelectorAll('.skill').forEach(b=>{const active=b.dataset.skill===skill;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});}
-function start(){started=true;paused=false;soundtrack.play();$('#intro').classList.add('hidden');$('#result').classList.add('hidden');canvas.focus({preventScroll:true});sync();}
+function start(){impactAudio.unlock();started=true;paused=false;soundtrack.play();$('#intro').classList.add('hidden');$('#result').classList.add('hidden');canvas.focus({preventScroll:true});sync();}
 function reset(levelIndex=game.levelIndex){if(!isUnlocked(levelIndex,best))return;clearTimeout(toastTimer);document.querySelector('#message').classList.remove('visible');soundtrack.pause();game.reset(levelIndex);background=makeBackground(game.level.theme,game.height);renderedRevision=-1;soundtrack.setLevel(levelIndex);updateLevelUI();started=false;paused=false;speed=1;hover=null;pointer=null;hintIndex=0;$('#hint-copy').textContent='Puzzle hints are optional.';$('#hint').textContent='Show a puzzle hint';accumulator=0;$('#result').classList.add('hidden');$('#intro').classList.remove('hidden');$('#speed').textContent='1\u00d7';$('#speed').setAttribute('aria-label','Speed: normal');$('#speed').classList.remove('active');select('walk');sync();}
 function togglePause(){if(!started)return;paused=!paused;paused?soundtrack.pause():soundtrack.play();sync();}
 function singleStep(){if(!started||game.result)return;paused=true;soundtrack.pause();game.step();if(game.result)result();sync();}
@@ -113,6 +114,7 @@ function draw(){
   ambientWorld(ctx,sceneryTick,game.level);finaleLandmarks(ctx,sceneryTick,game.level);
   ctx.drawImage(terrain,0,0);drawObjects(ctx,game);scenery(ctx,game.tick,game.level,game.spawned,game.lastSpawnTick,sceneryTick);
   for(let i=0;i<16;i++){const t=game.tick/100+i*4,x=80+(i*67)%870+Math.sin(t)*8,y=65+(i*47)%260+Math.cos(t*.7)*5;ctx.globalAlpha=.2+(Math.sin(t)+1)*.2;ctx.fillStyle='#e5db91';ctx.fillRect(x,y,2,2);}ctx.globalAlpha=1;
+  drawSplats(ctx,game.effects,game.tick);impactAudio.consume(game.effects,soundtrack.volume,soundtrack.muted);
   exitPortal(ctx,game.level,game.tick,game.units.some(u=>u.state==='exit'));
   if(pointer)hover=pick(pointer.x,pointer.y);else hover=null;
   for(const u of game.units){

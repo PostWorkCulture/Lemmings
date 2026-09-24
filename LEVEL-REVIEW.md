@@ -35,8 +35,12 @@ All levels now show Easy, Medium, Hard or Extreme in groups of five. Levels 6-20
 
 16. Under the Big Top: a narrowing ring course with circus canopies and swinging trapezes.
 17. Chimney Chase: clustered short towers opening onto a long final rooftop, with windows and cables.
-18. The Championship Circuit: two broad stadium circuits, terraces and floodlights.
+18. The Championship Circuit: three broad stadium circuits, terraces and floodlights.
 19. Orbital Maintenance: four compact offset service pods with moving machinery and status lights.
 20. Heart of Prism Falls: a wide basin narrowing into an asymmetric crystal gorge with waterfalls.
 
 Each finale has a separately authored footprint, crossing placement, descent spacing, solid underside shapes and exact skill budget. All require 20/20; deterministic solution tests verify solvability, while subjective difficulty remains a playtesting judgement. Rebuild with `node scripts/expand-campaign.mjs`, which reapplies `scripts/author-extremes.mjs`.
+
+## Difficulty reinforcement
+
+Medium maps now include two lower puzzle stages and five required tools in the verified route. Hard maps add a third stage; extreme maps retain their individual footprints with extra landing barriers and a third stadium circuit. Thin steel layers close direct digging shortcuts while preserving authored dig shafts and diagonal mining corridors. Every exit is roofed with a sealed far wall, requiring a side approach over its final crossing. Regression checks attempt vertical entry from both directions and confirm zero rescues. `scripts/reinforce-campaign.mjs` is applied automatically by the campaign authoring pipeline.

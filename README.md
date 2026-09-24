@@ -46,7 +46,7 @@ Music starts on **Play level** and continues on the results screen. Pause/resume
 
 ## Checks
 
-- `npm test`: 90 checks, including a 20/20 solution and deterministic replay for every map, inventory limits, terrain, falls, restarts, map changes, delayed rescue counting, portal arrivals and non-silent/unclipped soundtrack files.
+- `npm test`: 94 checks, including a 20/20 solution and deterministic replay for every map, inventory limits, terrain, falls, restarts, map changes, delayed rescue counting, portal arrivals and non-silent/unclipped soundtrack files.
 - `npm run check`: JavaScript syntax checks.
 - Browser checks: rendered all five themes; verified map selection and persistence, skill availability, change-level confirmation, music startup/pause/track changes, mute and volume controls.
 
@@ -97,3 +97,9 @@ Use the mouse wheel, scrollbar, or the up/down buttons in the information panel 
 All twenty worlds have animated ambient scenery, visible even before Play: birds, swaying trees, windmills, dolphins, falling background rocks, rolling snowballs, gears, satellites, candy wheels, fountains, flags, a Ferris wheel and butterflies. Tall maps retain movement at lower depths. Ambient animation stops with Pause and follows 2x speed during play. These additions are decorative and do not change level collision or rescue routes.
 
 Waterfalls in Fernfall Grotto and Prism Falls now originate in cliff springs, flow over visible rock lips and land in the actual bottom water. Layered moving ribbons, spray, foam and expanding ripples replace the disconnected decorative strips.
+
+## Route difficulty and impacts
+
+Medium routes now use Builder, Platformer, Basher, Miner and Digger in 8-10 assignments; Hard uses 11-14 and Extreme 14-18. Medium allows two blockers; later tiers allow one. Visible steel seams protect the intended soft shafts and mining corridors. Roofed exits require entry from the side. All twenty levels retain verified 20/20 solutions.
+
+Fatal floor impacts trigger a brief cartoon blood splash, flattened sprite and synthesised splat sound. Safe drops and parachutes do not. Effects follow simulation pause/speed, and audio respects the current mute/volume controls. `impact-review.html` provides isolated landing checks.

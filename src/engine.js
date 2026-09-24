@@ -13,7 +13,7 @@ export class Game {
     this.terrain = new Uint8Array(WIDTH * this.height);
     for(const rect of this.level.terrain)this.rect(...rect);
     for(const shape of this.level.shapes||[])this.polygon(shape.points,shape.type);
-    this.units=[]; this.lastSpawnTick=null; this.spawned=0; this.saved=0; this.lost=0; this.tick=0;
+    this.units=[];this.effects=[]; this.lastSpawnTick=null; this.spawned=0; this.saved=0; this.lost=0; this.tick=0;
     this.disabledObjects=new Set();this.stock={...this.level.stock}; this.result=null; this.events=[]; this.revision=(this.revision||0)+1;
   }
   rect(x,y,w,h,type) {
@@ -55,11 +55,11 @@ export class Game {
     this.events.push({tick:this.tick,id,skill});return {ok:true};
   }
   fall(u) { u.state='fall';u.vy=0;u.fallStart=u.y; }
-  remove(u,saved=false) { u.state=saved?'saved':'lost';saved?this.saved++:this.lost++; }
+  remove(u,saved=false,cause=null) { if(cause==='impact')this.effects.push({type:'splat',x:u.x,y:u.y,tick:this.tick});u.state=saved?'saved':'lost';saved?this.saved++:this.lost++; }
   step() {
     if(this.result)return;
     if(this.spawned<this.level.total && this.tick%this.level.interval===0)this.spawn();
-    updateObjects(this);this.tick++;
+    updateObjects(this);this.tick++;this.effects=this.effects.filter(e=>this.tick-e.tick<=150);
     for(const u of this.units) {
       if(u.state==='saved'||u.state==='lost')continue;
       if(u.state==='exit'){
@@ -92,7 +92,7 @@ export class Game {
         u.vy=Math.min(u.vy+(this.level.gravity||.19),u.abilities?.float?.9:4);
         let landed=false;
         for(let y=u.y;y<=u.y+u.vy;y+=.5)if(this.at(u.x,y)){u.y=Math.floor(y);landed=true;break;}
-        if(landed){if(u.y-u.fallStart>155&&!u.abilities?.float)this.remove(u);else {u.state='walk';u.vy=0;}}else u.y+=u.vy;
+        if(landed){if(u.y-u.fallStart>155&&!u.abilities?.float)this.remove(u,false,'impact');else {u.state='walk';u.vy=0;}}else u.y+=u.vy;
         continue;
       }
       if(!this.at(u.x,u.y)){this.fall(u);continue;}

@@ -1,3 +1,4 @@
+import {reinforceCampaign} from './reinforce-campaign.mjs';
 import {LEVELS as BASE} from '../src/levels-base-for-authoring.js';
 import {DIFFICULT_LAYOUTS} from '../src/difficulty-layouts.js';
 import {readFileSync,writeFileSync} from 'node:fs';
@@ -7,7 +8,7 @@ const routes=JSON.parse(readFileSync(new URL('../tests/difficulty-routes.json',i
 const designs=[
  {id:15,name:'Under the Big Top',form:'circus-rings',rooms:[[330,960,145],[250,780,125],[100,800,145]],depth:450,notes:'A narrowing aerial ring leads to a wide final performance stage.'},
  {id:16,name:'Chimney Chase',form:'rooftop-towers',rooms:[[480,960,135],[420,880,155],[60,920,130]],depth:470,notes:'A cluster of narrow chimney towers opens onto a long final rooftop.'},
- {id:17,name:'The Championship Circuit',form:'stadium-bowl',rooms:[[120,960,145],[60,960,150]],depth:475,notes:'Two broad stadium circuits demand long tunnels, a low crossing and an uphill finish.'},
+ {id:17,name:'The Championship Circuit',form:'stadium-bowl',rooms:[[120,960,145],[60,960,150],[240,930,145]],depth:475,notes:'Three broad stadium circuits combine springboards, low crossings, uphill building and tunnel preparation.'},
  {id:18,name:'Orbital Maintenance',form:'orbital-pods',rooms:[[480,960,125],[430,910,140],[350,910,125],[290,860,140]],depth:460,notes:'Four compact, offset service pods spiral down the station.'},
  {id:19,name:'Heart of Prism Falls',form:'crystal-cascade',rooms:[[150,980,135],[90,600,150],[40,610,145]],depth:445,notes:'A broad crystal basin narrows into a waterfall gorge and a secluded final grotto.'}
 ];
@@ -43,5 +44,6 @@ for(const design of designs){
  l.hints=[design.notes,'Keep the crowd safe while a scout prepares tunnels and crossings. All twenty must reach the exit.', 'Use the levers to disable traps. Mine or dig into the next area; the narrow chambers do not share the same crossing positions.'];
  const index=DIFFICULT_LAYOUTS.findIndex(x=>x.id===l.id);DIFFICULT_LAYOUTS[index]=l;routes[l.id]=route;
 }
+reinforceCampaign(DIFFICULT_LAYOUTS,routes);
 writeFileSync(new URL('../src/difficulty-layouts.js',import.meta.url),'// Authored multi-stage campaign layouts.\nexport const DIFFICULT_LAYOUTS='+JSON.stringify(DIFFICULT_LAYOUTS,null,2)+';\n');
 writeFileSync(new URL('../tests/difficulty-routes.json',import.meta.url),JSON.stringify(routes,null,2));
