@@ -18,7 +18,7 @@ let pendingLevel=null;
 let sceneryTick=0;
 let selected='walk',started=false,paused=false,speed=1,last=0,accumulator=0,renderedRevision=-1,hover=null,pointer=null,toastTimer,hintIndex=0,dialogPause=false;
 function message(text){$('#message').textContent=text;$('#message').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#message').classList.remove('visible'),5000);}
-function select(skill){if(skill!=='walk'&&game.stock[skill]<=0&&!(skill==='block'&&game.units.some(u=>u.state==='block')))return;selected=skill;document.querySelectorAll('.skill').forEach(b=>{const active=b.dataset.skill===skill;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});}
+function select(skill){if(skill!=='walk'&&!(game.stock[skill]>0)&&!(skill==='block'&&game.units.some(u=>u.state==='block')))return;selected=skill;document.querySelectorAll('.skill').forEach(b=>{const active=b.dataset.skill===skill;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});}
 function start(){impactAudio.unlock();started=true;paused=false;soundtrack.play();$('#intro').classList.add('hidden');$('#result').classList.add('hidden');canvas.focus({preventScroll:true});sync();}
 function reset(levelIndex=game.levelIndex){if(!isUnlocked(levelIndex,best))return;clearTimeout(toastTimer);document.querySelector('#message').classList.remove('visible');soundtrack.pause();game.reset(levelIndex);background=makeBackground(game.level.theme,game.height);renderedRevision=-1;soundtrack.setLevel(levelIndex);updateLevelUI();started=false;paused=false;speed=1;hover=null;pointer=null;hintIndex=0;$('#hint-copy').textContent='Puzzle hints are optional.';$('#hint').textContent='Show a puzzle hint';accumulator=0;$('#result').classList.add('hidden');$('#intro').classList.remove('hidden');$('#speed').textContent='1\u00d7';$('#speed').setAttribute('aria-label','Speed: normal');$('#speed').classList.remove('active');select('walk');sync();}
 function togglePause(){if(!started)return;paused=!paused;paused?soundtrack.pause():soundtrack.play();sync();}
@@ -35,7 +35,7 @@ function sync(){
 }
 function result(){
  const viewport=$('#viewport');$('#result').style.top=viewport.scrollTop+'px';$('#result').style.height=viewport.clientHeight+'px';$('#result').style.bottom='auto';viewport.style.overflowY='hidden';
-  if(game.result==='win'&&game.saved===20&&game.level.total===20&&game.lost===0&&game.spawned===20&&game.units.length===0){perfectRescues[game.levelIndex]={completed:true,saved:20,total:20,lost:0};try{localStorage.setItem('lemmings-perfect-v2',JSON.stringify(perfectRescues));}catch{}}
+  if(game.result==='win'&&game.saved===20&&game.level.total===20&&game.lost===0&&game.spawned===20&&game.units.length===0){perfectRescues[game.levelIndex]={completed:true,saved:20,total:20,lost:0,puzzleId:game.level.puzzleId};try{localStorage.setItem('lemmings-perfect-v2',JSON.stringify(perfectRescues));}catch{}}
   if(game.result==='win'){best[game.levelIndex]=Math.max(best[game.levelIndex]||0,game.saved);try{localStorage.setItem('lemmings-best',JSON.stringify(best));}catch{}}
   $('#next-level').classList.toggle('hidden',game.result!=='win'||game.levelIndex===LEVELS.length-1);
   $('#result').classList.remove('hidden');$('#result-eyebrow').textContent=game.result==='win'?`LEVEL ${String(game.levelIndex+1).padStart(2,'0')} COMPLETE`:'A LITTLE PRACTICE';
@@ -76,7 +76,7 @@ function updateLevelUI(){
  canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.toggle('tall-world',game.height>HEIGHT);$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';$('#map-navigation').hidden=game.height<=HEIGHT;$('#map-depth').textContent='Depth 0%';
  $('#difficulty-label').textContent=game.level.difficulty;$('#difficulty-label').dataset.difficulty=game.level.difficulty.toLowerCase();
  renderSkills();const l=game.level;document.title=`Lemmings · ${l.world}`;$('#world-label').textContent=`${l.world.toUpperCase()} · ${String(l.id+1).padStart(2,'0')}`;$('h1').textContent=l.name;$('#level-number').textContent=`${l.id+1} / ${LEVELS.length}`;$('#total-count').textContent='/'+l.total;$('#target-count').textContent='/'+l.target;$('#help-goal').textContent=`Save ${l.target} of ${l.total}. Watch out for long falls and the water below. There’s no time limit.`;canvas.setAttribute('aria-label',`${l.world}: ${l.name}`);$('#music-status').textContent='';updateMusicUI();
- document.querySelectorAll('[data-help-skill]').forEach(el=>{el.hidden=el.dataset.helpSkill!=='walk'&&l.stock[el.dataset.helpSkill]===0;});
+ document.querySelectorAll('[data-help-skill]').forEach(el=>{el.hidden=el.dataset.helpSkill!=='walk'&&!(l.stock[el.dataset.helpSkill]>0);});
  try{localStorage.setItem('lemmings-current-level',String(l.id));}catch{}
 }
 $('#music-toggle').addEventListener('click',()=>{soundtrack.toggle();if(started&&!paused&&!soundtrack.muted)soundtrack.play();updateMusicUI();});

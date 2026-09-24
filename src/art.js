@@ -126,7 +126,7 @@ export function magicalEntrance(c,tick,level,spawned=0,lastSpawnTick=null){
 }
 export function scenery(c,tick,level,spawned=0,lastSpawnTick=null,sceneryTick=tick) {
   worldScenery(c,sceneryTick,level);
-  magicalEntrance(c,tick,level,spawned,lastSpawnTick);
+  if(level.entrances){for(const [i,e] of level.entrances.entries()){const n=level.entrances.length,count=Math.max(0,Math.ceil((spawned-i)/n));magicalEntrance(c,tick,{...level,spawnX:e.x,spawnY:e.y,total:Math.ceil((level.total-i)/n)},count,count?((count-1)*n+i)*level.interval:null);}}else magicalEntrance(c,tick,level,spawned,lastSpawnTick);
   // Golden splayed arch and twin torches from the supplied classic exit reference.
   exitArch(c,level.exitX,level.exitY,tick);
   if(level.theme==='forest'){

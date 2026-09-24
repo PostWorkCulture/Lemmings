@@ -1,6 +1,9 @@
 import {objectPosition,isDangerous} from './objects.js';
 export function drawObjects(c,g){
- for(const o of g.level.objects||[]){const p=objectPosition(o,g.tick);c.save();
+ const controls=[...new Set((g.level.objects||[]).filter(o=>o.type==='switch').flatMap(o=>o.targets||[o.target]))];
+ const badge=(id,x,y)=>{const i=controls.indexOf(id);if(i<0)return;c.save();c.fillStyle=['#e8c47d','#9cbede','#bbcf8a'][i%3];c.beginPath();c.arc(x,y,6,0,Math.PI*2);c.fill();c.fillStyle='#24312d';c.font='bold 8px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(String.fromCharCode(65+i),x,y);c.restore();};
+ for(const z of g.level.oneWay||[]){c.fillStyle='#e4c787';for(let x=z.x+12;x<z.x+z.w-5;x+=20)for(let y=z.y+15;y<z.y+z.h-10;y+=26){if(g.at(x,y)!==1)continue;c.beginPath();c.moveTo(x+z.dir*5,y);c.lineTo(x-z.dir*4,y-4);c.lineTo(x-z.dir*4,y+4);c.closePath();c.fill();}}
+ for(const o of g.level.objects||[]){const p=objectPosition(o,g.tick);c.save();if(o.requires&&!g.disabledObjects.has(o.requires))c.globalAlpha=.35;
   if(o.type==='rubble'){
    // Cracks are drawn only on surviving rock so a bashed tunnel stays visibly open.
    c.strokeStyle='#e7b180';c.lineWidth=1.5;
@@ -17,6 +20,8 @@ export function drawObjects(c,g){
    c.fillStyle='#ba8399';c.fillRect(o.x,o.y-4,o.w,4);c.strokeStyle='#b5c8c7';c.lineWidth=2;for(let x=o.x+3;x<o.x+o.w;x+=8){c.beginPath();c.moveTo(x,o.y);c.lineTo(x+3,o.y+4);c.lineTo(x,o.y+8);c.stroke();}c.fillStyle='#697c83';c.fillRect(o.x-2,o.y+8,o.w+4,3);
   }else if(o.type==='lift'){
    c.strokeStyle='#a8bbb348';c.setLineDash([3,4]);c.beginPath();c.moveTo(o.x+o.w/2,o.y);c.lineTo(o.toX+o.w/2,o.toY);c.stroke();c.setLineDash([]);c.fillStyle='#657f87';c.fillRect(p.x,p.y,o.w,8);c.fillStyle='#d2c387';c.fillRect(p.x,p.y,o.w,2);c.fillStyle='#364d5d';c.fillRect(p.x+8,p.y+8,o.w-16,5);
+  }else if(o.type==='bridge'){const open=g.disabledObjects.has(o.id);c.strokeStyle=open?'#c5b587':'#a6a69666';c.lineWidth=3;c.setLineDash(open?[]:[5,5]);c.beginPath();c.moveTo(o.x,o.y);c.lineTo(o.x+o.w,o.y);c.stroke();c.setLineDash([]);if(open){c.fillStyle='#897b69';c.fillRect(o.x,o.y,o.w,o.h);c.fillStyle='#ccbe91';c.fillRect(o.x,o.y,o.w,2);}else{c.fillStyle='#a39178';c.fillRect(o.x,o.y-38,7,38);c.fillRect(o.x+o.w-7,o.y-38,7,38);}
+  }else if(o.type==='gate'){const open=g.disabledObjects.has(o.id);c.fillStyle=open?'#658b7860':'#748593';c.fillRect(o.x,o.y,o.w,open?6:o.h);if(!open){c.strokeStyle='#d1c38b';c.lineWidth=2;for(let y=o.y+8;y<o.y+o.h;y+=12){c.beginPath();c.moveTo(o.x+2,y);c.lineTo(o.x+o.w-2,y+6);c.stroke();}}c.fillStyle=open?'#a5d985':'#e3a073';c.fillRect(o.x+o.w/2-2,o.y+1,4,4);
   }else if(o.type==='switch'){
    c.fillStyle='#636f71';c.fillRect(o.x-7,o.y-8,14,8);c.strokeStyle=g.disabledObjects.has(o.target)?'#a9d987':'#e5bb71';c.lineWidth=3;c.beginPath();c.moveTo(o.x,o.y-6);c.lineTo(o.x+(g.disabledObjects.has(o.target)?6:-6),o.y-20);c.stroke();
   }else if(o.type==='crusher'){
@@ -24,6 +29,9 @@ export function drawObjects(c,g){
   }else if(o.type==='laser'){
    c.fillStyle='#7b8ca1';c.fillRect(o.x-5,o.y-5,10,8);c.fillRect(o.x-5,o.y+o.h,10,8);c.fillStyle=isDangerous(o,g.tick,g.disabledObjects)?'#ed858f':'#74a39b44';c.fillRect(o.x,o.y,Math.max(2,o.w),o.h);
   }
+  if(o.type==='switch')badge(o.target,o.x,o.y-29);
+  else if(o.type==='gate'||o.type==='bridge')badge(o.id,o.x+o.w/2,o.y-10);
+  else if(o.requires)badge(o.requires,o.x,o.y-15);
   c.restore();
  }
 }

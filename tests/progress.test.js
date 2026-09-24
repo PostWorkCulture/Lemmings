@@ -19,3 +19,8 @@ test('missing the target does not interrupt remaining lemmings',()=>{
  g.step();assert.equal(g.result,null);assert.equal(g.units[0].state,'exit');
  for(let i=0;i<96;i++)g.step();assert.equal(g.result,'lose');assert.equal(g.saved,15);assert.equal(g.lost,5);
 });
+
+test('redesigned puzzles require a fresh perfect rescue while earlier unlocks remain',()=>{
+ const r={completed:true,saved:20,total:20,lost:0};assert.equal(isPerfect(5,{5:r}),false);
+ assert.equal(isPerfect(5,{5:{...r,puzzleId:'stack-access'}}),true);
+});
