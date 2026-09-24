@@ -82,11 +82,6 @@ export function worldScenery(c,tick,level){
   if(['volcano','factory'].includes(key)){c.fillStyle='#57606a';c.fillRect(px-8,y-25,16,25);c.fillStyle='#b88c60';c.fillRect(px-10,y-28,20,5);}
   c.restore();
  }
- if(['waterfall','enchanted'].includes(key)){
-  for(const [x,width,top] of key==='waterfall'?[[125,42,40],[745,64,100]]:[[180,42,30],[600,28,80],[920,38,20]]){
-   c.save();c.globalAlpha=.23;c.fillStyle='#a0dbdc';c.fillRect(x,top,width,(level.height||470)-28-top);for(let i=0;i<16;i++){c.fillStyle='#e3f7f3';c.fillRect(x+3+(i*17)%(width-5),top+(i*37+tick*2)%((level.height||470)-28-top),2,16);}c.restore();
-  }
- }
  if(['polar','alpine'].includes(key)){for(let i=0;i<35;i++){c.fillStyle='#e4f1ee70';c.fillRect((i*97+tick*.15)%1000,(i*53+tick*.3)%440,2,2);}}
  if(key==='beach'){for(let i=0;i<5;i++){const x=(i*217+tick*.3)%1100-50,y=68+i%3*18;c.strokeStyle='#e3e7d599';c.beginPath();c.moveTo(x-6,y);c.lineTo(x,y+3+Math.sin(tick*.08));c.lineTo(x+6,y);c.stroke();}}
 }

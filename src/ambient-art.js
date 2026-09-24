@@ -1,3 +1,4 @@
+import {drawWaterfalls} from './waterfall-art.js';
 // Ambient world life is drawn behind the playable terrain and never changes collision.
 const TAU = Math.PI * 2;
 const wrap = (n, span) => ((n % span) + span) % span;
@@ -30,6 +31,7 @@ function rock(c,x,y,r,t,snow=false) {
 }
 function butterfly(c,x,y,t,color) {const flap=3+Math.abs(Math.sin(t))*5;oval(c,x-flap*.65,y,flap,6,color);oval(c,x+flap*.65,y,flap,6,color);oval(c,x,y,1.4,5,'#455653');}
 export function ambientWorld(c,tick,level) {
+ drawWaterfalls(c,tick,level);
  const key=level.theme, height=level.height||470, t=tick;
  c.save();c.globalAlpha=.8;
  // A complete skyline scene remains visible at every depth of taller maps.
@@ -106,7 +108,6 @@ export function finaleLandmarks(c,t,level) {
   }
   if(form==='crystal-cascade'){
    for(let i=0;i<6;i++){const x=(i<3?left-12:right+12)+(i%3-1)*18,h=35+i%3*22;shape(c,[[x-12,y+45],[x-10,y+20-h],[x,y+5-h],[x+13,y+23-h],[x+10,y+50]],i%2?'#aa9bc5':'#75b7c0');}
-   const fx=right+24,fh=Math.min(150,level.height-y-30);c.fillStyle='#96d5e15c';c.fillRect(fx,y-30,32,fh);c.fillStyle='#e0edf0';for(let i=0;i<7;i++)c.fillRect(fx+4+i%3*9,y-30+wrap(t*1.8+i*23,fh),2,15);
    c.strokeStyle='#c5b3cf';c.lineWidth=2;c.beginPath();c.arc(mid,y+40,w*.43,Math.PI,TAU);c.stroke();
   }
  }

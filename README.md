@@ -40,13 +40,13 @@ Only skills supplied for the current map appear in the tray. Skill inventories v
 
 Twenty original 32-bar stereo compositions, inspired by the bright DOS/FM direction of the supplied [Lemmings soundtrack reference](https://www.youtube.com/watch?v=EF3vMAmEnsY). No recording or melody is copied from that video. Each track has its own tune, key, tempo and lead sound, with bass, chord accompaniment, arpeggios and light percussion. Tracks run for approximately 53–75 seconds and loop.
 
-Music starts on **Play level** and pauses with gameplay, menus or a hidden tab. Fast-forward does not change the music tempo. The **♫** control opens mute and volume settings, which persist in this browser. Audio is local and needs no streaming service or network connection once the app is loaded.
+Music starts on **Play level** and continues on the results screen. Pause/resume remains available after completion. Choosing another level stops the old track; opening and closing the level menu from the results screen keeps it playing. During an active run, music pauses with gameplay, menus or a hidden tab. Fast-forward does not change the music tempo. The **♫** control opens mute and volume settings, which persist in this browser. Audio is local and needs no streaming service or network connection once the app is loaded.
 
 `npm run compose` rebuilds the WAV files from `scripts/compose-music.mjs`. `assets/audio/manifest.json` records track durations and measured peak/RMS levels. The server supplies the audio MIME type and byte-range support.
 
 ## Checks
 
-- `npm test`: 88 checks, including a 20/20 solution and deterministic replay for every map, inventory limits, terrain, falls, restarts, map changes, delayed rescue counting, portal arrivals and non-silent/unclipped soundtrack files.
+- `npm test`: 90 checks, including a 20/20 solution and deterministic replay for every map, inventory limits, terrain, falls, restarts, map changes, delayed rescue counting, portal arrivals and non-silent/unclipped soundtrack files.
 - `npm run check`: JavaScript syntax checks.
 - Browser checks: rendered all five themes; verified map selection and persistence, skill availability, change-level confirmation, music startup/pause/track changes, mute and volume controls.
 
@@ -95,3 +95,5 @@ Use the mouse wheel, scrollbar, or the up/down buttons in the information panel 
 ## Living scenery
 
 All twenty worlds have animated ambient scenery, visible even before Play: birds, swaying trees, windmills, dolphins, falling background rocks, rolling snowballs, gears, satellites, candy wheels, fountains, flags, a Ferris wheel and butterflies. Tall maps retain movement at lower depths. Ambient animation stops with Pause and follows 2x speed during play. These additions are decorative and do not change level collision or rescue routes.
+
+Waterfalls in Fernfall Grotto and Prism Falls now originate in cliff springs, flow over visible rock lips and land in the actual bottom water. Layered moving ribbons, spray, foam and expanding ripples replace the disconnected decorative strips.

@@ -20,7 +20,7 @@ function message(text){$('#message').textContent=text;$('#message').classList.ad
 function select(skill){if(skill!=='walk'&&game.stock[skill]<=0&&!(skill==='block'&&game.units.some(u=>u.state==='block')))return;selected=skill;document.querySelectorAll('.skill').forEach(b=>{const active=b.dataset.skill===skill;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});}
 function start(){started=true;paused=false;soundtrack.play();$('#intro').classList.add('hidden');$('#result').classList.add('hidden');canvas.focus({preventScroll:true});sync();}
 function reset(levelIndex=game.levelIndex){if(!isUnlocked(levelIndex,best))return;clearTimeout(toastTimer);document.querySelector('#message').classList.remove('visible');soundtrack.pause();game.reset(levelIndex);background=makeBackground(game.level.theme,game.height);renderedRevision=-1;soundtrack.setLevel(levelIndex);updateLevelUI();started=false;paused=false;speed=1;hover=null;pointer=null;hintIndex=0;$('#hint-copy').textContent='Puzzle hints are optional.';$('#hint').textContent='Show a puzzle hint';accumulator=0;$('#result').classList.add('hidden');$('#intro').classList.remove('hidden');$('#speed').textContent='1\u00d7';$('#speed').setAttribute('aria-label','Speed: normal');$('#speed').classList.remove('active');select('walk');sync();}
-function togglePause(){if(!started||game.result)return;paused=!paused;paused?soundtrack.pause():soundtrack.play();sync();}
+function togglePause(){if(!started)return;paused=!paused;paused?soundtrack.pause():soundtrack.play();sync();}
 function singleStep(){if(!started||game.result)return;paused=true;soundtrack.pause();game.step();if(game.result)result();sync();}
 function toggleSpeed(){speed=speed===1?2:1;$('#speed').textContent=speed+'\u00d7';$('#speed').classList.toggle('active',speed===2);$('#speed').setAttribute('aria-label',speed===1?'Speed: normal':'Speed: fast');}
 function sync(){
@@ -29,13 +29,13 @@ function sync(){
   for(const key of SKILL_ORDER.filter(k=>k!=='walk'&&game.level.stock[k]>0)){$('#count-'+key).textContent=game.stock[key];const button=$(`[data-skill="${key}"]`);button.disabled=game.stock[key]<=0&&!(key==='block'&&game.units.some(u=>u.state==='block'));button.hidden=game.level.stock[key]===0;}
   $('#status-label').textContent=game.result?(game.result==='win'?'LEVEL COMPLETE':'LEVEL ENDED'):!started?'READY':paused?'PAUSED':'PLAYING';
   $('#pause').textContent=paused?'\u25b6':'\u2161';$('#pause').setAttribute('aria-label',paused?'Resume':'Pause');$('#pause').classList.toggle('active',paused);
-  $('#pause').disabled=!started||!!game.result;
+  $('#pause').disabled=!started;
 
 }
 function result(){
  const viewport=$('#viewport');$('#result').style.top=viewport.scrollTop+'px';$('#result').style.height=viewport.clientHeight+'px';$('#result').style.bottom='auto';viewport.style.overflowY='hidden';
   if(game.result==='win'&&game.saved===20&&game.level.total===20&&game.lost===0&&game.spawned===20&&game.units.length===0){perfectRescues[game.levelIndex]={completed:true,saved:20,total:20,lost:0};try{localStorage.setItem('lemmings-perfect-v2',JSON.stringify(perfectRescues));}catch{}}
-  soundtrack.pause();if(game.result==='win'){best[game.levelIndex]=Math.max(best[game.levelIndex]||0,game.saved);try{localStorage.setItem('lemmings-best',JSON.stringify(best));}catch{}}
+  if(game.result==='win'){best[game.levelIndex]=Math.max(best[game.levelIndex]||0,game.saved);try{localStorage.setItem('lemmings-best',JSON.stringify(best));}catch{}}
   $('#next-level').classList.toggle('hidden',game.result!=='win'||game.levelIndex===LEVELS.length-1);
   $('#result').classList.remove('hidden');$('#result-eyebrow').textContent=game.result==='win'?`LEVEL ${String(game.levelIndex+1).padStart(2,'0')} COMPLETE`:'A LITTLE PRACTICE';
   $('#result-title').textContent=game.result==='win'?(game.saved===game.level.total?'Not one left behind.':'Home, sweet home.'):'Another little plan?';
@@ -51,11 +51,11 @@ canvas.addEventListener('pointerdown',e=>{
 });
 $('.skills').addEventListener('click',e=>{const b=e.target.closest('[data-skill]');if(b)select(b.dataset.skill);});
 $('#start').addEventListener('click',start);$('#pause').addEventListener('click',togglePause);$('#speed').addEventListener('click',toggleSpeed);$('#replay').addEventListener('click',()=>{reset();start();});
-function openDialog(id){dialogPause=paused;paused=true;soundtrack.pause();$(id).showModal();sync();}
+function openDialog(id){dialogPause=paused;if(!game.result){paused=true;soundtrack.pause();}$(id).showModal();sync();}
 $('#help').addEventListener('click',()=>openDialog('#help-dialog'));
 $('#restart').addEventListener('click',()=>{if(!started){reset();return;}openDialog('#restart-dialog');});
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>$('#'+b.dataset.close).close()));
-document.querySelectorAll('dialog').forEach(d=>d.addEventListener('close',()=>{paused=dialogPause;if(started&&!paused&&!game.result)soundtrack.play();sync();}));
+document.querySelectorAll('dialog').forEach(d=>d.addEventListener('close',()=>{paused=dialogPause;if(started&&!paused)soundtrack.play();sync();}));
 $('#confirm-restart').addEventListener('click',()=>{$('#restart-dialog').close();dialogPause=false;reset();start();});
 $('#hint').addEventListener('click',()=>{const hints=game.level.hints;$('#hint-copy').textContent=hints[Math.min(hintIndex++,hints.length-1)];$('#hint').textContent=hintIndex>=hints.length?'Repeat final hint':'Next hint';});
 $('#next-level').addEventListener('click',()=>{if(game.result==='win'&&isUnlocked(game.levelIndex+1,best))reset(game.levelIndex+1);});
@@ -78,7 +78,7 @@ function updateLevelUI(){
  document.querySelectorAll('[data-help-skill]').forEach(el=>{el.hidden=el.dataset.helpSkill!=='walk'&&l.stock[el.dataset.helpSkill]===0;});
  try{localStorage.setItem('lemmings-current-level',String(l.id));}catch{}
 }
-$('#music-toggle').addEventListener('click',()=>{soundtrack.toggle();if(started&&!paused&&!game.result&&!soundtrack.muted)soundtrack.play();updateMusicUI();});
+$('#music-toggle').addEventListener('click',()=>{soundtrack.toggle();if(started&&!paused&&!soundtrack.muted)soundtrack.play();updateMusicUI();});
 $('#volume').addEventListener('input',e=>soundtrack.setVolume(Number(e.target.value)/100));
 $('#soundtrack').addEventListener('error',()=>{$('#music-status').textContent='Music could not load.';});
 $('#soundtrack').addEventListener('musicblocked',()=>{$('#music-status').textContent='Press Music on to enable audio.';});
@@ -101,7 +101,7 @@ function showLevels(){
 }
 $('#levels-button').addEventListener('click',showLevels);$('#cancel-level').addEventListener('click',()=>{$('#level-confirm').classList.add('hidden');pendingLevel=null;});$('#confirm-level').addEventListener('click',()=>{if(pendingLevel!==null)changeLevel(pendingLevel);});
 window.addEventListener('keydown',e=>{if(document.querySelector('dialog[open]'))return;if(e.code==='Space'){e.preventDefault();togglePause();}if(['1','2','3','4'].includes(e.key)){select(['walk','block','build','dig'][Number(e.key)-1]);}if(e.key.toLowerCase()==='f')toggleSpeed();if(e.key==='.')singleStep();});
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&started&&!game.result){paused=true;soundtrack.pause();sync();}last=0;accumulator=0;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&started){paused=true;soundtrack.pause();sync();}last=0;accumulator=0;});
 loadIconArt().then(()=>{
   for(const small of document.querySelectorAll('.skill-picture'))skillIcon(small.getContext('2d'),small.width,small.height,small.dataset.pose);
   for(const icon of document.querySelectorAll('[data-ui-icon]'))uiIcon(icon.getContext('2d'),icon.width,icon.height,icon.dataset.uiIcon);
