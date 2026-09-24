@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
+# Local reference boards and source photographs; runtime artwork is in assets/.
+/concepts/
+/Lemmings*.jpg
+/Lemmings*.gif
+/Lemmings*.webp
+/Rocket.avif
+/rocket-reference.png

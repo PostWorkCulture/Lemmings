@@ -1,0 +1,142 @@
+[
+  {
+    "title": "Little Green Parade",
+    "file": "assets/audio/mossy-hollows.wav",
+    "seconds": 66.21,
+    "peak": 0.351,
+    "rms": 0.108
+  },
+  {
+    "title": "Sunstone Stroll",
+    "file": "assets/audio/sunstone-ruins.wav",
+    "seconds": 60,
+    "peak": 0.379,
+    "rms": 0.122
+  },
+  {
+    "title": "Crystal Carousel",
+    "file": "assets/audio/crystal-caverns.wav",
+    "seconds": 75.29,
+    "peak": 0.335,
+    "rms": 0.087
+  },
+  {
+    "title": "Brass and Buttons",
+    "file": "assets/audio/clockwork-works.wav",
+    "seconds": 58.18,
+    "peak": 0.369,
+    "rms": 0.099
+  },
+  {
+    "title": "Snowflake Skip",
+    "file": "assets/audio/frostbound-peaks.wav",
+    "seconds": 69.82,
+    "peak": 0.347,
+    "rms": 0.099
+  },
+  {
+    "title": "The Three Boughs",
+    "file": "assets/audio/level-6.wav",
+    "seconds": 67.37,
+    "peak": 0.334,
+    "rms": 0.105
+  },
+  {
+    "title": "The Buried Staircase",
+    "file": "assets/audio/level-7.wav",
+    "seconds": 66.21,
+    "peak": 0.357,
+    "rms": 0.118
+  },
+  {
+    "title": "Above the Abyss",
+    "file": "assets/audio/level-8.wav",
+    "seconds": 65.08,
+    "peak": 0.343,
+    "rms": 0.089
+  },
+  {
+    "title": "The Furnace Detour",
+    "file": "assets/audio/level-9.wav",
+    "seconds": 64,
+    "peak": 0.353,
+    "rms": 0.098
+  },
+  {
+    "title": "Snowblind Switchback",
+    "file": "assets/audio/level-10.wav",
+    "seconds": 62.95,
+    "peak": 0.349,
+    "rms": 0.098
+  },
+  {
+    "title": "Roots and Rooftops",
+    "file": "assets/audio/level-11.wav",
+    "seconds": 61.94,
+    "peak": 0.341,
+    "rms": 0.107
+  },
+  {
+    "title": "Four Pillars",
+    "file": "assets/audio/level-12.wav",
+    "seconds": 60.95,
+    "peak": 0.38,
+    "rms": 0.118
+  },
+  {
+    "title": "Crystal Corkscrew",
+    "file": "assets/audio/level-13.wav",
+    "seconds": 60,
+    "peak": 0.362,
+    "rms": 0.089
+  },
+  {
+    "title": "The Long Shift",
+    "file": "assets/audio/level-14.wav",
+    "seconds": 59.08,
+    "peak": 0.345,
+    "rms": 0.095
+  },
+  {
+    "title": "Thin Ice",
+    "file": "assets/audio/level-15.wav",
+    "seconds": 58.18,
+    "peak": 0.359,
+    "rms": 0.101
+  },
+  {
+    "title": "Canopy Cascade",
+    "file": "assets/audio/level-16.wav",
+    "seconds": 57.31,
+    "peak": 0.347,
+    "rms": 0.11
+  },
+  {
+    "title": "The Sunken Crown",
+    "file": "assets/audio/level-17.wav",
+    "seconds": 56.47,
+    "peak": 0.372,
+    "rms": 0.123
+  },
+  {
+    "title": "Needle and Thread",
+    "file": "assets/audio/level-18.wav",
+    "seconds": 55.65,
+    "peak": 0.355,
+    "rms": 0.097
+  },
+  {
+    "title": "The Great Escape",
+    "file": "assets/audio/level-19.wav",
+    "seconds": 54.86,
+    "peak": 0.372,
+    "rms": 0.1
+  },
+  {
+    "title": "No One Left Behind",
+    "file": "assets/audio/level-20.wav",
+    "seconds": 54.08,
+    "peak": 0.356,
+    "rms": 0.102
+  }
+]

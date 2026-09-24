@@ -1,0 +1,13 @@
+{
+  "name": "lemmings-mossy-hollows",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "node server.mjs",
+    "test": "node --test",
+    "check": "node scripts/check.mjs",
+    "compose": "node scripts/compose-music.mjs"
+  }
+}

@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {Game,EXIT_FRAMES}from '../src/engine.js';
+function arrival(count=1,index=0){const g=new Game(index);g.spawned=g.level.total;g.saved=g.level.total-count;g.units=Array.from({length:count},(_,id)=>({id,x:g.level.exitX+(g.level.dir===1?-10:18),y:g.level.exitY,dir:g.level.dir,state:'walk',vy:0,jobTick:0,steps:0}));return g;}
+test('rescue count and victory wait for the complete portal animation',()=>{const g=arrival();g.step();assert.equal(g.units[0].state,'exit');assert.equal(g.saved,19);assert.equal(g.result,null);for(let i=0;i<EXIT_FRAMES-1;i++)g.step();assert.equal(g.saved,19);assert.equal(g.result,null);g.step();assert.equal(g.saved,20);assert.equal(g.units.length,0);assert.equal(g.result,'win');});
+test('lemmings turn and approach the doorway from either direction',()=>{for(const level of [0,4]){const g=arrival(1,level);g.step();const start=g.units[0].x;for(let i=0;i<16;i++)g.step();assert.equal(g.units[0].x,start);for(let i=0;i<26;i++)g.step();assert.equal(g.units[0].x,g.level.exitX);assert.equal(g.saved,19);}});
+test('overlapping arrivals count once each and cannot receive new jobs',()=>{const g=arrival(2);g.step();assert.equal(g.assign(0,'block').ok,false);assert.equal(g.assign(0,'walk').ok,false);for(let i=0;i<EXIT_FRAMES;i++)g.step();assert.equal(g.saved,20);assert.equal(g.lost,0);for(let i=0;i<10;i++)g.step();assert.equal(g.saved,20);});
+test('restart clears unfinished exit animations',()=>{const g=arrival();g.step();g.reset();assert.equal(g.saved,0);assert.equal(g.units.length,0);assert.equal(g.result,null);});
