@@ -299,7 +299,7 @@ export function enteringLemming(c,u,level,tick){
   c.restore();
 }
 
-// All hazard motion uses simulation time, so pause and 2x stay consistent.
+// All hazard motion uses simulation time, so pause and fast-forward stay consistent.
 export function hazards(c,tick,theme,height=HEIGHT){
   const hazard=THEMES[theme].hazard;
   if(hazard==='toys'){toyGround(c,height);return;}
