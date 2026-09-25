@@ -9,7 +9,7 @@ export class Game {
   reset(levelIndex=this.levelIndex??0) {
     if(!LEVELS[levelIndex])throw new RangeError('Unknown level');
     this.levelIndex=levelIndex;this.level=LEVELS[levelIndex];
-    this.height=this.level.height||HEIGHT;this.hazardY=this.height-28;
+    this.height=this.level.height||HEIGHT;this.hazardY=this.height-(this.level.waterDepth||28);
     this.terrain = new Uint8Array(WIDTH * this.height);
     for(const rect of this.level.terrain)this.rect(...rect);
     for(const shape of this.level.shapes||[])this.polygon(shape.points,shape.type);

@@ -27,7 +27,7 @@ export function iceCream(c,x,y,s=1){
 }
 export function chapterBackdrop(c,key,height,level=null){
  const sky=c.createLinearGradient(0,0,0,height);sky.addColorStop(0,key==='circus'?'#289cde':'#9bdde9');sky.addColorStop(1,key==='circus'?'#bceaf4':'#d4f0ef');c.fillStyle=sky;c.fillRect(0,0,1000,height);
- cloud(c,110,65,1.5);cloud(c,820,60,1.5);cloud(c,390,40,1);
+ if(key!=='beach'){cloud(c,110,65,1.5);cloud(c,820,60,1.5);cloud(c,390,40,1);}
  if(key==='circus'){
   const ground=height-28;c.fillStyle='#b5aa8d';c.fillRect(0,ground-70,1000,100);
   const layer=document.createElement('canvas');layer.width=1000;layer.height=height;const tents=layer.getContext('2d');
@@ -74,4 +74,11 @@ export function mountainWeather(c,t,height){
 
 export function toyGround(c,height){
  c.fillStyle='#b76870';c.fillRect(0,height-28,1000,28);
+}
+
+export function driftingClouds(c,tick){
+ for(const [x,y,size,speed] of [[110,65,1.5,.09],[820,60,1.5,.065],[390,40,1,.075]]){
+  const position=((x+tick*speed+110)%1220)-110;
+  cloud(c,position,y,size);
+ }
 }

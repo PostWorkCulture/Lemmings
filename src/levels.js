@@ -18,7 +18,7 @@ Object.assign(LEVELS[8],coastalRescue,{id:8,difficulty:'Medium',target:18,target
 Object.assign(LEVELS[13],structuredClone(DIFFICULT_LAYOUTS.find(l=>l.id===13)),{id:13,puzzleId:null,solutionId:null,oneWay:[],entrances:null,slipperySlopes:[],difficulty:'Hard',target:19,targetTime:240});
 export const CHAPTERS=[
  {name:'Freaky Forest',theme:'woodland'},
- {name:"Life's a Beach",theme:'beach'},
+ {name:"Dunes",theme:'beach'},
  {name:'Mountain Rescue',theme:'alpine'},
  {name:'What a Circus!',theme:'circus'}
 ];
@@ -81,5 +81,8 @@ export function rocketHeight(level,entrance){return level.rocketY??(level.entran
 delete LEVELS[1].stock.swim;
 delete LEVELS[4].stock.climb;
 
-// A quieter inland beach backdrop for the locksmith's layered route.
-LEVELS[5].backgroundStyle='inland-beach';
+// Raised sand replaces the distant sea throughout the beach chapter.
+for(const level of LEVELS.slice(5,10))level.backgroundStyle='inland-beach';
+
+// Extend the water downward without moving the playable shoreline.
+for(const level of LEVELS.slice(5,10)){level.waterDepth=72;level.height+=44;}

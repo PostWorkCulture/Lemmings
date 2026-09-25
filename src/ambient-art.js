@@ -1,5 +1,5 @@
 import {rocketHeight} from './levels.js';
-import {skyBalloon,mountainWeather} from './chapter-art.js';
+import {skyBalloon,mountainWeather,driftingClouds} from './chapter-art.js';
 import {drawWaterfalls} from './waterfall-art.js';
 // Ambient world life is drawn behind the playable terrain and never changes collision.
 const TAU = Math.PI * 2;
@@ -81,6 +81,7 @@ function butterfly(c,x,y,t,color) {const flap=3+Math.abs(Math.sin(t))*5;oval(c,x
 export function ambientWorld(c,tick,level) {
  drawWaterfalls(c,tick,level);
  const key=level.theme, height=level.height||470, t=tick;
+ if(key==='beach')driftingClouds(c,tick);
  c.save();c.globalAlpha=.8;
  // A complete skyline scene remains visible at every depth of taller maps.
  for(let row=0;row<height-70;row+=330){

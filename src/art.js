@@ -315,12 +315,12 @@ export function hazards(c,tick,theme,height=HEIGHT){
     c.restore();return;
   }
   if(hazard==='void'){c.fillStyle='#0c1026';c.fillRect(0,height-28,WIDTH,28);for(let i=0;i<30;i++){c.fillStyle='#bfcaf166';c.fillRect((i*79+tick*.2)%WIDTH,height-25+i%20,1,1);}return;}
-  const lava=hazard==='lava'||theme==='clockwork',surface=height-28;
+  const lava=hazard==='lava'||theme==='clockwork',beach=theme==='beach',surface=height-(beach?72:28);
   c.save();
   const fill=c.createLinearGradient(0,surface,0,height);
-  fill.addColorStop(0,lava?'#ffb33e':hazard==='sand'?'#cdb482':hazard==='syrup'?'#b183a0':'#589ba9');
-  fill.addColorStop(.22,lava?'#d94b20':THEMES[theme].water);
-  fill.addColorStop(1,lava?'#681d20':hazard==='sand'?'#796144':hazard==='syrup'?'#50324b':'#142c43');
+  fill.addColorStop(0,lava?'#ffb33e':hazard==='sand'?'#cdb482':hazard==='syrup'?'#b183a0':beach?'#4bd9ff':'#589ba9');
+  fill.addColorStop(.22,lava?'#d94b20':beach?'#169feb':THEMES[theme].water);
+  fill.addColorStop(1,lava?'#681d20':hazard==='sand'?'#796144':hazard==='syrup'?'#50324b':beach?'#0867cd':'#142c43');
   c.fillStyle=fill;c.fillRect(0,surface,WIDTH,height-surface);
   // A rolling surface with bright foam or molten seams.
   for(let row=0;row<3;row++){
