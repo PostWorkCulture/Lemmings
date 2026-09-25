@@ -10,3 +10,21 @@
 .skill>span{font-size:7px}.skills{flex:1}.playback{flex-shrink:0;margin-left:auto}
 
 .difficulty-badge{font-size:9px;letter-spacing:.7px;text-transform:uppercase;padding:4px 7px;border:1px solid #9fc48755;border-radius:4px;color:#bad79e;white-space:nowrap}.difficulty-badge[data-difficulty="medium"]{color:#ead095;border-color:#cfac6555}.difficulty-badge[data-difficulty="hard"]{color:#e5aa8b;border-color:#c6856455}.difficulty-badge[data-difficulty="extreme"]{color:#e8a1b8;border-color:#bd739355}.difficulty-heading{font-size:12px;color:#d4dcbf;margin:24px 0 8px}.viewport.tall-world{overflow-y:auto;overscroll-behavior:contain;scrollbar-color:#8da179 #1d302a;scrollbar-width:auto}.viewport.tall-world>canvas{height:auto;object-fit:initial;touch-action:pan-y}.viewport:not(.tall-world)>canvas{height:100%;object-fit:contain}#map-navigation{display:flex;align-items:center;gap:8px;font-size:9px;white-space:nowrap}#map-navigation[hidden]{display:none}#map-navigation button{background:#344638;border:1px solid #6d8158;border-radius:3px;color:#d9e7ca;font-size:16px;width:25px;height:24px;padding:0}@media(max-width:700px){.difficulty-badge{font-size:7px;padding:2px 4px}.level-heading{position:relative}.level-heading .difficulty-badge{display:inline-block;margin-top:2px}#map-navigation{gap:3px;font-size:7px}#map-navigation button{width:20px}.stats{gap:6px}.game-topbar{padding:0 6px}}
+
+/* Equal-sized playback controls beside Play in the information bar. */
+.game-topbar{height:auto;min-height:54px;padding:7px 12px}
+.topbar-state{--playback-width:104px;min-width:0;gap:6px;flex-shrink:0}
+.topbar-state .playback{gap:6px;margin-left:0}
+#intro .primary,.topbar-state .control{width:var(--playback-width);height:40px;min-width:var(--playback-width);padding:0;border-radius:6px;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+#intro .primary{font-size:12px}
+#intro .primary span{margin-left:7px}
+.topbar-state .control{font-size:20px}
+.topbar-state .live-label{width:var(--playback-width);min-width:0;height:40px;justify-content:center;letter-spacing:.5px}
+@media(max-width:1000px){.game-topbar{flex-wrap:wrap;gap:8px 12px}.topbar-state{margin-right:auto}.stats{margin-left:auto}}
+@media(max-width:600px){.topbar-state{--playback-width:clamp(68px,21vw,88px);width:100%;margin:0}.game-topbar{padding:6px;gap:7px}.stats{margin-left:0;flex:1}#intro .primary{font-size:10px}}
+
+/* Readable skill labels, with horizontal scrolling for larger inventories. */
+.skill{width:78px;min-width:78px;height:61px;padding:2px 6px 5px}
+.skill>span{font-size:11px;line-height:15px}
+.skill>b{font-size:12px}
+.skill-picture{width:39px;height:30px}
