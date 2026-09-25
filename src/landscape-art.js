@@ -58,6 +58,7 @@ export function worldBackground(key,height=470){
    else if(['candy','circus'].includes(key)){ellipse(c,x,y+80,70,75,i%2?w.earth[1]:w.grass[1]);}
    else if(['woodland','treehouse','highland'].includes(key)){c.globalAlpha=.65;tree(c,x,y+130,1.6);}
    else if(['egypt','marble','castle'].includes(key)){tower(c,x,y+130,110,w.earth[1]);}
+   else if(['alpine','polar'].includes(key)){poly(c,[[x-60,y+130],[x,y-20],[x+75,y+130]],'#557785');poly(c,[[x-17,y+20],[x,y-20],[x+20,y+20],[x+4,y+12]],'#d4e3df');}
    else {poly(c,[[x-60,y+130],[x,y-20],[x+75,y+130]],w.earth[2]);crystal(c,x+20,y+80,45,w.grass[1]);}
    c.globalAlpha=1;
   }
@@ -65,7 +66,14 @@ export function worldBackground(key,height=470){
  if(key==='egypt'){const ground=height-28;pyramid(c,245,ground,660,330);pyramid(c,600,ground,460,230);pyramid(c,850,ground,580,300);}
  return canvas;
 }
-export function worldScenery(c,tick,level){
+export function scenerySupported(level,x,y,terrainAt=null){
+ const solid=terrainAt||((px,py)=>{
+  if(level.terrain.some(([tx,ty,w,h])=>px>=tx&&px<tx+w&&py>=ty&&py<ty+h))return true;
+  return (level.shapes||[]).some(({points})=>{let inside=false;for(let i=0,j=points.length-1;i<points.length;j=i++){const [ax,ay]=points[i],[bx,by]=points[j];if((ay>py)!==(by>py)&&px<(bx-ax)*(py-ay)/(by-ay)+ax)inside=!inside;}return inside;});
+ });
+ return !!solid(x,y)&&![1,12,24,40].some(d=>solid(x,y-d));
+}
+export function worldScenery(c,tick,level,terrainAt=null){
  const key=level.theme;
  // Ancient trunks replace the forest's masonry. Branches and foliage are decorative;
  // the dark bark below follows the exact solid collision silhouette.
@@ -78,9 +86,9 @@ export function worldScenery(c,tick,level){
  }
  // Local details anchored to solid starting shelves, never floating scenery.
  for(const [i,[x,y,w,h,type]] of level.terrain.entries()){
-  if((type!==1&&!(key==='beach'&&type===2&&h<65))||w<100||y>(level.height||560)-30)continue;const px=x+Math.min(w*.22,60);c.save();c.globalAlpha=.85;
+  if((type!==1&&!(key==='beach'&&type===2&&h<65))||w<100||y>(level.height||560)-30)continue;const px=x+Math.min(w*.22,60);if(!scenerySupported(level,px,y,terrainAt))continue;c.save();c.globalAlpha=.85;
   if(['woodland','treehouse','highland'].includes(key)){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.025+i)*.055);tree(c,0,0,key==='treehouse'?.8:.65);c.restore();}
-  if(key==='beach'){parasol(c,x+w*.68,y,22);iceCream(c,x+w*.85,y,.75);c.save();c.translate(px,y);c.rotate(Math.sin(tick*.024+i)*.07);tree(c,0,0,.7,true);c.restore();c.fillStyle='#c89777';c.fillRect(x+w-45,y-10,13,10);c.strokeStyle='#d5c596';c.strokeRect(x+w-43,y-15,9,6);}
+  if(key==='beach'){if(scenerySupported(level,x+w*.68,y,terrainAt))parasol(c,x+w*.68,y,22);if(scenerySupported(level,x+w*.85,y,terrainAt))iceCream(c,x+w*.85,y,.75);c.save();c.translate(px,y);c.rotate(Math.sin(tick*.024+i)*.07);tree(c,0,0,.7,true);c.restore();c.fillStyle='#c89777';c.fillRect(x+w-45,y-10,13,10);c.strokeStyle='#d5c596';c.strokeRect(x+w-43,y-15,9,6);}
   if(['alpine','polar'].includes(key)){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.02+i)*.04);pine(c,0,0,.65,'#24884b');c.restore();}
   if(key==='candy'){c.fillStyle='#d5c7b4';c.fillRect(px-2,y-42,4,42);ellipse(c,px,y-44,16,16,i%2?'#e2a6ba':'#b9d1b6');c.strokeStyle='#f5d6de';c.lineWidth=2;c.beginPath();c.arc(px,y-44,9,0,TAU*1.4);c.stroke();}
   if(['space','station','enchanted','waterfall'].includes(key))crystal(c,px,y,24+i%3*10,key==='station'?'#79acb1':'#9daacb');

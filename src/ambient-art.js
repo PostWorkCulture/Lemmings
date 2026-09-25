@@ -1,3 +1,4 @@
+import {rocketHeight} from './levels.js';
 import {skyBalloon,mountainWeather} from './chapter-art.js';
 import {drawWaterfalls} from './waterfall-art.js';
 // Ambient world life is drawn behind the playable terrain and never changes collision.
@@ -14,7 +15,24 @@ export function clearSky(level,x,y){
  if(level.terrain.some(([tx,ty,w])=>x+18>=tx&&x-18<=tx+w&&ty<=y+14))return false;
  if((level.shapes||[]).some(s=>x+18>=Math.min(...s.points.map(p=>p[0]))&&x-18<=Math.max(...s.points.map(p=>p[0]))&&Math.min(...s.points.map(p=>p[1]))<=y+14))return false;
  const entrances=level.entrances||[{x:level.spawnX,y:level.spawnY}];
- return !entrances.some(e=>Math.abs(e.x-x)<52&&y>=e.y-95);
+ return !entrances.some(e=>Math.abs(e.x-x)<52&&y>=rocketHeight(level,e)-80);
+}
+const balloonPositions=new WeakMap();
+export function circusBalloonAnchors(level){
+ if(balloonPositions.has(level))return balloonPositions.get(level);
+ const anchors=[];
+ // Reserve each balloon's entire drift envelope once, never hide it mid-flight.
+ for(let i=0;i<5;i++){
+  for(const offset of [0,35,-35,65,-65]){
+   const x=160+i*170+offset;
+   const ceilings=[...(level.terrain||[]).filter(([tx,,w])=>x+30>=tx&&x-30<=tx+w).map(r=>r[1]),...(level.shapes||[]).filter(s=>x+30>=Math.min(...s.points.map(p=>p[0]))&&x-30<=Math.max(...s.points.map(p=>p[0]))).map(s=>Math.min(...s.points.map(p=>p[1])))];
+   const y=Math.min([27,47,34,52,25][i],Math.min(110,...ceilings)-52);
+   const entrances=level.entrances||[{x:level.spawnX,y:level.spawnY}];
+   if(y<23||x<35||x>965||entrances.some(e=>Math.abs(e.x-x)<75))continue;
+   anchors.push({x,y,i});break;
+  }
+ }
+ balloonPositions.set(level,anchors);return anchors;
 }
 function skyBird(c,level,x,y,t,white=false){if(clearSky(level,x,y))bird(c,x,y,t,white);}
 function rotor(c,x,y,angle,r,color,vanes=false) {
@@ -99,7 +117,7 @@ export function ambientWorld(c,tick,level) {
   if(key==='candy') {for(let i=0;i<3;i++){const x=170+i*330,y=row+120+i%2*35;c.fillStyle='#dacbbb';c.fillRect(x-3,y,6,90);oval(c,x,y,26,26,'#e4c4c4');rotor(c,x,y,t*.025*(i%2?-1:1),23,i%2?'#a5c7b9':'#c885a6',true);}}
   if(key==='marble') {for(let i=0;i<3;i++){const x=180+i*310,y=row+178;c.strokeStyle='#bcdde5';c.lineWidth=2;for(let j=0;j<5;j++){const p=wrap(t*.025+j*.6,3)/3;c.beginPath();c.arc(x+(j-2)*p*15,y-Math.sin(p*Math.PI)*43,2,0,TAU);c.stroke();}oval(c,x,y+3,33,5,'#a6c1c380');}}
   if(key==='castle') {for(let i=0;i<3;i++){const x=190+i*305,y=row+85;c.fillStyle='#abb6b6';c.fillRect(x,y,3,85);const wave=Math.sin(t*.07+i)*9;shape(c,[[x+3,y],[x+44,y+wave],[x+35,y+16+wave],[x+3,y+20]],'#b27f88');}}
-  if(key==='circus'&&row===0){for(let i=0;i<5;i++){const x=90+i*195+Math.sin(t*.012+i)*12,y=[26,49,34,53,23][i]+Math.sin(t*.018+i)*5;if(clearSky(level,x,y+20))skyBalloon(c,x,y,t,i);}}
+  if(key==='circus'&&row===0){for(const {x,y,i} of circusBalloonAnchors(level))skyBalloon(c,x+Math.sin(t*.012+i)*12,y+Math.sin(t*.018+i)*5,t,i);}
   if(key==='night') {if(row===0)for(let i=0;i<5;i++){const x=wrap(t*.8+i*229,1120)-60;skyBird(c,level,x,25+i%3*14+Math.sin(t*.033+i)*5,t*.2+i); }c.strokeStyle='#ead8a170';c.lineWidth=2;c.beginPath();const p=wrap(t,550);if(p<90){c.moveTo(500+p*3,row+25+p*.6);c.lineTo(540+p*3,row+33+p*.6);}c.stroke();}
   if(key==='sports') {for(let i=0;i<3;i++){const x=180+i*320,y=row+126;rotor(c,x,y,t*.045,23,['#e7c48a','#b1c7ae','#c29bbc'][i],true);c.fillStyle='#9cae9d';c.fillRect(x-2,y+6,4,55);}const x=wrap(t*.9,1100)-50,y=row+245-Math.abs(Math.sin(t*.035))*52;oval(c,x,y,11,11,'#dec8a0');c.save();c.translate(x,y);c.rotate(t*.07);c.fillStyle='#716c67';c.fillRect(-4,-4,8,8);c.restore();}
   if(['enchanted','waterfall'].includes(key)) {for(let i=0;i<6;i++){const x=160+i*145+Math.sin(t*.016+i)*36,y=row+85+i%3*40+Math.cos(t*.022+i)*16;butterfly(c,x,y,t*.16+i,i%2?'#b1d7d9':'#c4acd6');}if(key==='enchanted'){for(let i=0;i<5;i++){const x=wrap(90+i*206+t*.2,1000),y=row+240-wrap(t*.18+i*37,200);oval(c,x,y,4,4,'#d9e1ab70');}}}
@@ -112,7 +130,7 @@ export function finaleLandmarks(c,t,level) {
  for(const p of level.setPieces||[]){
   const {left,right,y,room,form}=p,mid=(left+right)/2,w=right-left;
   const depth={'circus-rings':74,'rooftop-towers':137,'stadium-bowl':132,'orbital-pods':84,'crystal-cascade':52}[form]??140;
-  if(y+depth>(level.height||560)-28)continue;
+  if(y+depth>(level.height||560)-28||form==='circus-rings')continue;
   if(form==='circus-rings'){
    const peak=y-102;c.strokeStyle='#d4ba9b';c.lineWidth=2;
    for(let i=0;i<8;i++)shape(c,[[mid,peak],[left+w*i/8,y+16],[left+w*(i+1)/8,y+16]],i%2?'#b37e9c':'#d5bfa2');

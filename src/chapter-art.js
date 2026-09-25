@@ -29,10 +29,10 @@ export function chapterBackdrop(c,key,height){
  const sky=c.createLinearGradient(0,0,0,height);sky.addColorStop(0,key==='circus'?'#289cde':'#9bdde9');sky.addColorStop(1,key==='circus'?'#bceaf4':'#d4f0ef');c.fillStyle=sky;c.fillRect(0,0,1000,height);
  cloud(c,110,65,1.5);cloud(c,820,60,1.5);cloud(c,390,40,1);
  if(key==='circus'){
-  const ground=height-28;c.fillStyle='#46a847';c.fillRect(0,ground-70,1000,100);
-  c.save();c.globalAlpha=.48;
-  tent(c,145,ground,300,Math.min(300,height-120));tent(c,860,ground,310,Math.min(300,height-120));tent(c,500,ground,480,Math.min(440,height-90));
-  c.restore();
+  const ground=height-28;c.fillStyle='#b5aa8d';c.fillRect(0,ground-70,1000,100);
+  const layer=document.createElement('canvas');layer.width=1000;layer.height=height;const tents=layer.getContext('2d');
+  tent(tents,145,ground,300,Math.min(300,height-120));tent(tents,860,ground,310,Math.min(300,height-120));tent(tents,500,ground,480,Math.min(440,height-90));
+  c.save();c.globalAlpha=.48;c.drawImage(layer,0,0);c.restore();
   poly(c,[[440,ground],[560,ground],[625,height],[375,height]],'#f2cc83');
  }else{
   const horizon=Math.max(180,height*.42),shore=height-135;c.fillStyle='#168fbe';c.fillRect(0,horizon,1000,height-horizon);

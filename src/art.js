@@ -90,6 +90,10 @@ export function renderTerrain(game,canvas) {
       if(!terrainAt(x-1,y)||!terrainAt(x+1,y))color='#14261c';
       if(!terrainAt(x,y-1))color='#46543a';
     }
+    if(type===2&&['alpine','polar'].includes(game.level.theme)){
+      if(!terrainAt(x,y-1)||!terrainAt(x,y-2))color='#e8f1ef';
+      else if(!terrainAt(x,y-4))color='#b6d5df';
+    }
     if(type===2&&game.level.theme==='circus'){
       color='#795c96';
       if(y%17<2||x%32<2)color='#51425f';
@@ -122,31 +126,36 @@ export function magicalEntrance(c,tick,level,spawned=0,lastSpawnTick=null){
   c.save();c.translate(level.spawnX,level.spawnY);c.scale(level.rocketScale||1,level.rocketScale||1);
   c.lineJoin='round';c.lineCap='round';c.lineWidth=1.5;c.strokeStyle='#34243d';
   const shape=(draw,color)=>{c.beginPath();draw();c.closePath();c.fillStyle=color;c.fill();c.stroke();};
-  // Red swept fins and white hull echo the supplied rocket reference.
+  // Golden timber, dark ink outlines and diagonal braces echo the reference crate.
+  const panel=(points,color)=>shape(()=>points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y)),color);
+  c.strokeStyle='#484038';c.lineWidth=1.7;
+  panel([[-38,-57],[-23,-65],[33,-60],[33,-20],[-23,-17],[-38,-24]],'#ad8349');
+  panel([[-23,-65],[33,-60],[33,-20],[-23,-17]],'#c79c52');
+  panel([[-38,-57],[-23,-65],[-23,-17],[-38,-24]],'#aa8047');
+  for(let x=-13;x<32;x+=11){c.beginPath();c.moveTo(x,-59);c.lineTo(x,-23);c.stroke();}
+  for(let x=-34;x<-24;x+=5){c.beginPath();c.moveTo(x,-54);c.lineTo(x,-27);c.stroke();}
+  panel([[-38,-57],[-23,-65],[33,-60],[29,-54],[-22,-58]],'#dfbd7d');
+  panel([[-21,-56],[-15,-58],[29,-27],[26,-21]],'#ddba73');
+  panel([[-37,-29],[-34,-25],[-25,-54],[-27,-60]],'#d6ae69');
+  panel([[-38,-57],[-33,-58],[-33,-26],[-38,-24]],'#dbb777');
+  panel([[-25,-65],[-19,-65],[-19,-17],[-25,-18]],'#e3c38a');
+  panel([[28,-60],[33,-60],[33,-20],[28,-20]],'#dfba77');
+  panel([[-23,-25],[33,-28],[33,-20],[-23,-17]],'#d9b173');
+  c.strokeStyle='#805b2c';c.lineWidth=.7;
+  for(let i=0;i<7;i++){const x=-15+i*6,y=-48+(i%3)*7;c.beginPath();c.moveTo(x,y);c.quadraticCurveTo(x-2,y+5,x,y+10);c.stroke();}
+  c.beginPath();c.moveTo(-15,-61);c.quadraticCurveTo(4,-62,23,-58);c.moveTo(-16,-21);c.lineTo(23,-24);c.stroke();
+  c.fillStyle='#493b2b';for(const [x,y]of [[-22,-60],[30,-56],[-22,-21],[30,-23],[-35,-53],[-35,-28]]){c.beginPath();c.arc(x,y,1,0,Math.PI*2);c.fill();}
+  // Two wooden trapdoors open below the box and close after the last arrival.
+  c.strokeStyle='#484038';c.lineWidth=1.4;c.fillStyle='#251e1b';c.fillRect(-17,-18,34,4);
   for(const side of [-1,1]){
-    c.save();c.scale(side,1);
-    shape(()=>{c.moveTo(16,-40);c.bezierCurveTo(36,-42,38,-23,28,-10);c.bezierCurveTo(23,-5,30,-25,16,-24);},'#a85960');
-    c.fillStyle='#743f50';c.beginPath();c.moveTo(19,-36);c.quadraticCurveTo(32,-30,27,-12);c.quadraticCurveTo(27,-24,17,-24);c.fill();c.restore();
-  }
-  shape(()=>{c.moveTo(0,-87);c.bezierCurveTo(-26,-64,-31,-40,-18,-25);c.quadraticCurveTo(-16,-22,0,-23);c.quadraticCurveTo(16,-22,18,-25);c.bezierCurveTo(31,-40,26,-64,0,-87);},'#bcbdb0');
-  c.fillStyle='#898897';c.beginPath();c.moveTo(-13,-65);c.bezierCurveTo(-24,-43,-17,-28,-4,-24);c.lineTo(-17,-25);c.bezierCurveTo(-27,-42,-23,-55,-19,-65);c.fill();
-  shape(()=>{c.moveTo(0,-87);c.quadraticCurveTo(-13,-75,-20,-63);c.quadraticCurveTo(0,-69,20,-63);c.quadraticCurveTo(13,-77,0,-87);},'#ae5960');
-  c.strokeStyle='#ce9390';c.lineWidth=2;c.beginPath();c.moveTo(1,-83);c.quadraticCurveTo(12,-73,17,-65);c.stroke();c.strokeStyle='#34243d';c.lineWidth=1.5;
-  // Blue-rimmed porthole with diagonal glass reflections.
-  c.fillStyle='#416c84';c.beginPath();c.arc(0,-49,12,0,Math.PI*2);c.fill();c.stroke();
-  c.fillStyle='#86a6b5';c.beginPath();c.arc(0,-49,8.4,0,Math.PI*2);c.fill();c.stroke();
-  c.save();c.beginPath();c.arc(0,-49,7.5,0,Math.PI*2);c.clip();c.strokeStyle='#bdc9c8';c.lineWidth=3;c.beginPath();c.moveTo(-10,-46);c.lineTo(7,-59);c.moveTo(-5,-39);c.lineTo(12,-52);c.stroke();c.restore();
-  // The dark underside is a real opening; twin leaves swing down to release the crew.
-  c.fillStyle='#162239';c.fillRect(-14,-24,28,4);
-  for(const side of [-1,1]){
-    const hinge=side*15,angle=open*Math.PI*.47,tip=hinge-side*15*Math.cos(angle),drop=15*Math.sin(angle);
-    shape(()=>{c.moveTo(hinge,-23);c.lineTo(tip,-23+drop);c.lineTo(tip,-20+drop);c.lineTo(hinge,-20);},'#4c778b');
-    c.fillStyle='#a1b8b8';c.fillRect(hinge-1.5,-24,3,3);
+    const hinge=side*17,angle=open*Math.PI*.47,tip=hinge-side*17*Math.cos(angle),drop=17*Math.sin(angle);
+    panel([[hinge,-17],[tip,-17+drop],[tip,-13+drop],[hinge,-13]],'#c49e62');
+    c.fillStyle='#655f51';c.fillRect(hinge-1.5,-19,3,5);
   }
   c.restore();
 }
-export function scenery(c,tick,level,spawned=0,lastSpawnTick=null,sceneryTick=tick) {
-  worldScenery(c,sceneryTick,level);
+export function scenery(c,tick,level,spawned=0,lastSpawnTick=null,sceneryTick=tick,game=null) {
+  worldScenery(c,sceneryTick,level,game?(x,y)=>game.at(x,y):null);
   if(level.entrances){for(const [i,e] of level.entrances.entries()){const n=level.entrances.length,count=Math.max(0,Math.ceil((spawned-i)/n));magicalEntrance(c,tick,{...level,spawnX:e.x,spawnY:rocketHeight(level,e),rocketScale:i===0?1:.6,total:Math.ceil((level.total-i)/n)},count,count?((count-1)*n+i)*level.interval:null);}}else magicalEntrance(c,tick,{...level,spawnY:level.rocketY||90},spawned,lastSpawnTick);
   // Golden splayed arch and twin torches from the supplied classic exit reference.
   exitArch(c,level.exitX,level.exitY,tick);
@@ -257,11 +266,11 @@ export function exitPortal(c,level,tick,active){
   if(!active)return;
   c.save();c.translate(level.exitX,level.exitY);
   c.beginPath();c.moveTo(-18,-3);c.lineTo(-4,-39);c.lineTo(6,-39);c.lineTo(19,-3);c.closePath();c.clip();
-  const glow=c.createRadialGradient(1,-19,1,1,-19,25);glow.addColorStop(0,'#b9edff');glow.addColorStop(.18,'#8e88ff');glow.addColorStop(.5,'#5844b5');glow.addColorStop(1,'#142039');c.fillStyle=glow;c.fillRect(-20,-40,40,40);
+  const glow=c.createRadialGradient(1,-19,1,1,-19,25);glow.addColorStop(0,'#e3ffd7');glow.addColorStop(.18,'#92eea2');glow.addColorStop(.5,'#26935b');glow.addColorStop(1,'#123a29');c.fillStyle=glow;c.fillRect(-20,-40,40,40);
   for(let arm=0;arm<3;arm++){
-    c.beginPath();for(let i=0;i<34;i++){const a=i*.17+tick*.075+arm*Math.PI*2/3,r=1+i*.37,x=1+Math.cos(a)*r,y=-19+Math.sin(a)*r*.7;i?c.lineTo(x,y):c.moveTo(x,y);}c.strokeStyle=['#d2d3ff99','#75ddff88','#b8a0ff99'][arm];c.lineWidth=.75;c.stroke();
+    c.beginPath();for(let i=0;i<34;i++){const a=i*.17+tick*.075+arm*Math.PI*2/3,r=1+i*.37,x=1+Math.cos(a)*r,y=-19+Math.sin(a)*r*.7;i?c.lineTo(x,y):c.moveTo(x,y);}c.strokeStyle=['#e4ffce99','#74eea788','#b6ef8c99'][arm];c.lineWidth=.75;c.stroke();
   }
-  for(let i=0;i<6;i++){const a=tick*.045+i*2.4,r=8+i%3*3;c.fillStyle=i%2?'#f5f3ff':'#a6e5ff';c.fillRect(Math.round(1+Math.cos(a)*r),Math.round(-19+Math.sin(a)*r),1,1);}
+  for(let i=0;i<6;i++){const a=tick*.045+i*2.4,r=8+i%3*3;c.fillStyle=i%2?'#f5f3ff':'#b8ffc5';c.fillRect(Math.round(1+Math.cos(a)*r),Math.round(-19+Math.sin(a)*r),1,1);}
   c.restore();
 }
 function lemmingBack(c,tick){
