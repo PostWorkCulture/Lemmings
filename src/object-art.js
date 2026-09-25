@@ -1,3 +1,4 @@
+import {cautionStripes} from './hazard-art.js';
 import {objectPosition,isDangerous} from './objects.js';
 export function drawObjects(c,g){
  const controls=[...new Set((g.level.objects||[]).filter(o=>o.type==='switch').flatMap(o=>o.targets||[o.target]))];
@@ -25,9 +26,9 @@ export function drawObjects(c,g){
   }else if(o.type==='switch'){
    c.fillStyle='#636f71';c.fillRect(o.x-7,o.y-8,14,8);c.strokeStyle=g.disabledObjects.has(o.target)?'#a9d987':'#e5bb71';c.lineWidth=3;c.beginPath();c.moveTo(o.x,o.y-6);c.lineTo(o.x+(g.disabledObjects.has(o.target)?6:-6),o.y-20);c.stroke();
   }else if(o.type==='crusher'){
-   const active=isDangerous(o,g.tick,g.disabledObjects);c.fillStyle='#596372';c.fillRect(o.x+o.w/2-3,o.y,6,o.h);c.fillStyle=active?'#bb866e':'#87979b';c.fillRect(o.x,active?o.y+o.h-18:o.y,o.w,18);c.fillStyle='#e2bf78';for(let x=o.x+2;x<o.x+o.w-3;x+=8)c.fillRect(x,(active?o.y+o.h-18:o.y)+12,4,6);
+   const active=isDangerous(o,g.tick,g.disabledObjects);c.fillStyle='#596372';c.fillRect(o.x+o.w/2-3,o.y,6,o.h);cautionStripes(c,o.x,active?o.y+o.h-18:o.y,o.w,18);c.fillStyle='#161911';for(let x=o.x+2;x<o.x+o.w-3;x+=8)c.fillRect(x,(active?o.y+o.h-18:o.y)+12,4,6);
   }else if(o.type==='laser'){
-   c.fillStyle='#7b8ca1';c.fillRect(o.x-5,o.y-5,10,8);c.fillRect(o.x-5,o.y+o.h,10,8);c.fillStyle=isDangerous(o,g.tick,g.disabledObjects)?'#ed858f':'#74a39b44';c.fillRect(o.x,o.y,Math.max(2,o.w),o.h);
+   cautionStripes(c,o.x-7,o.y-6,14,10);cautionStripes(c,o.x-7,o.y+o.h,14,10);const active=isDangerous(o,g.tick,g.disabledObjects);c.fillStyle=active?'#161911':'#f4df0030';c.fillRect(o.x-1,o.y,Math.max(4,o.w+2),o.h);if(active){c.fillStyle='#f4df00';c.fillRect(o.x,o.y,Math.max(2,o.w),o.h);}
   }
   if(o.type==='switch')badge(o.target,o.x,o.y-29);
   else if(o.type==='gate'||o.type==='bridge')badge(o.id,o.x+o.w/2,o.y-10);

@@ -1,3 +1,4 @@
+import {hazardMarkers} from './hazard-art.js';
 import {worldBackground,worldScenery} from './landscape-art.js';
 import { THEMES } from './levels.js';
 import { WIDTH,HEIGHT } from './engine.js';
@@ -272,7 +273,7 @@ export function enteringLemming(c,u,level,tick){
 // All hazard motion uses simulation time, so pause and 2x stay consistent.
 export function hazards(c,tick,theme,height=HEIGHT){
   const hazard=THEMES[theme].hazard;
-  if(hazard==='void'){c.fillStyle='#0c1026';c.fillRect(0,height-28,WIDTH,28);for(let i=0;i<30;i++){c.fillStyle='#bfcaf166';c.fillRect((i*79+tick*.2)%WIDTH,height-25+i%20,1,1);}return;}
+  if(hazard==='void'){c.fillStyle='#0c1026';c.fillRect(0,height-28,WIDTH,28);for(let i=0;i<30;i++){c.fillStyle='#bfcaf166';c.fillRect((i*79+tick*.2)%WIDTH,height-25+i%20,1,1);}hazardMarkers(c,height-14);return;}
   const lava=hazard==='lava'||theme==='clockwork',surface=height-28;
   c.save();
   const fill=c.createLinearGradient(0,surface,0,height);
@@ -297,5 +298,6 @@ export function hazards(c,tick,theme,height=HEIGHT){
       if(i%4===0){c.strokeStyle='#86cad780';c.beginPath();c.ellipse(x,surface+13-phase*10,2+phase*4,1.2,0,0,Math.PI*2);c.stroke();}
     }
   }
+  hazardMarkers(c,height-14);
   c.restore();
 }
