@@ -22,7 +22,7 @@ let pendingLevel=null;
 let sceneryTick=0;
 let selected='walk',started=false,paused=false,speed=1,last=0,accumulator=0,renderedRevision=-1,hover=null,pointer=null,toastTimer,hintIndex=0,dialogPause=false;
 function message(text){$('#message').textContent=text;$('#message').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#message').classList.remove('visible'),5000);}
-function select(skill){if(skill!=='walk'&&!(game.stock[skill]>0)&&!(skill==='block'&&game.units.some(u=>u.state==='block')))return;selected=skill;document.querySelectorAll('.skill').forEach(b=>{const active=b.dataset.skill===skill;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});}
+function select(skill){if(skill!=='walk'&&!(game.stock[skill]>0)&&!(['block','attract'].includes(skill)&&game.units.some(u=>u.state===skill)))return;selected=skill;document.querySelectorAll('.skill').forEach(b=>{const active=b.dataset.skill===skill;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});}
 function start(){impactAudio.unlock();started=true;paused=false;soundtrack.play();$('#intro').classList.add('hidden');$('#result').classList.add('hidden');canvas.focus({preventScroll:true});if(game.level.bottomEntry)$('#viewport').scrollTop=$('#viewport').scrollHeight;sync();}
 function reset(levelIndex=game.levelIndex){if(!isUnlocked(levelIndex,starRecords))return;clearTimeout(toastTimer);document.querySelector('#message').classList.remove('visible');soundtrack.pause();game.reset(levelIndex);background=makeBackground(game.level.theme,game.height);renderedRevision=-1;soundtrack.setLevel(levelIndex);updateLevelUI();started=false;paused=false;speed=1;hover=null;pointer=null;hintIndex=0;$('#hint-copy').textContent='Puzzle hints are optional.';$('#hint').textContent='Show a puzzle hint';accumulator=0;$('#result').classList.add('hidden');$('#intro').classList.remove('hidden');$('#speed').textContent='1\u00d7';$('#speed').setAttribute('aria-label','Speed: normal');$('#speed').classList.remove('active');select('walk');sync();}
 function togglePause(){if(!started)return;paused=!paused;paused?soundtrack.pause():soundtrack.play();sync();}
@@ -31,7 +31,7 @@ function toggleSpeed(){speed=speed===1?2:1;$('#speed').textContent=speed+'\u00d7
 function sync(){
   $('#out').textContent=String(game.spawned).padStart(2,'0');$('#saved').textContent=String(game.saved).padStart(2,'0');$('#lost').textContent=String(game.lost).padStart(2,'0');
   const seconds=Math.floor(game.tick/60);$('#timer').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
-  for(const key of SKILL_ORDER.filter(k=>k!=='walk'&&game.level.stock[k]>0)){$('#count-'+key).textContent=game.stock[key];const button=$(`[data-skill="${key}"]`);button.disabled=game.stock[key]<=0&&!(key==='block'&&game.units.some(u=>u.state==='block'));button.hidden=game.level.stock[key]===0;}
+  for(const key of SKILL_ORDER.filter(k=>k!=='walk'&&game.level.stock[k]>0)){$('#count-'+key).textContent=game.stock[key];const button=$(`[data-skill="${key}"]`);button.disabled=game.stock[key]<=0&&!(['block','attract'].includes(key)&&game.units.some(u=>u.state===key));button.hidden=game.level.stock[key]===0;}
   $('#status-label').textContent=game.result?(game.result==='win'?'LEVEL COMPLETE':'LEVEL ENDED'):!started?'READY':paused?'PAUSED':'PLAYING';
   $('#pause').textContent=paused?'\u25b6':'\u2161';$('#pause').setAttribute('aria-label',paused?'Resume':'Pause');$('#pause').classList.toggle('active',paused);
   $('#pause').disabled=!started;
@@ -53,7 +53,7 @@ function result(){
   $('#result-copy').textContent=game.result==='win'?`${game.saved} of ${game.level.total} home safely. ${game.saved===game.level.total?'A perfect rescue!':'You did it. Can you bring everyone home next time?'}`:`${game.saved} rescued · ${game.lost} lost. Rescue target: ${game.level.target} of ${game.level.total}.`;
   sync();
 }
-function pick(x,y){return game.units.filter(u=>!['exit','drown'].includes(u.state)).map(u=>({u,d:Math.hypot(u.x-x,(u.y-12)-y)})).filter(o=>o.d<25).sort((a,b)=>a.d-b.d||a.u.id-b.u.id)[0]?.u||null;}
+function pick(x,y){return game.units.filter(u=>!['exit','drown'].includes(u.state)).map(u=>({u,d:Math.hypot(u.x-x,(u.y-12)-y)})).filter(o=>o.d<25).sort((a,b)=>Number(!!game.canAssign(a.u,selected))-Number(!!game.canAssign(b.u,selected))||Number(b.u.state===selected&&['block','attract'].includes(selected))-Number(a.u.state===selected&&['block','attract'].includes(selected))||a.d-b.d||a.u.id-b.u.id)[0]?.u||null;}
 function position(e){const b=canvas.getBoundingClientRect();const scale=Math.min(b.width/WIDTH,b.height/canvas.height);return{x:(e.clientX-b.left-(b.width-WIDTH*scale)/2)/scale,y:(e.clientY-b.top-(b.height-canvas.height*scale)/2)/scale};}
 canvas.addEventListener('pointermove',e=>{pointer=position(e);hover=pick(pointer.x,pointer.y);});canvas.addEventListener('pointerleave',()=>{pointer=null;hover=null;});
 canvas.addEventListener('pointerdown',e=>{

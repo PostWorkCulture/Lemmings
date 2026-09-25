@@ -34,7 +34,7 @@ export class Game {
   canAssign(u,skill) {
     if(!u||!this.units.includes(u)||this.result||['exit','drown','saved','lost'].includes(u.state))return 'Choose a lemming first.';
     if(!SKILLS[skill])return 'Unknown skill.';
-    if(skill==='block'&&u.state==='block')return '';
+    if(['block','attract'].includes(skill)&&u.state===skill)return '';
     if(skill==='walk')return ['walk','fall','jump','ladder','pole','climb','swim','slide'].includes(u.state)?'Choose a lemming doing a job.':'';
     if((this.stock[skill]||0)<=0)return 'No more of that skill left.';
     if(SKILLS[skill].permanent&&u.abilities?.[skill])return 'This lemming already has that ability.';
@@ -46,7 +46,7 @@ export class Game {
   }
   assign(id,skill) {
     const u=this.units.find(u=>u.id===id),error=this.canAssign(u,skill);if(error)return {ok:false,message:error};
-    if(skill==='block'&&u.state==='block')skill='walk';
+    if(['block','attract'].includes(skill)&&u.state===skill)skill='walk';
     if(skill==='walk'&&u.state==='block')u.dir=u.releaseDir??u.dir;
     if(skill==='block')u.releaseDir=null;
     if(skill==='bash'){u.bashStarted=false;u.bashApproach=0;}

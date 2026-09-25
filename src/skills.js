@@ -13,7 +13,7 @@ export const SKILLS={
  run:{name:'Runner',help:'Permanently walk twice as fast.',permanent:true},
  stack:{name:'Stacker',help:'Build a vertical column of 12 blocks, then step off.'},
  turn:{name:'Turner',help:'Turn this lemming around immediately.'},
- attract:{name:'Attractor',help:'Play music to hold nearby walkers. Walker stops the music.'},
+ attract:{name:'Attractor',help:'Play music to hold nearby walkers. Click the musician again with Attractor, or use Walker, to release everyone for free.'},
  explode:{name:'Exploder',help:'After three seconds, sacrifice this lemming to open a circular hole. Steel survives.'}
 };
 export const SKILL_ORDER=Object.keys(SKILLS);

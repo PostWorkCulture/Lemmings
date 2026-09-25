@@ -22,7 +22,7 @@ export const CHAPTERS=[
  {name:'Mountain Rescue',theme:'alpine'},
  {name:'What a Circus!',theme:'circus'}
 ];
-const titles=['The Hollow Oak','Woodland Crossing','Behind the Waterfall','The Old Sawmill','Treetop Trail',
+const titles=['The Hollow Oak','Woodland Crossing','The Hidden Hollow','The Old Sawmill','Treetop Trail',
  'The Palm Grove Locksmith','The Shifting Dunes','Island Hopping','The Harbour Drawbridge','Clifftop Rescue',
  'The Snowbound Detour','The Frozen Pass','The Frozen Fossil','The Summit Expedition','The Crooked Ridge',
  'The Opening Act','Big-Top Rendezvous','The Championship Circuit','Three-Ring Rescue','Last Performer Home'];
@@ -31,7 +31,7 @@ for(const level of LEVELS){
  level.chapter=chapter.name;level.world=chapter.name;level.theme=chapter.theme;level.hazard=THEMES[chapter.theme].hazard;level.name=titles[level.id];
  level.setPieces=(level.setPieces||[]).map(p=>({...p,form:level.id>=15?'circus-rings':p.form}));
 }
-LEVELS[2].waterfallTheme='waterfall';
+
 
 // Soft circus props are actual editable/climbable terrain.
 LEVELS[15].terrain=LEVELS[15].terrain.filter(r=>!(r[0]===640&&r[1]===240));
@@ -75,3 +75,8 @@ LEVELS[12].interval=360;LEVELS[12].targetTime+=60;
 
 
 export function rocketHeight(level,entrance){return level.rocketY??(level.entrances&&entrance!==level.entrances[0]?Math.max(90,entrance.y-20):90);}
+
+// Keep inventories relevant: neither swimming below Woodland Crossing nor climbing
+// Treetop Trail's boundary trunks provides a route toward the rescue exit.
+delete LEVELS[1].stock.swim;
+delete LEVELS[4].stock.climb;
