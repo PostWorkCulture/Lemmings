@@ -7,3 +7,4 @@ for(const level of LEVELS){level.difficulty=['Easy','Medium','Hard','Extreme'][M
 for(const layout of DIFFICULT_LAYOUTS)Object.assign(LEVELS[layout.id],layout);
 
 applyPuzzleCampaign(LEVELS);
+for(const level of LEVELS)if(THEMES[level.theme].hazard==='snow')level.hazard='snow';

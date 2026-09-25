@@ -7,7 +7,7 @@ Ten slots have new, individually authored puzzles. Other slots retain their long
 |---|---|---|
 | 4 Easy | Shift Change | Runner crosses a timed press, Platformer reaches shutdown; Attractor holds the crowd. |
 | 6 Medium | The Canopy Locksmith | Stacker and Builder reach the canopy switch; a second Basher dismantles the scaffold for the crowd. |
-| 7 Medium | Tomb from the Other Side | Climber approaches arrow-marked masonry from behind; Turner and Basher recover the worker. |
+| 7 Medium | The Shifting Dunes | Walk over low dunes; steep sand sends climbers sliding back. Bridge the ravines and bash a lower route through the high dune and tomb wall. |
 | 10 Medium | Crevasse Rescue | A lone Parachuter unlocks the rescue pole, then clears and bridges the lower route. |
 | 13 Hard | The Fossil Breakthrough | Basher preserves everyone; an alternative Exploder solution meets the 19-person target. Both need a bridge. |
 | 14 Hard | Behind the Drawbridge | Swimmer reaches the moat landing, opens the keep, tunnels to the drawbridge lever and builds to the raised exit. |

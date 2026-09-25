@@ -1,4 +1,4 @@
-import {drawSplats,ImpactAudio} from './impact-effects.js';
+import {drawDrowning,drawSplats,ImpactAudio} from './impact-effects.js';
 import {ambientWorld,finaleLandmarks} from './ambient-art.js';
 import {SKILLS,SKILL_ORDER} from './skills.js';
 import {drawObjects,skillEquipment} from './object-art.js';
@@ -43,7 +43,7 @@ function result(){
   $('#result-copy').textContent=game.result==='win'?`${game.saved} of ${game.level.total} home safely. ${game.saved===game.level.total?'A perfect rescue!':'You did it. Can you bring everyone home next time?'}`:`${game.saved} rescued · ${game.lost} lost. Rescue target: ${game.level.target} of ${game.level.total}.`;
   sync();
 }
-function pick(x,y){return game.units.filter(u=>u.state!=='exit').map(u=>({u,d:Math.hypot(u.x-x,(u.y-12)-y)})).filter(o=>o.d<25).sort((a,b)=>a.d-b.d||a.u.id-b.u.id)[0]?.u||null;}
+function pick(x,y){return game.units.filter(u=>!['exit','drown'].includes(u.state)).map(u=>({u,d:Math.hypot(u.x-x,(u.y-12)-y)})).filter(o=>o.d<25).sort((a,b)=>a.d-b.d||a.u.id-b.u.id)[0]?.u||null;}
 function position(e){const b=canvas.getBoundingClientRect();const scale=Math.min(b.width/WIDTH,b.height/canvas.height);return{x:(e.clientX-b.left-(b.width-WIDTH*scale)/2)/scale,y:(e.clientY-b.top-(b.height-canvas.height*scale)/2)/scale};}
 canvas.addEventListener('pointermove',e=>{pointer=position(e);hover=pick(pointer.x,pointer.y);});canvas.addEventListener('pointerleave',()=>{pointer=null;hover=null;});
 canvas.addEventListener('pointerdown',e=>{
@@ -118,9 +118,11 @@ function draw(){
   exitPortal(ctx,game.level,game.tick,game.units.some(u=>u.state==='exit'));
   if(pointer)hover=pick(pointer.x,pointer.y);else hover=null;
   for(const u of game.units){
+    if(u.state==='drown'){drawDrowning(ctx,u,game.tick,character,game.height);continue;}
     if(u.state==='exit'){enteringLemming(ctx,u,game.level,game.tick);continue;}
     if(u===hover){ctx.strokeStyle=game.canAssign(u,selected)?'#e1b982':'#d8f7a2';ctx.lineWidth=1;ctx.strokeRect(Math.round(u.x)-12,Math.round(u.y)-30,25,33);ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.moveTo(u.x-3,u.y-35);ctx.lineTo(u.x+3,u.y-35);ctx.lineTo(u.x,u.y-31);ctx.fill();}
-    character(ctx,u.x,u.y,u.state,u.dir,game.tick);skillEquipment(ctx,u,game.tick);
+    if(u.state==='slide'){ctx.save();ctx.translate(u.x,u.y-5);ctx.rotate(-u.dir*.5);character(ctx,0,5,'fall',u.dir,game.tick);ctx.restore();ctx.fillStyle='#dec18e';for(let i=0;i<4;i++)ctx.fillRect(u.x-u.dir*(5+i*3),u.y-2-(game.tick+i*3)%7,2,2);}
+    else character(ctx,u.x,u.y,u.state,u.dir,game.tick);skillEquipment(ctx,u,game.tick);
     if(u.state==='block'){ctx.fillStyle='#e8c988';ctx.fillRect(u.x-4,u.y-31,8,2);}
     if(u.state==='build'){ctx.fillStyle='#e8c988';ctx.fillRect(u.x-7,u.y-32,14*(16-u.steps)/16,2);}
   }

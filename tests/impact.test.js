@@ -6,7 +6,7 @@ test('safe drops and parachute landings have no blood or impact event',()=>{for(
 for(const hazard of ['water','lava','void','sand','syrup']){
  test(hazard+' death triggers the kill effect',()=>{
   const g=new Game();g.level={...g.level,hazard,objects:[]};g.spawned=20;
-  g.units=[{id:0,x:500,y:g.hazardY+1,state:'fall',vy:0,dir:1,fallStart:g.hazardY}];g.step();
+  g.units=[{id:0,x:500,y:g.hazardY+1,state:'fall',vy:0,dir:1,fallStart:g.hazardY}];g.step();if(hazard==='water')for(let n=0;n<180;n++)g.step();
   assert.equal(g.lost,1);assert.equal(g.effects.length,1);assert.equal(g.effects[0].type,'splat');
  });
 }
@@ -28,4 +28,23 @@ test('explosion and off-map deaths trigger visible kill effects',()=>{
 test('successful rescues never trigger the kill effect',()=>{
  const g=new Game(),u=g.spawn();g.remove(u,true);g.remove(u,true);
  assert.equal(g.saved,1);assert.equal(g.lost,0);assert.equal(g.effects.length,0);
+});
+
+test('drowning delays the loss and level result, and cannot receive skills',()=>{
+ const g=new Game();g.spawned=20;g.saved=19;g.level={...g.level,hazard:'water',objects:[]};
+ const u={id:0,x:500,y:g.hazardY+2,state:'fall',dir:1,vy:0};g.units=[u];g.step();
+ assert.equal(u.state,'drown');assert.equal(u.shark,true);assert.equal(g.lost,0);assert.equal(g.result,null);
+ assert.equal(g.assign(0,'float').ok,false);
+ for(let i=0;i<179;i++)g.step();assert.equal(g.lost,0);
+ g.step();assert.equal(g.lost,1);assert.equal(g.result,'win');
+});
+test('sharks appear for some water deaths and never target swimmers',()=>{
+ for(const id of [1,3]){
+  const g=new Game();g.spawned=20;g.level={...g.level,hazard:'water',objects:[]};
+  const u={id,x:500,y:g.hazardY+2,state:'fall',dir:1,vy:0};g.units=[u];g.step();
+  assert.equal(u.shark,id===3);
+ }
+ const g=new Game();g.spawned=20;g.level={...g.level,hazard:'water',objects:[]};g.terrain.fill(0);
+ const u={id:0,x:500,y:g.hazardY+2,state:'fall',dir:1,vy:0,abilities:{swim:true}};g.units=[u];g.step();
+ assert.equal(u.state,'swim');assert.equal(u.shark,undefined);assert.equal(g.lost,0);
 });

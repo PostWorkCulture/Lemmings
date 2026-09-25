@@ -28,13 +28,13 @@ test('multiple entrances distribute exactly twenty lemmings in a repeatable sequ
  for(const id of [16,18]){const g=new Game(id);for(let n=0;n<20;n++){const e=g.level.entrances[n%g.level.entrances.length],u=g.spawn();assert.equal(u.x,e.x);assert.equal(u.y,e.y);assert.equal(u.dir,e.dir);}}
 });
 test('one-way masonry resists excavation from the wrong side',()=>{
- for(const dir of [-1,1]){const g=new Game(6);g.spawned=20;
+ for(const dir of [-1,1]){const g=new Game(6);g.level={...g.level,slipperySlopes:[],oneWay:[{x:360,y:220,w:80,h:120,dir:-1}]};g.terrain.fill(0);g.rect(40,340,920,24,2);g.rect(360,220,80,120,1);g.stock.bash=1;g.spawned=20;
   const u={id:0,x:dir===1?351:449,y:340,state:'walk',dir,vy:0,jobTick:0};g.units=[u];g.assign(0,'bash');
   for(let n=0;n<300;n++)g.step();
   assert.equal(g.at(400,325),dir===1?1:0);
  }
 });
-for(const [id,skill]of [[5,'stack'],[6,'climb'],[9,'float'],[13,'swim'],[15,'jump'],[16,'climb'],[18,'bash'],[19,'platform']]){
+for(const [id,skill]of [[5,'stack'],[6,'bash'],[9,'float'],[13,'swim'],[15,'jump'],[16,'climb'],[18,'bash'],[19,'platform']]){
  test(`Level ${id+1} specialist obstacle cannot be solved by omitting ${skill}`,()=>{
   const {g}=solvePuzzle(id,'perfect',skill);assert.notEqual(g.result,'win');
  });

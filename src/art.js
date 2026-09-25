@@ -273,6 +273,17 @@ export function enteringLemming(c,u,level,tick){
 // All hazard motion uses simulation time, so pause and 2x stay consistent.
 export function hazards(c,tick,theme,height=HEIGHT){
   const hazard=THEMES[theme].hazard;
+  if(hazard==='snow'){
+    const surface=height-28;c.save();
+    const snow=c.createLinearGradient(0,surface,0,height);snow.addColorStop(0,'#f4fbf8');snow.addColorStop(1,'#a9c7d6');
+    c.fillStyle=snow;c.beginPath();c.moveTo(0,height);
+    for(let x=0;x<=WIDTH;x+=4)c.lineTo(x,surface+Math.sin(x*.023)*3+Math.cos(x*.051)*1.5);
+    c.lineTo(WIDTH,height);c.closePath();c.fill();
+    c.strokeStyle='#83aabd';c.lineWidth=1.5;
+    for(let x=12;x<WIDTH;x+=67){c.beginPath();c.moveTo(x,height-9);c.quadraticCurveTo(x+15,height-15,x+33,height-10);c.stroke();}
+    c.fillStyle='#ffffff';for(let i=0;i<60;i++)c.fillRect(i*83%WIDTH,surface+6+i*17%18,2,1);
+    hazardMarkers(c,height-14);c.restore();return;
+  }
   if(hazard==='void'){c.fillStyle='#0c1026';c.fillRect(0,height-28,WIDTH,28);for(let i=0;i<30;i++){c.fillStyle='#bfcaf166';c.fillRect((i*79+tick*.2)%WIDTH,height-25+i%20,1,1);}hazardMarkers(c,height-14);return;}
   const lava=hazard==='lava'||theme==='clockwork',surface=height-28;
   c.save();

@@ -1,0 +1,9 @@
+<!doctype html><meta charset="utf-8"><title>Water animation review</title><style>body{background:#142626;color:white;font:16px sans-serif}main{display:grid;grid-template-columns:1fr 1fr;gap:20px}canvas{width:100%;image-rendering:pixelated;background:#314d59}h2{font-size:16px}</style><main></main><script type="module">
+import {drawDrowning} from './src/impact-effects.js';
+import {character,hazards} from './src/art.js';
+for(const [name,age,shark]of [['Entry splash',12,false],['Slow sinking',95,false],['Shark chase',75,true],['Shark bite',116,true]]){
+ const p=document.createElement('section');p.innerHTML='<h2>'+name+'</h2><canvas width="500" height="140"></canvas>';document.querySelector('main').append(p);
+ const c=p.querySelector('canvas').getContext('2d');c.scale(2,2);c.translate(-375,-400);
+ hazards(c,age,'beach',470);drawDrowning(c,{x:500,y:445,dir:1,drownStart:0,shark},age,character,470);
+}
+</script>

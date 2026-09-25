@@ -31,10 +31,10 @@ export class Game {
   at(x,y) { x=Math.floor(x);y=Math.floor(y);if(x<0||x>=WIDTH||y<0||y>=this.height)return 0;for(const o of this.level.objects||[]){if(((o.type==='gate'&&!this.disabledObjects.has(o.id))||(o.type==='bridge'&&this.disabledObjects.has(o.id)))&&x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h)return 2;}for(const o of this.level.objects||[])if(o.type==='lift'){const p=objectPosition(o,this.tick);if(x>=p.x&&x<=p.x+o.w&&y>=Math.floor(p.y)&&y<Math.floor(p.y)+5)return 2;}return this.terrain[y*WIDTH+x]; }
   spawn() { this.lastSpawnTick=this.tick;const entrance=this.level.entrances?.[this.spawned%this.level.entrances.length]||{x:this.level.spawnX,y:this.level.spawnY,dir:this.level.dir};const u={id:this.spawned++,x:entrance.x,y:entrance.y,dir:entrance.dir,state:'fall',vy:0,fallStart:entrance.y,jobTick:0,steps:0};this.units.push(u);return u; }
   canAssign(u,skill) {
-    if(!u||!this.units.includes(u)||this.result||['exit','saved','lost'].includes(u.state))return 'Choose a lemming first.';
+    if(!u||!this.units.includes(u)||this.result||['exit','drown','saved','lost'].includes(u.state))return 'Choose a lemming first.';
     if(!SKILLS[skill])return 'Unknown skill.';
     if(skill==='block'&&u.state==='block')return '';
-    if(skill==='walk')return ['walk','fall','jump','ladder','pole','climb','swim'].includes(u.state)?'Choose a lemming doing a job.':'';
+    if(skill==='walk')return ['walk','fall','jump','ladder','pole','climb','swim','slide'].includes(u.state)?'Choose a lemming doing a job.':'';
     if((this.stock[skill]||0)<=0)return 'No more of that skill left.';
     if(SKILLS[skill].permanent&&u.abilities?.[skill])return 'This lemming already has that ability.';
     if(SKILLS[skill].air&&['walk','fall','jump'].includes(u.state))return '';
@@ -48,6 +48,7 @@ export class Game {
     if(skill==='block'&&u.state==='block')skill='walk';
     if(skill==='walk'&&u.state==='block')u.dir=u.releaseDir??u.dir;
     if(skill==='block')u.releaseDir=null;
+    if(skill==='bash'){u.bashStarted=false;u.bashApproach=0;}
     if(skill!=='walk')this.stock[skill]--;
     if(SKILLS[skill].permanent){u.abilities={...u.abilities,[skill]:true};}
     else if(skill==='turn'){u.dir*=-1;}
@@ -62,6 +63,21 @@ export class Game {
     updateObjects(this);this.tick++;this.effects=this.effects.filter(e=>this.tick-e.tick<=150);
     for(const u of this.units) {
       if(u.state==='saved'||u.state==='lost')continue;
+      if(u.state==='slide'){
+        const slope=u.slideSlope;u.x-=slope.uphill*1.8;
+        let floor=null;for(let y=u.y-5;y<=u.y+10;y++)if(this.at(u.x,y)&&!this.at(u.x,y-1)){floor=y;break;}
+        if(floor!==null)u.y=floor;
+        if((u.x-slope.baseX)*slope.uphill<=0||floor===null){u.state='walk';u.dir=-slope.uphill;u.slideSlope=null;}
+        continue;
+      }
+      if(u.state==='walk'||u.state==='climb'){
+        const slope=(this.level.slipperySlopes||[]).find(s=>u.x>=s.x&&u.x<s.x+s.w&&u.y>=s.y&&u.y<s.y+s.h&&u.y<s.ceiling&&u.dir===s.uphill&&this.at(u.x,u.y)!==3);
+        if(slope){u.state='slide';u.slideSlope=slope;u.dir=-slope.uphill;continue;}
+      }
+      if(u.state==='drown'){
+        if(this.tick-u.drownStart>=180)this.remove(u);
+        continue;
+      }
       if(u.state==='exit'){
         u.exitTick++;
         const approach=Math.max(0,Math.min(1,(u.exitTick-16)/26));
@@ -69,7 +85,10 @@ export class Game {
         if(u.exitTick>=EXIT_FRAMES)this.remove(u,true);
         continue;
       }
-      if(u.y>=this.hazardY&&u.abilities?.swim&&!['lava','void','sand','syrup'].includes(this.level.hazard)){u.state='swim';u.y=this.hazardY;}
+      if(u.y>=this.hazardY&&u.abilities?.swim&&!['lava','void','sand','syrup','snow'].includes(this.level.hazard)){u.state='swim';u.y=this.hazardY;}
+      if(u.y>=this.hazardY&&this.level.hazard==='water'&&!u.abilities?.swim){
+        u.state='drown';u.y=this.hazardY+3;u.drownStart=this.tick;u.shark=u.id%3===0;continue;
+      }
       if((u.y>=this.hazardY&&u.state!=='swim')||u.x<8||u.x>990){this.remove(u);continue;}
       if(objectInteraction(this,u))continue;
       if(u.riding&&['walk','block','attract'].includes(u.state))continue;
@@ -102,7 +121,11 @@ export class Game {
       if(u.state==='bash'||u.state==='mine'){
         if(++u.jobTick%8===0){const mining=u.state==='mine',nx=u.x+u.dir*3,ny=u.y+(mining?2:0);let steel=false,earth=false;
           for(let y=ny-22;y<ny+(mining?3:0);y++)for(let x=nx-7;x<nx+8;x++){const t=this.at(x,y);if(t===2||(t===1&&(this.level.oneWay||[]).some(z=>x>=z.x&&x<z.x+z.w&&y>=z.y&&y<z.y+z.h&&u.dir!==z.dir)))steel=true;if(t===1||t===3)earth=true;}
-          if(steel){u.state='walk';continue;}if(!earth&&!mining){u.state='walk';continue;}this.rect(nx-8,ny-23,16,23,0);u.x=nx;u.y=ny;if(!this.at(u.x,u.y))this.fall(u);
+          if(steel){u.state='walk';continue;}if(!earth&&!mining){
+            if(!u.bashStarted&&(u.bashApproach||0)<36){u.bashApproach=(u.bashApproach||0)+3;u.x=nx;if(!this.at(u.x,u.y))this.fall(u);continue;}
+            u.state='walk';continue;
+          }
+          if(!mining)u.bashStarted=true;this.rect(nx-8,ny-23,16,23,0);u.x=nx;u.y=ny;if(!this.at(u.x,u.y))this.fall(u);
         }continue;
       }
       if(u.state==='platform'||u.state==='stack'){
