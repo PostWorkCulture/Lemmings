@@ -28,3 +28,8 @@
 .skill>span{font-size:11px;line-height:15px}
 .skill>b{font-size:12px}
 .skill-picture{width:39px;height:30px}
+
+.timer{min-width:95px;line-height:1.5}.timer small{display:block;color:#d6c27c;font-size:9px;letter-spacing:0}
+.level-card .level-stars{display:flex;gap:3px;flex:0 0 auto;font-size:19px}.earned{color:#efc653}.unearned{color:#58645c}
+.result-stars{font-size:32px;letter-spacing:6px;margin:12px 0}#choose-level{margin:0 0 12px}#star-summary{font-size:11px}.star-rules{font-size:11px}
+@media(max-width:560px){.level-card .level-stars{font-size:15px;gap:1px}.level-card{gap:8px}.level-card canvas{width:75px}}

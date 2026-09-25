@@ -1,13 +1,26 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Game} from '../src/engine.js';
-import {isUnlocked,isPerfect} from '../src/progress.js';
-test('levels unlock only after preceding targets are met',()=>{
+import {isUnlocked,isPerfect,earnedStars,migrateStars,recordResult} from '../src/progress.js';
+test('stars open at most the next two levels and only earlier stars count',()=>{
  assert.equal(isUnlocked(0,{}),true);assert.equal(isUnlocked(1,{}),false);
- assert.equal(isUnlocked(1,{0:15}),false);assert.equal(isUnlocked(1,{0:16}),true);
- assert.equal(isUnlocked(2,{0:20,1:17}),false);assert.equal(isUnlocked(2,{0:16,1:18}),true);
- assert.equal(isUnlocked(4,{3:20}),false);assert.equal(isUnlocked(20,{0:20,1:20,2:20,3:20,4:20}),false);
+ assert.equal(isUnlocked(1,{0:{stars:1}}),true);assert.equal(isUnlocked(2,{0:{stars:1}}),false);
+ assert.equal(isUnlocked(2,{0:{stars:2}}),true);assert.equal(isUnlocked(3,{0:{stars:3}}),false);
+ assert.equal(isUnlocked(3,{0:{stars:2},2:{stars:1}}),true);
+ assert.equal(isUnlocked(1,{5:{stars:3}}),false);assert.equal(isUnlocked(20,{0:{stars:3}}),false);
 });
+test('three stars require completion, a perfect rescue and strictly under target time',()=>{
+ const l={target:18,total:20,targetTime:100},run={completed:true,saved:20,lost:0,ticks:5999};
+ assert.equal(earnedStars(l,run),3);assert.equal(earnedStars(l,{...run,ticks:6000}),2);
+ assert.equal(earnedStars(l,{...run,ticks:undefined}),2);assert.equal(earnedStars(l,{...run,saved:19,lost:1}),1);
+ assert.equal(earnedStars(l,{...run,completed:false}),0);assert.equal(earnedStars(l,{...run,saved:17}),0);
+ assert.equal(recordResult(l,{stars:3},{...run,saved:18,lost:2}).stars,3);
+});
+test('old progress migrates without inventing a timed star',()=>{
+ const records=migrateStars({0:20,1:18},{0:{completed:true,saved:20,total:20,lost:0}});
+ assert.equal(records[0].stars,2);assert.equal(records[1].stars,1);assert.equal(isUnlocked(2,records),true);
+});
+
 test('gold stars require a completed 20/20 rescue with zero losses',()=>{
  const good={completed:true,saved:20,total:20,lost:0};
  assert.equal(isPerfect(0,{0:good}),true);

@@ -2,7 +2,7 @@ import {drawDrowning,drawSplats,ImpactAudio} from './impact-effects.js';
 import {ambientWorld,finaleLandmarks} from './ambient-art.js';
 import {SKILLS,SKILL_ORDER} from './skills.js';
 import {drawObjects,skillEquipment} from './object-art.js';
-import { isUnlocked,isPerfect } from './progress.js';
+import { isUnlocked,starCount,totalStars,earnedStars,migrateStars,recordResult,unlockHint } from './progress.js';
 import { LEVELS,THEMES } from './levels.js';
 import { Soundtrack,TRACKS } from './music.js';
 import { Game,WIDTH,HEIGHT } from './engine.js';
@@ -10,8 +10,12 @@ import { character,makeBackground,renderTerrain,scenery,skillIcon,uiIcon,loadIco
 const $=s=>document.querySelector(s),canvas=$('#game'),ctx=canvas.getContext('2d');
 let best={};try{const stored=JSON.parse(localStorage.getItem('lemmings-best')||'{}');if(stored&&typeof stored==='object'&&!Array.isArray(stored))best=stored;}catch{}
 let perfectRescues={};try{const records=JSON.parse(localStorage.getItem('lemmings-perfect-v2')||'{}');if(records&&typeof records==='object'&&!Array.isArray(records))perfectRescues=records;}catch{}
+let starRecords={};try{const stored=JSON.parse(localStorage.getItem('lemmings-stars-v1')||'{}');if(stored&&typeof stored==='object'&&!Array.isArray(stored))starRecords=stored;}catch{}
+starRecords=migrateStars(best,perfectRescues,starRecords);
+const formatTime=seconds=>String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
+function starsMarkup(count){return [1,2,3].map(n=>`<span class="${n<=count?'earned':'unearned'}" aria-hidden="true">★</span>`).join('');}
 let initialLevel=0;try{initialLevel=Number(localStorage.getItem('lemmings-current-level'))||0;}catch{}
-if(!isUnlocked(initialLevel,best))initialLevel=0;
+if(!isUnlocked(initialLevel,starRecords))initialLevel=0;
 const game=new Game(initialLevel),terrain=document.createElement('canvas');let background=makeBackground(game.level.theme,game.height);terrain.width=WIDTH;terrain.height=game.height;
 const soundtrack=new Soundtrack($('#soundtrack'));const impactAudio=new ImpactAudio();
 let pendingLevel=null;
@@ -20,7 +24,7 @@ let selected='walk',started=false,paused=false,speed=1,last=0,accumulator=0,rend
 function message(text){$('#message').textContent=text;$('#message').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#message').classList.remove('visible'),5000);}
 function select(skill){if(skill!=='walk'&&!(game.stock[skill]>0)&&!(skill==='block'&&game.units.some(u=>u.state==='block')))return;selected=skill;document.querySelectorAll('.skill').forEach(b=>{const active=b.dataset.skill===skill;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});}
 function start(){impactAudio.unlock();started=true;paused=false;soundtrack.play();$('#intro').classList.add('hidden');$('#result').classList.add('hidden');canvas.focus({preventScroll:true});sync();}
-function reset(levelIndex=game.levelIndex){if(!isUnlocked(levelIndex,best))return;clearTimeout(toastTimer);document.querySelector('#message').classList.remove('visible');soundtrack.pause();game.reset(levelIndex);background=makeBackground(game.level.theme,game.height);renderedRevision=-1;soundtrack.setLevel(levelIndex);updateLevelUI();started=false;paused=false;speed=1;hover=null;pointer=null;hintIndex=0;$('#hint-copy').textContent='Puzzle hints are optional.';$('#hint').textContent='Show a puzzle hint';accumulator=0;$('#result').classList.add('hidden');$('#intro').classList.remove('hidden');$('#speed').textContent='1\u00d7';$('#speed').setAttribute('aria-label','Speed: normal');$('#speed').classList.remove('active');select('walk');sync();}
+function reset(levelIndex=game.levelIndex){if(!isUnlocked(levelIndex,starRecords))return;clearTimeout(toastTimer);document.querySelector('#message').classList.remove('visible');soundtrack.pause();game.reset(levelIndex);background=makeBackground(game.level.theme,game.height);renderedRevision=-1;soundtrack.setLevel(levelIndex);updateLevelUI();started=false;paused=false;speed=1;hover=null;pointer=null;hintIndex=0;$('#hint-copy').textContent='Puzzle hints are optional.';$('#hint').textContent='Show a puzzle hint';accumulator=0;$('#result').classList.add('hidden');$('#intro').classList.remove('hidden');$('#speed').textContent='1\u00d7';$('#speed').setAttribute('aria-label','Speed: normal');$('#speed').classList.remove('active');select('walk');sync();}
 function togglePause(){if(!started)return;paused=!paused;paused?soundtrack.pause():soundtrack.play();sync();}
 function singleStep(){if(!started||game.result)return;paused=true;soundtrack.pause();game.step();if(game.result)result();sync();}
 function toggleSpeed(){speed=speed===1?2:1;$('#speed').textContent=speed+'\u00d7';$('#speed').classList.toggle('active',speed===2);$('#speed').setAttribute('aria-label',speed===1?'Speed: normal':'Speed: fast');}
@@ -34,6 +38,12 @@ function sync(){
 
 }
 function result(){
+ const run={completed:game.result==='win',saved:game.saved,lost:game.lost,ticks:game.tick};
+ const stars=earnedStars(game.level,run);
+ if(stars){starRecords[game.levelIndex]=recordResult(game.level,starRecords[game.levelIndex],run);try{localStorage.setItem('lemmings-stars-v1',JSON.stringify(starRecords));}catch{}}
+ $('#result-stars').innerHTML=starsMarkup(stars);$('#result-stars').setAttribute('aria-label',stars+' of 3 stars earned this run');
+ $('#star-summary').textContent=stars===3?'Completed · Everyone saved · Under target time':stars===2?'Completed · Everyone saved. Beat '+formatTime(game.level.targetTime)+' for the third star.':stars===1?'Completed. Save everyone to earn a second star.':'Reach the rescue target to earn your first star.';
+
  const viewport=$('#viewport');$('#result').style.top=viewport.scrollTop+'px';$('#result').style.height=viewport.clientHeight+'px';$('#result').style.bottom='auto';viewport.style.overflowY='hidden';
   if(game.result==='win'&&game.saved===20&&game.level.total===20&&game.lost===0&&game.spawned===20&&game.units.length===0){perfectRescues[game.levelIndex]={completed:true,saved:20,total:20,lost:0,puzzleId:game.level.puzzleId};try{localStorage.setItem('lemmings-perfect-v2',JSON.stringify(perfectRescues));}catch{}}
   if(game.result==='win'){best[game.levelIndex]=Math.max(best[game.levelIndex]||0,game.saved);try{localStorage.setItem('lemmings-best',JSON.stringify(best));}catch{}}
@@ -59,7 +69,7 @@ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('close',()=>{paused=dialogPause;if(started&&!paused)soundtrack.play();sync();}));
 $('#confirm-restart').addEventListener('click',()=>{$('#restart-dialog').close();dialogPause=false;reset();start();});
 $('#hint').addEventListener('click',()=>{const hints=game.level.hints;$('#hint-copy').textContent=hints[Math.min(hintIndex++,hints.length-1)];$('#hint').textContent=hintIndex>=hints.length?'Repeat final hint':'Next hint';});
-$('#next-level').addEventListener('click',()=>{if(game.result==='win'&&isUnlocked(game.levelIndex+1,best))reset(game.levelIndex+1);});
+$('#next-level').addEventListener('click',()=>{if(game.result==='win'&&isUnlocked(game.levelIndex+1,starRecords))reset(game.levelIndex+1);});
 function updateMusicUI(){
  $('#music-toggle').textContent=soundtrack.muted?'Music off':'Music on';$('#music-toggle').setAttribute('aria-pressed',String(!soundtrack.muted));$('#volume').value=Math.round(soundtrack.volume*100);$('#track-name').textContent=TRACKS[game.levelIndex][1];
 }
@@ -75,7 +85,7 @@ function renderSkills(){
 function updateLevelUI(){
  canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.toggle('tall-world',game.height>HEIGHT);$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';$('#map-navigation').hidden=game.height<=HEIGHT;$('#map-depth').textContent='Depth 0%';
  $('#difficulty-label').textContent=game.level.difficulty;$('#difficulty-label').dataset.difficulty=game.level.difficulty.toLowerCase();
- renderSkills();const l=game.level;document.title=`Lemmings · ${l.world}`;$('#world-label').textContent=`${l.world.toUpperCase()} · ${String(l.id+1).padStart(2,'0')}`;$('h1').textContent=l.name;$('#level-number').textContent=`${l.id+1} / ${LEVELS.length}`;$('#total-count').textContent='/'+l.total;$('#target-count').textContent='/'+l.target;$('#help-goal').textContent=`Save ${l.target} of ${l.total}. Watch out for long falls and the water below. There’s no time limit.`;canvas.setAttribute('aria-label',`${l.world}: ${l.name}`);$('#music-status').textContent='';updateMusicUI();
+ renderSkills();const l=game.level;$('#time-target').textContent='3★ < '+formatTime(l.targetTime);document.title=`Lemmings · ${l.world}`;$('#world-label').textContent=`${l.world.toUpperCase()} · ${String(l.id+1).padStart(2,'0')}`;$('h1').textContent=l.name;$('#level-number').textContent=`${l.id+1} / ${LEVELS.length}`;$('#total-count').textContent='/'+l.total;$('#target-count').textContent='/'+l.target;$('#help-goal').textContent=`Save ${l.target} of ${l.total}. Watch out for long falls and the water below. There’s no time limit.`;canvas.setAttribute('aria-label',`${l.world}: ${l.name}`);$('#music-status').textContent='';updateMusicUI();
  document.querySelectorAll('[data-help-skill]').forEach(el=>{el.hidden=el.dataset.helpSkill!=='walk'&&!(l.stock[el.dataset.helpSkill]>0);});
  try{localStorage.setItem('lemmings-current-level',String(l.id));}catch{}
 }
@@ -84,23 +94,23 @@ $('#volume').addEventListener('input',e=>soundtrack.setVolume(Number(e.target.va
 $('#soundtrack').addEventListener('error',()=>{$('#music-status').textContent='Music could not load.';});
 $('#soundtrack').addEventListener('musicblocked',()=>{$('#music-status').textContent='Press Music on to enable audio.';});
 $('#soundtrack').addEventListener('playing',()=>{$('#music-status').textContent='';});
-function changeLevel(index){if(!isUnlocked(index,best))return;reset(index);$('#levels-dialog').close();}
+function changeLevel(index){if(!isUnlocked(index,starRecords))return;reset(index);$('#levels-dialog').close();}
 function showLevels(){
- const list=$('#level-list');list.replaceChildren();$('#level-confirm').classList.add('hidden');pendingLevel=null;
+ $('#campaign-stars').textContent=totalStars(starRecords)+' / 60 stars · Earn stars to open the next two levels';const list=$('#level-list');list.replaceChildren();$('#level-confirm').classList.add('hidden');pendingLevel=null;
  for(const level of LEVELS){
   if(level.id%5===0){const heading=document.createElement('h3');heading.className='difficulty-heading';heading.textContent=`${level.difficulty} - Levels ${level.id+1}-${level.id+5}`;list.append(heading);}
-  const unlocked=isUnlocked(level.id,best),perfect=isPerfect(level.id,perfectRescues);
+  const unlocked=isUnlocked(level.id,starRecords),stars=starCount(starRecords[level.id]);
   const button=document.createElement('button');button.disabled=!unlocked;button.className='level-card'+(level.id===game.levelIndex?' current':'');button.setAttribute('aria-label',`Level ${level.id+1}: ${level.name}`);
   const preview=document.createElement('canvas');preview.width=200;preview.height=94;preview.setAttribute('aria-hidden','true');const c=preview.getContext('2d');const previewScale=Math.min(200/WIDTH,94/level.height);c.translate((200-WIDTH*previewScale)/2,0);c.scale(previewScale,previewScale);c.drawImage(makeBackground(level.theme,level.height),0,0);const t=document.createElement('canvas');t.width=WIDTH;t.height=level.height;const previewGame=new Game(level.id);renderTerrain(previewGame,t);hazards(c,0,level.theme,level.height);ambientWorld(c,180,level);finaleLandmarks(c,180,level);c.drawImage(t,0,0);drawObjects(c,previewGame);scenery(c,0,level);button.append(preview);
-  const info=document.createElement('span');const title=document.createElement('strong');title.textContent=`${String(level.id+1).padStart(2,'0')} · ${level.name}`;const sub=document.createElement('small');sub.textContent=`${level.difficulty} · ${level.world} · Rescue ${level.target}/${level.total}${best[level.id]?` · Best ${best[level.id]}/${level.total}`:''}`;info.append(title,sub);button.append(info);
-  if(!unlocked){sub.textContent=`${level.difficulty} · ${level.world} · Complete level ${level.id} to unlock`;button.setAttribute('aria-label',`Level ${level.id+1}: ${level.name}, locked`);}
-  if(perfect){const medal=document.createElement('span');medal.className='gold-star';medal.setAttribute('role','img');medal.setAttribute('aria-label','Gold star: 20 of 20 rescued');medal.title='Perfect rescue: 20/20 saved';medal.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 15 8.3 22 9.3 17 14.2 18.2 21.2 12 17.9 5.8 21.2 7 14.2 2 9.3 9 8.3Z" fill="#efc653" stroke="#b98d30" stroke-width="1"/></svg>';button.append(medal);}
+  const info=document.createElement('span');const title=document.createElement('strong');title.textContent=`${String(level.id+1).padStart(2,'0')} · ${level.name}`;const sub=document.createElement('small');sub.textContent=`${level.difficulty} · ${level.world} · Rescue ${level.target}/${level.total} · 3★ under ${formatTime(level.targetTime)}${best[level.id]?` · Best ${best[level.id]}/${level.total}`:''}`;info.append(title,sub);button.append(info);
+  if(!unlocked){sub.textContent=`${level.difficulty} · ${level.world} · ${unlockHint(level.id,starRecords)}`;button.setAttribute('aria-label',`Level ${level.id+1}: ${level.name}, locked`);}
+  const medal=document.createElement('span');medal.className='level-stars';medal.setAttribute('role','img');medal.setAttribute('aria-label',stars+' of 3 stars');medal.innerHTML=starsMarkup(stars);button.append(medal);
 
   button.addEventListener('click',()=>{if(level.id===game.levelIndex){$('#levels-dialog').close();return;}if(started&&!game.result){pendingLevel=level.id;$('#level-confirm').classList.remove('hidden');$('#level-confirm').scrollIntoView({block:'nearest'});}else changeLevel(level.id);});list.append(button);
  }
  openDialog('#levels-dialog');
 }
-$('#levels-button').addEventListener('click',showLevels);$('#cancel-level').addEventListener('click',()=>{$('#level-confirm').classList.add('hidden');pendingLevel=null;});$('#confirm-level').addEventListener('click',()=>{if(pendingLevel!==null)changeLevel(pendingLevel);});
+$('#choose-level').addEventListener('click',showLevels);$('#levels-button').addEventListener('click',showLevels);$('#cancel-level').addEventListener('click',()=>{$('#level-confirm').classList.add('hidden');pendingLevel=null;});$('#confirm-level').addEventListener('click',()=>{if(pendingLevel!==null)changeLevel(pendingLevel);});
 window.addEventListener('keydown',e=>{if(document.querySelector('dialog[open]'))return;if(e.code==='Space'){e.preventDefault();togglePause();}if(['1','2','3','4'].includes(e.key)){select(['walk','block','build','dig'][Number(e.key)-1]);}if(e.key.toLowerCase()==='f')toggleSpeed();if(e.key==='.')singleStep();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&started){paused=true;soundtrack.pause();sync();}last=0;accumulator=0;});
 loadIconArt().then(()=>{

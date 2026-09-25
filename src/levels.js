@@ -8,3 +8,6 @@ for(const layout of DIFFICULT_LAYOUTS)Object.assign(LEVELS[layout.id],layout);
 
 applyPuzzleCampaign(LEVELS);
 for(const level of LEVELS)if(THEMES[level.theme].hazard==='snow')level.hazard='snow';
+
+const targetTimes=[90,90,90,120,90,135,135,180,180,135,240,240,105,135,240,120,105,210,110,180];
+for(const level of LEVELS)level.targetTime=targetTimes[level.id];
