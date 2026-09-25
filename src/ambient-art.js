@@ -19,6 +19,27 @@ function windmill(c,x,y,t) {
 function gear(c,x,y,r,t) {
  c.save();c.translate(x,y);c.rotate(t);c.strokeStyle='#a9936b';c.lineWidth=8;c.beginPath();c.arc(0,0,r*.75,0,TAU);c.stroke();for(let i=0;i<12;i++){c.rotate(TAU/12);c.fillStyle='#aa9777';c.fillRect(r*.64,-4,r*.35,8);}rotor(c,0,0,0,r*.64,'#968976');c.restore();
 }
+export function factoryGears(level,row){
+ const surface=(level.height||470)-28,water=level.hazard==='water';
+ return [[220,row+130,38,.019],[283,row+147,25,-.029],[770,row+99,46,-.013]]
+  .filter(([,y,r])=>water?y-r<surface:y+r+4<surface)
+  .map(([x,y,r,speed])=>({x,y,r,speed,surface,inWater:water&&y+r>=surface}));
+}
+function factoryGear(c,g,t){
+ const {x,y,r,speed,surface,inWater}=g;
+ c.save();
+ if(inWater){c.beginPath();c.rect(x-r-5,y-r-5,r*2+10,surface-y+r+11);c.clip();}
+ gear(c,x,y,r,t*speed);c.restore();
+ if(!inWater)return;
+ // Spray comes from the two points where the rotating rim meets the water.
+ const reach=Math.sqrt(Math.max(0,r*r-(surface-y)*(surface-y)));
+ for(const side of [-1,1]){
+  const contact=x+side*reach;
+  c.strokeStyle='#c4f0ef';c.lineWidth=1.5;c.beginPath();c.ellipse(contact,surface+2,9+Math.sin(t*.15)*3,2,0,0,TAU);c.stroke();
+  for(let i=0;i<5;i++){const p=wrap(t*.055+i*.2,1),dx=side*p*(8+i*2),dy=-Math.sin(p*Math.PI)*(8+i*2);
+   oval(c,contact+dx,surface+dy,1.5,2,'#d8f7f2');}
+ }
+}
 function dolphin(c,x,surface,t) {
  const phase=wrap(t,430)/430;if(phase>.74)return;
  const p=phase/.74, y=surface-8-Math.sin(p*Math.PI)*58;
@@ -50,7 +71,7 @@ export function ambientWorld(c,tick,level) {
    dolphin(c,120,row+246,t+90);dolphin(c,690,row+269,t+260);
    c.strokeStyle='#d0e9e480';c.lineWidth=2;for(let i=0;i<5;i++){c.beginPath();c.ellipse(wrap(i*221+t*.32,1100)-50,row+247+i*12,35,3,0,0,Math.PI);c.stroke();}
   }
-  if(key==='factory') {gear(c,220,row+130,38,t*.019);gear(c,283,row+147,25,-t*.029);gear(c,770,row+99,46,-t*.013);for(let i=0;i<6;i++){const p=wrap(t*.4+i*22,150);oval(c,500+Math.sin(p*.025)*18,row+190-p,9+p*.1,7+p*.07,'#aab7ae25');}}
+  if(key==='factory') {for(const g of factoryGears(level,row))factoryGear(c,g,t);for(let i=0;i<6;i++){const p=wrap(t*.4+i*22,150);oval(c,500+Math.sin(p*.025)*18,row+190-p,9+p*.1,7+p*.07,'#aab7ae25');}}
   if(['volcano','prehistoric'].includes(key)) {
    // Distant debris falls behind every playable shelf: scenery, not a new trap.
    for(let i=0;i<4;i++){const p=wrap(t*(.7+i*.12)+i*91,335);rock(c,110+i*238+Math.sin(p*.02)*12,row-30+p,8+i%2*4,t*.035+i);}
