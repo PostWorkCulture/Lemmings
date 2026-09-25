@@ -55,7 +55,7 @@ export class Game {
     this.events.push({tick:this.tick,id,skill});return {ok:true};
   }
   fall(u) { u.state='fall';u.vy=0;u.fallStart=u.y; }
-  remove(u,saved=false,cause=null) { if(cause==='impact')this.effects.push({type:'splat',x:u.x,y:u.y,tick:this.tick});u.state=saved?'saved':'lost';saved?this.saved++:this.lost++; }
+  remove(u,saved=false) { if(['saved','lost'].includes(u.state))return;if(!saved)this.effects.push({type:'splat',x:Math.max(13,Math.min(WIDTH-13,u.x)),y:Math.min(this.height-5,u.y),tick:this.tick});u.state=saved?'saved':'lost';saved?this.saved++:this.lost++; }
   step() {
     if(this.result)return;
     if(this.spawned<this.level.total && this.tick%this.level.interval===0)this.spawn();
@@ -92,7 +92,7 @@ export class Game {
         u.vy=Math.min(u.vy+(this.level.gravity||.19),u.abilities?.float?.9:4);
         let landed=false;
         for(let y=u.y;y<=u.y+u.vy;y+=.5)if(this.at(u.x,y)){u.y=Math.floor(y);landed=true;break;}
-        if(landed){if(u.y-u.fallStart>155&&!u.abilities?.float)this.remove(u,false,'impact');else {u.state='walk';u.vy=0;}}else u.y+=u.vy;
+        if(landed){if(u.y-u.fallStart>155&&!u.abilities?.float)this.remove(u);else {u.state='walk';u.vy=0;}}else u.y+=u.vy;
         continue;
       }
       if(!this.at(u.x,u.y)){this.fall(u);continue;}
