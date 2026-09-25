@@ -49,7 +49,7 @@ export function chapterBackdrop(c,key,height,level=null){
    c.fillStyle=color;c.beginPath();c.moveTo(0,height);for(let x=0;x<=1000;x+=5)c.lineTo(x,shore+offset+Math.sin(x*.013)*13+Math.cos(x*.021)*6);c.lineTo(1000,height);c.closePath();c.fill();
   }
   for(let i=0;i<45;i++)oval(c,i*149%1000,shore+49+i*23%66,2+i%4,1.3,'#d6a64e70');
-  parasol(c,125,shore+84,38);parasol(c,825,shore+91,42);parasol(c,940,shore+62,26);iceCream(c,225,shore+102,1.4);
+
  }
 }
 export function skyBalloon(c,x,y,t,i){

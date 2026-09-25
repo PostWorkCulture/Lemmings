@@ -120,7 +120,7 @@ loadIconArt().then(()=>{
 function draw(){
   ctx.imageSmoothingEnabled=false;ctx.drawImage(background,0,0);
   if(renderedRevision!==game.revision){renderTerrain(game,terrain);renderedRevision=game.revision;}
-  hazards(ctx,game.tick,game.level.theme,game.height);
+  hazards(ctx,sceneryTick,game.level.theme,game.height);
   ambientWorld(ctx,sceneryTick,game.level);finaleLandmarks(ctx,sceneryTick,game.level);
   ctx.drawImage(terrain,0,0);drawObjects(ctx,game);scenery(ctx,game.tick,game.level,game.spawned,game.lastSpawnTick,sceneryTick,game);
   if(game.level.theme==='woodland')for(let i=0;i<16;i++){const t=game.tick/100+i*4,x=80+(i*67)%870+Math.sin(t)*8,y=65+(i*47)%260+Math.cos(t*.7)*5;ctx.globalAlpha=.2+(Math.sin(t)+1)*.2;ctx.fillStyle='#e5db91';ctx.fillRect(x,y,2,2);}ctx.globalAlpha=1;
@@ -143,7 +143,7 @@ function draw(){
 }
 function frame(now){
   if(last===0)last=now;const dt=Math.min(now-last,100);last=now;
-  if(!paused&&!game.result&&!document.hidden)sceneryTick+=dt*.06*(started?speed:1);
+  if(!paused&&!document.hidden)sceneryTick+=dt*.06*(started?speed:1);
   if(started&&!paused&&!game.result){accumulator+=dt*speed;while(accumulator>=1000/60){game.step();accumulator-=1000/60;if(game.result){result();break;}}}else accumulator=0;
   draw();sync();requestAnimationFrame(frame);
 }

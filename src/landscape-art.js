@@ -1,4 +1,4 @@
-import {chapterBackdrop,parasol,iceCream} from './chapter-art.js';
+import {chapterBackdrop} from './chapter-art.js';
 import {WORLDS} from './worlds.js';
 const TAU=Math.PI*2;
 function poly(c,p,color){c.fillStyle=color;c.beginPath();p.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fill();}
@@ -88,7 +88,7 @@ export function worldScenery(c,tick,level,terrainAt=null){
  for(const [i,[x,y,w,h,type]] of level.terrain.entries()){
   if((type!==1&&!(key==='beach'&&type===2&&h<65))||w<100||y>(level.height||560)-30)continue;const px=x+Math.min(w*.22,60);if(!scenerySupported(level,px,y,terrainAt))continue;c.save();c.globalAlpha=.85;
   if(['woodland','treehouse','highland'].includes(key)){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.025+i)*.055);tree(c,0,0,key==='treehouse'?.8:.65);c.restore();}
-  if(key==='beach'){if(scenerySupported(level,x+w*.68,y,terrainAt))parasol(c,x+w*.68,y,22);if(scenerySupported(level,x+w*.85,y,terrainAt))iceCream(c,x+w*.85,y,.75);c.save();c.translate(px,y);c.rotate(Math.sin(tick*.024+i)*.07);tree(c,0,0,.7,true);c.restore();c.fillStyle='#c89777';c.fillRect(x+w-45,y-10,13,10);c.strokeStyle='#d5c596';c.strokeRect(x+w-43,y-15,9,6);}
+  if(key==='beach'){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.024+i)*.07);tree(c,0,0,.7,true);c.restore();c.fillStyle='#c89777';c.fillRect(x+w-45,y-10,13,10);c.strokeStyle='#d5c596';c.strokeRect(x+w-43,y-15,9,6);}
   if(['alpine','polar'].includes(key)){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.02+i)*.04);pine(c,0,0,.65,'#24884b');c.restore();}
   if(key==='candy'){c.fillStyle='#d5c7b4';c.fillRect(px-2,y-42,4,42);ellipse(c,px,y-44,16,16,i%2?'#e2a6ba':'#b9d1b6');c.strokeStyle='#f5d6de';c.lineWidth=2;c.beginPath();c.arc(px,y-44,9,0,TAU*1.4);c.stroke();}
   if(['space','station','enchanted','waterfall'].includes(key))crystal(c,px,y,24+i%3*10,key==='station'?'#79acb1':'#9daacb');
