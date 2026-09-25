@@ -93,7 +93,7 @@ export function ambientWorld(c,tick,level) {
    butterfly(c,330+Math.sin(t*.018)*55,row+145+Math.cos(t*.026)*20,t*.2,'#d9bc82');
   }
   if(key==='highland'){const shelves=level.terrain.filter(r=>r[4]===1&&r[2]>160&&r[1]>row+140&&r[1]<row+330&&r[1]<height-30);const shelf=shelves.find(r=>r[0]<785&&r[0]+r[2]>785)||shelves[0];if(shelf){const x=Math.min(shelf[0]+shelf[2]-45,Math.max(shelf[0]+45,785));windmill(c,x,shelf[1]-83,t+seed);}}
-  if(key==='beach'&&row===0) {
+  if(key==='beach'&&row===0&&level.backgroundStyle!=='inland-beach') {
    // Keep the whole leap inside the distant ocean band, at every map height.
    const surface=Math.max(180,height*.42)+90;
    dolphin(c,120,surface,t+90);dolphin(c,690,surface+20,t+260);

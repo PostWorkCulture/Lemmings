@@ -8,10 +8,10 @@ function pine(c,x,y,s=1,color='#268548'){c.fillStyle='#565447';c.fillRect(x-3*s,
 function pyramid(c,x,y,w,h){poly(c,[[x-w/2,y],[x,y-h],[x+w/2,y]],'#b3966a');poly(c,[[x,y-h],[x+w/2,y],[x+12,y]],'#897457');}
 function tower(c,x,y,h,color){c.fillStyle=color;c.fillRect(x-22,y-h,44,h);for(let i=0;i<4;i++)c.fillRect(x-25+i*14,y-h-8,10,12);c.fillStyle='#333c50';for(let yy=y-h+25;yy<y;yy+=35)c.fillRect(x-4,yy,8,17);}
 function crystal(c,x,y,h,color){poly(c,[[x-13,y],[x-17,y-h*.7],[x,y-h],[x+16,y-h*.7],[x+12,y]],color);poly(c,[[x,y-h],[x+16,y-h*.7],[x+12,y],[x,y]],'#d2e8ee44');}
-export function worldBackground(key,height=470){
+export function worldBackground(key,height=470,level=null){
  const w=WORLDS.find(w=>w.key===key);if(!w)return null;
  const canvas=document.createElement('canvas');canvas.width=1000;canvas.height=height;const c=canvas.getContext('2d');
- if(['circus','beach'].includes(key)){chapterBackdrop(c,key,height);return canvas;}
+ if(['circus','beach'].includes(key)){chapterBackdrop(c,key,height,level);return canvas;}
  const g=c.createLinearGradient(0,0,0,470);g.addColorStop(0,w.sky[0]);g.addColorStop(1,w.sky[1]);c.fillStyle=g;c.fillRect(0,0,1000,470);
  const hills=(color,offset=0)=>{c.fillStyle=color;c.beginPath();c.moveTo(0,470);for(let x=0;x<=1000;x+=10)c.lineTo(x,290+offset+Math.sin(x*.01)*30+Math.cos(x*.019)*20);c.lineTo(1000,470);c.fill();};
  const stars=()=>{for(let i=0;i<100;i++){c.fillStyle=i%3?'#d3e4e880':'#eff6ef';c.fillRect((i*173)%1000,(i*67)%380,1+i%2,1);}};

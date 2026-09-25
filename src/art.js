@@ -31,8 +31,8 @@ export function character(c,x,y,state='walk',dir=1,tick=0,scale=1) {
   }
   c.restore();
 }
-export function makeBackground(theme='forest',height=HEIGHT) {
-  const world=worldBackground(theme,height);if(world)return world;
+export function makeBackground(theme='forest',height=HEIGHT,level=null) {
+  const world=worldBackground(theme,height,level);if(world)return world;
   if(theme!=='forest')return themedBackground(theme);
   const canvas=document.createElement('canvas');canvas.width=WIDTH;canvas.height=HEIGHT;
   const c=canvas.getContext('2d');

@@ -25,7 +25,7 @@ export function iceCream(c,x,y,s=1){
  c.strokeStyle='#a86f34';c.lineWidth=1;for(let i=0;i<3;i++){c.beginPath();c.moveTo(-5+i*2,-14+i*3);c.lineTo(4,-10+i*2);c.stroke();}
  oval(c,-3,-21,6,6,'#ff9ab9');oval(c,4,-21,6,6,'#fff1c0');oval(c,0,-27,6,6,'#88d9bc');c.restore();
 }
-export function chapterBackdrop(c,key,height){
+export function chapterBackdrop(c,key,height,level=null){
  const sky=c.createLinearGradient(0,0,0,height);sky.addColorStop(0,key==='circus'?'#289cde':'#9bdde9');sky.addColorStop(1,key==='circus'?'#bceaf4':'#d4f0ef');c.fillStyle=sky;c.fillRect(0,0,1000,height);
  cloud(c,110,65,1.5);cloud(c,820,60,1.5);cloud(c,390,40,1);
  if(key==='circus'){
@@ -35,6 +35,14 @@ export function chapterBackdrop(c,key,height){
   c.save();c.globalAlpha=.48;c.drawImage(layer,0,0);c.restore();
   poly(c,[[440,ground],[560,ground],[625,height],[375,height]],'#f2cc83');
  }else{
+  if(level?.backgroundStyle==='inland-beach'){
+   const beachTop=Math.max(180,height*.42);
+   for(const [offset,color]of [[0,'#e8bb64'],[17,'#efca7b'],[46,'#f5d58e']]){
+    c.fillStyle=color;c.beginPath();c.moveTo(0,height);for(let x=0;x<=1000;x+=8)c.lineTo(x,beachTop+offset+Math.sin(x*.007)*10);c.lineTo(1000,height);c.closePath();c.fill();
+   }
+   for(let i=0;i<35;i++)oval(c,i*149%1000,beachTop+66+i*37%Math.max(30,height-beachTop-85),2+i%3,1,'#cca35345');
+   return;
+  }
   const horizon=Math.max(180,height*.42),shore=height-135;c.fillStyle='#168fbe';c.fillRect(0,horizon,1000,height-horizon);
   for(let i=0;i<20;i++){c.strokeStyle=i%2?'#77d7e980':'#b0edf180';c.lineWidth=2;c.beginPath();const x=i*137%1000,y=horizon+14+i*19%Math.max(20,shore-horizon);c.moveTo(x,y);c.quadraticCurveTo(x+20,y+6,x+60,y);c.stroke();}
   for(const [offset,color]of [[-13,'#77d4df'],[-5,'#e4ffff'],[4,'#b3eaf0'],[15,'#f9be39'],[27,'#ffdc62']]){

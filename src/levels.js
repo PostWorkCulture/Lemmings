@@ -80,3 +80,6 @@ export function rocketHeight(level,entrance){return level.rocketY??(level.entran
 // Treetop Trail's boundary trunks provides a route toward the rescue exit.
 delete LEVELS[1].stock.swim;
 delete LEVELS[4].stock.climb;
+
+// A quieter inland beach backdrop for the locksmith's layered route.
+LEVELS[5].backgroundStyle='inland-beach';
