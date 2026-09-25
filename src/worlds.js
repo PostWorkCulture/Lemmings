@@ -15,7 +15,7 @@ export const WORLDS=[
  ['prehistoric','Bonefern Caverns','Into the Fossil',['#252c30','#737c58'],['#746853','#8b7b61','#9d8c6e','#584f45','#b4a88b'],['#c4bd81','#91995f','#656e48'],'water'],
  ['castle','Briarstone Keep','Moat and Turrets',['#343e56','#7a8991'],['#646673','#7b7c88','#93959c','#4e505d','#b1aeb1'],['#b7c1a3','#909a89','#626d63'],'water'],
  ['highland','Heather Highlands','The Crooked Glen',['#476570','#b5b7a0'],['#655847','#7a6650','#92775b','#4c453a','#aa9170'],['#c0ce73','#8ca355','#597b44'],'snow'],
- ['circus','Starlight Circus','The Great Bounce',['#352447','#92677c'],['#957160','#ad8b74','#c19f88','#705850','#d9b99b'],['#e4c17c','#c39b64','#8e7054'],'water'],
+ ['circus','Starlight Circus','The Great Bounce',['#289cde','#bceaf4'],['#79638e','#8c729f','#b9a2ca','#5f4c73','#a48ab7'],['#c5b0d5','#ab91bd','#7e6691'],'toys'],
  ['night','Moonlit Rooftops','Midnight Express',['#141b36','#424b68'],['#52526b','#696580','#7e7794','#3d3e55','#9890aa'],['#b6b2c4','#858499','#61637f'],'water'],
  ['sports','Lemming Games','The Obstacle Course',['#497e89','#acbfa4'],['#9a624c','#b57557','#ca8a62','#764b3c','#e1a87a'],['#c6d492','#90ab69','#668249'],'water'],
  ['station','Starport Nine','The Gravity Garden',['#15172e','#424362'],['#535b72','#67748b','#8397a5','#3e455d','#a1bcc3'],['#c8e1d5','#85b2b3','#5c8297'],'void'],

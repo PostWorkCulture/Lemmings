@@ -10,7 +10,7 @@ test('every authored waterfall lands in unobstructed level water',()=>{
  }}
 });
 test('waterfalls remain continuous to the bottom of taller maps',()=>{
- const source=LEVELS.find(l=>l.theme==='enchanted'),level={...source,height:source.height+200};
+ const source=LEVELS.find(l=>l.waterfallTheme==='waterfall'),level={...source,height:source.height+200};
  assert.equal(waterfallRoutes(level)[0].waterY,level.height-28);
  assert.equal(waterfallRoutes(level).length,1);
  assert.deepEqual(waterfallRoutes(LEVELS[0]),[]);

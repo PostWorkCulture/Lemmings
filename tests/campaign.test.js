@@ -20,7 +20,7 @@ export function solveLevel(index){if(LEVELS[index].puzzleId)return solvePuzzle(i
 }
 for(const level of LEVELS){
  test(`Level ${level.id+1}: ${level.name} has a 20/20 solution within its skill budget`,()=>{const g=solveLevel(level.id);assert.equal(g.result,'win');assert.equal(g.saved,level.total);assert.ok(g.tick<level.targetTime*60,'perfect route must beat the third-star target');assert.equal(g.lost,0);assert.ok(Object.values(g.stock).every(n=>n>=0));});
- test(`Level ${level.id+1}: recorded solution replays exactly`,()=>{const solved=solveLevel(level.id),g=new Game(level.id);while(g.tick<solved.tick){for(const e of solved.events.filter(e=>e.tick===g.tick))assert.ok(g.assign(e.id,e.skill).ok);g.step();}assert.equal(g.result,'win');assert.equal(g.saved,solved.saved);assert.deepEqual(g.terrain,solved.terrain);});
+ test(`Level ${level.id+1}: recorded solution replays exactly`,()=>{const solved=solveLevel(level.id),g=new Game(level.id);while(g.tick<solved.tick&&!g.result){for(const e of solved.events.filter(e=>e.tick===g.tick))assert.ok(g.assign(e.id,e.skill).ok);g.step();}assert.equal(g.result,'win');assert.equal(g.saved,solved.saved);assert.deepEqual(g.terrain,solved.terrain);});
 }
 test('switching levels resets terrain, stock, direction and rescue target',()=>{const g=solveLevel(0);for(let i=1;i<5;i++){g.reset(i);assert.equal(g.level.target,18);assert.equal(g.tick,0);assert.equal(g.saved,0);assert.deepEqual(g.stock,LEVELS[i].stock);assert.deepEqual(g.terrain,new Game(i).terrain);g.step();assert.equal(g.units[0].dir,LEVELS[i].dir);}});
 test('skills unavailable on a map cannot be spent',()=>{const g=new Game(2);while(!g.units.some(u=>u.state==='walk'))g.step();assert.equal(g.assign(0,'build').ok,false);assert.equal(g.stock.build,0);});

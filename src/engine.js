@@ -1,6 +1,6 @@
 import {SKILLS} from './skills.js';
 import {objectPosition,updateObjects,objectInteraction} from './objects.js';
-import { LEVELS } from './levels.js';
+import { LEVELS,rocketHeight } from './levels.js';
 export const WIDTH = 1000, HEIGHT = 470;
 export const EXIT_FRAMES = 96;
 export const LEVEL = LEVELS[0];
@@ -13,6 +13,7 @@ export class Game {
     this.terrain = new Uint8Array(WIDTH * this.height);
     for(const rect of this.level.terrain)this.rect(...rect);
     for(const shape of this.level.shapes||[])this.polygon(shape.points,shape.type);
+    if(this.level.hazard==='toys')this.rect(0,this.hazardY,WIDTH,28,2);
     this.units=[];this.effects=[]; this.lastSpawnTick=null; this.spawned=0; this.saved=0; this.lost=0; this.tick=0;
     this.disabledObjects=new Set();this.stock={...this.level.stock}; this.result=null; this.events=[]; this.revision=(this.revision||0)+1;
   }
@@ -29,7 +30,7 @@ export class Game {
     for(let y=lo;y<hi;y++){const xs=[];for(let i=0;i<points.length;i++){const [ax,ay]=points[i],[bx,by]=points[(i+1)%points.length];if((ay<=y&&by>y)||(by<=y&&ay>y))xs.push(ax+(y-ay)*(bx-ax)/(by-ay));}xs.sort((a,b)=>a-b);for(let i=0;i<xs.length;i+=2)this.rect(xs[i],y,xs[i+1]-xs[i],1,type);}
   }
   at(x,y) { x=Math.floor(x);y=Math.floor(y);if(x<0||x>=WIDTH||y<0||y>=this.height)return 0;for(const o of this.level.objects||[]){if(((o.type==='gate'&&!this.disabledObjects.has(o.id))||(o.type==='bridge'&&this.disabledObjects.has(o.id)))&&x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h)return 2;}for(const o of this.level.objects||[])if(o.type==='lift'){const p=objectPosition(o,this.tick);if(x>=p.x&&x<=p.x+o.w&&y>=Math.floor(p.y)&&y<Math.floor(p.y)+5)return 2;}return this.terrain[y*WIDTH+x]; }
-  spawn() { this.lastSpawnTick=this.tick;const entrance=this.level.entrances?.[this.spawned%this.level.entrances.length]||{x:this.level.spawnX,y:this.level.spawnY,dir:this.level.dir};const u={id:this.spawned++,x:entrance.x,y:entrance.y,dir:entrance.dir,state:'fall',vy:0,fallStart:entrance.y,jobTick:0,steps:0};this.units.push(u);return u; }
+  spawn() { this.lastSpawnTick=this.tick;const entrance=this.level.entrances?.[this.spawned%this.level.entrances.length]||{x:this.level.spawnX,y:this.level.spawnY,dir:this.level.dir};const u={id:this.spawned++,x:entrance.x,y:entrance.y,dir:entrance.dir,state:'fall',vy:0,fallStart:entrance.y,jobTick:0,steps:0};u.arrival={x:entrance.x,y:entrance.y,startY:rocketHeight(this.level,entrance),age:0,duration:Math.max(1,Math.abs(entrance.y-(rocketHeight(this.level,entrance)))/1.5)};u.x=entrance.x;u.y=rocketHeight(this.level,entrance);this.units.push(u);return u; }
   canAssign(u,skill) {
     if(!u||!this.units.includes(u)||this.result||['exit','drown','saved','lost'].includes(u.state))return 'Choose a lemming first.';
     if(!SKILLS[skill])return 'Unknown skill.';
@@ -63,6 +64,12 @@ export class Game {
     updateObjects(this);this.tick++;this.effects=this.effects.filter(e=>this.tick-e.tick<=150);
     for(const u of this.units) {
       if(u.state==='saved'||u.state==='lost')continue;
+      if(u.arrival){
+        const a=u.arrival,p=Math.min(1,++a.age/a.duration);
+        u.x=a.x;u.y=a.startY+(a.y-a.startY)*p;
+        if(p===1){u.arrival=null;u.fallStart=u.y;u.vy=0;}
+        continue;
+      }
       if(u.state==='slide'){
         const slope=u.slideSlope;u.x-=slope.uphill*1.8;
         let floor=null;for(let y=u.y-5;y<=u.y+10;y++)if(this.at(u.x,y)&&!this.at(u.x,y-1)){floor=y;break;}
@@ -85,16 +92,16 @@ export class Game {
         if(u.exitTick>=EXIT_FRAMES)this.remove(u,true);
         continue;
       }
-      if(u.y>=this.hazardY&&u.abilities?.swim&&!['lava','void','sand','syrup','snow'].includes(this.level.hazard)){u.state='swim';u.y=this.hazardY;}
+      if(u.y>=this.hazardY&&u.abilities?.swim&&!['lava','void','sand','syrup','snow','toys'].includes(this.level.hazard)){u.state='swim';u.y=this.hazardY;}
       if(u.y>=this.hazardY&&this.level.hazard==='water'&&!u.abilities?.swim){
         u.state='drown';u.y=this.hazardY+3;u.drownStart=this.tick;u.shark=u.id%3===0;continue;
       }
-      if((u.y>=this.hazardY&&u.state!=='swim')||u.x<8||u.x>990){this.remove(u);continue;}
+      if((u.y>=this.hazardY&&u.state!=='swim'&&this.level.hazard!=='toys')||u.x<8||u.x>990){this.remove(u);continue;}
       if(objectInteraction(this,u))continue;
       if(u.riding&&['walk','block','attract'].includes(u.state))continue;
       if(u.state==='ladder'||u.state==='pole'){
         const o=u.object,target=u.state==='ladder'?o.top:o.bottom;u.y+=Math.sign(target-u.y)*Math.min(1.1,Math.abs(target-u.y));
-        if(Math.abs(u.y-target)<.2){u.dir=o.dir||u.dir;u.x+=u.dir*12;u.state='walk';u.object=null;}continue;
+        if(Math.abs(u.y-target)<.2){u.y=target;u.dir=o.dir||u.dir;u.x+=u.dir*12;while(o.surfaceExit&&u.y>0&&this.at(u.x,u.y-1))u.y--;u.state='walk';u.object=null;}continue;
       }
       if(u.state==='swim'){const nx=u.x+u.dir*.8;if(this.at(nx,this.hazardY-4)){u.y=this.hazardY-5;while(this.at(nx,u.y)&&u.y>this.hazardY-52)u.y--;u.y++;u.state='walk';}u.x=nx;continue;}
       if(u.state==='climb'){if(this.at(u.x-u.dir*2,u.y-25)){u.dir*=-1;this.fall(u);continue;}u.y-=.8;if(!this.at(u.x+u.dir*2,u.y-1)){u.x+=u.dir*4;u.y=Math.floor(u.y);u.state='walk';}continue;}

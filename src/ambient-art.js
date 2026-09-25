@@ -1,3 +1,4 @@
+import {skyBalloon,mountainWeather} from './chapter-art.js';
 import {drawWaterfalls} from './waterfall-art.js';
 // Ambient world life is drawn behind the playable terrain and never changes collision.
 const TAU = Math.PI * 2;
@@ -73,11 +74,12 @@ export function ambientWorld(c,tick,level) {
    for(let i=0;i<7;i++){const x=wrap(120+i*153+t*.42,1080)-40,y=row+80+wrap(i*27+t*.2,200);c.save();c.translate(x,y);c.rotate(t*.035+i);oval(c,0,0,5,2,'#c2b86c');c.restore();}
    butterfly(c,330+Math.sin(t*.018)*55,row+145+Math.cos(t*.026)*20,t*.2,'#d9bc82');
   }
-  if(['highland','woodland'].includes(key)){const shelves=level.terrain.filter(r=>r[4]===1&&r[2]>160&&r[1]>row+140&&r[1]<row+330);const shelf=shelves.find(r=>r[0]<785&&r[0]+r[2]>785)||shelves[0];if(shelf){const x=Math.min(shelf[0]+shelf[2]-45,Math.max(shelf[0]+45,785));windmill(c,x,shelf[1]-83,t+seed);}}
-  if(key==='beach') {
-   // Dolphins leap out of the distant ocean; the foreground water remains dangerous.
-   dolphin(c,120,row+246,t+90);dolphin(c,690,row+269,t+260);
-   c.strokeStyle='#d0e9e480';c.lineWidth=2;for(let i=0;i<5;i++){c.beginPath();c.ellipse(wrap(i*221+t*.32,1100)-50,row+247+i*12,35,3,0,0,Math.PI);c.stroke();}
+  if(key==='highland'){const shelves=level.terrain.filter(r=>r[4]===1&&r[2]>160&&r[1]>row+140&&r[1]<row+330&&r[1]<height-30);const shelf=shelves.find(r=>r[0]<785&&r[0]+r[2]>785)||shelves[0];if(shelf){const x=Math.min(shelf[0]+shelf[2]-45,Math.max(shelf[0]+45,785));windmill(c,x,shelf[1]-83,t+seed);}}
+  if(key==='beach'&&row===0) {
+   // Keep the whole leap inside the distant ocean band, at every map height.
+   const surface=Math.max(180,height*.42)+90;
+   dolphin(c,120,surface,t+90);dolphin(c,690,surface+20,t+260);
+   c.strokeStyle='#d0e9e480';c.lineWidth=2;for(let i=0;i<5;i++){c.beginPath();c.ellipse(wrap(i*221+t*.32,1100)-50,surface+i*12,35,3,0,0,Math.PI);c.stroke();}
   }
   if(key==='factory') {for(const g of factoryGears(level,row))factoryGear(c,g,t);for(let i=0;i<6;i++){const p=wrap(t*.4+i*22,150);oval(c,500+Math.sin(p*.025)*18,row+190-p,9+p*.1,7+p*.07,'#aab7ae25');}}
   if(['volcano','prehistoric'].includes(key)) {
@@ -85,12 +87,7 @@ export function ambientWorld(c,tick,level) {
    for(let i=0;i<4;i++){const p=wrap(t*(.7+i*.12)+i*91,335);rock(c,110+i*238+Math.sin(p*.02)*12,row-30+p,8+i%2*4,t*.035+i);}
    if(key==='volcano')for(let i=0;i<13;i++){const p=wrap(t*.65+i*33,270);oval(c,70+i*77+Math.sin(p*.04)*12,row+300-p,2,3,'#eeb879');}
   }
-  if(['polar','alpine'].includes(key)) {
-   // Snowballs roll along a distant ridge, always behind the active terrain.
-   const ridge=row+174;c.strokeStyle='#afcbd270';c.lineWidth=6;c.beginPath();c.moveTo(0,ridge);c.lineTo(1000,ridge+62);c.stroke();
-   for(let i=0;i<3;i++){const x=wrap(t*.9+i*370,1100)-50;rock(c,x,ridge+x*.062-11,10+i*2,t*.06+i,true);}
-   for(let i=0;i<24;i++){const x=wrap(i*97+t*.25+Math.sin(t*.015+i)*9,1000),y=row+wrap(i*53+t*.55,330);oval(c,x,y,1.7,1.7,'#e4f1ee');}
-  }
+  if(['polar','alpine'].includes(key)&&row===0)mountainWeather(c,t,height);
   if(key==='egypt') {
    if(row===0)for(let i=0;i<3;i++){const x=wrap(t*.38+i*340,1100)-50;skyBird(c,level,x,25+i*14,t*.045+i,false);}
    for(let i=0;i<12;i++){c.fillStyle='#ebc98870';c.fillRect(wrap(i*87+t*1.5,1000),row+150+i*8+Math.sin(t*.018+i)*5,16,1);}
@@ -102,7 +99,7 @@ export function ambientWorld(c,tick,level) {
   if(key==='candy') {for(let i=0;i<3;i++){const x=170+i*330,y=row+120+i%2*35;c.fillStyle='#dacbbb';c.fillRect(x-3,y,6,90);oval(c,x,y,26,26,'#e4c4c4');rotor(c,x,y,t*.025*(i%2?-1:1),23,i%2?'#a5c7b9':'#c885a6',true);}}
   if(key==='marble') {for(let i=0;i<3;i++){const x=180+i*310,y=row+178;c.strokeStyle='#bcdde5';c.lineWidth=2;for(let j=0;j<5;j++){const p=wrap(t*.025+j*.6,3)/3;c.beginPath();c.arc(x+(j-2)*p*15,y-Math.sin(p*Math.PI)*43,2,0,TAU);c.stroke();}oval(c,x,y+3,33,5,'#a6c1c380');}}
   if(key==='castle') {for(let i=0;i<3;i++){const x=190+i*305,y=row+85;c.fillStyle='#abb6b6';c.fillRect(x,y,3,85);const wave=Math.sin(t*.07+i)*9;shape(c,[[x+3,y],[x+44,y+wave],[x+35,y+16+wave],[x+3,y+20]],'#b27f88');}}
-  if(key==='circus') {const x=745,y=row+156;c.strokeStyle='#bc9f98';c.lineWidth=3;shape(c,[[x-32,y+85],[x,y],[x+32,y+85]],'#807083');c.beginPath();c.arc(x,y,64,0,TAU);c.stroke();for(let i=0;i<8;i++){const a=t*.01+i*TAU/8,px=x+Math.cos(a)*64,py=y+Math.sin(a)*64;c.beginPath();c.moveTo(x,y);c.lineTo(px,py);c.stroke();c.fillStyle=i%2?'#ddba91':'#b398bd';c.fillRect(px-7,py,14,10);}for(let i=0;i<3;i++){const bx=130+i*90+Math.sin(t*.015+i)*20,by=row+80+Math.sin(t*.021+i)*12;c.strokeStyle='#c3b6b4';c.beginPath();c.moveTo(bx,by);c.lineTo(bx+6,by+45);c.stroke();oval(c,bx,by,13,17,i%2?'#b5c397':'#d69ea4');}}
+  if(key==='circus'&&row===0){for(let i=0;i<5;i++){const x=90+i*195+Math.sin(t*.012+i)*12,y=[26,49,34,53,23][i]+Math.sin(t*.018+i)*5;if(clearSky(level,x,y+20))skyBalloon(c,x,y,t,i);}}
   if(key==='night') {if(row===0)for(let i=0;i<5;i++){const x=wrap(t*.8+i*229,1120)-60;skyBird(c,level,x,25+i%3*14+Math.sin(t*.033+i)*5,t*.2+i); }c.strokeStyle='#ead8a170';c.lineWidth=2;c.beginPath();const p=wrap(t,550);if(p<90){c.moveTo(500+p*3,row+25+p*.6);c.lineTo(540+p*3,row+33+p*.6);}c.stroke();}
   if(key==='sports') {for(let i=0;i<3;i++){const x=180+i*320,y=row+126;rotor(c,x,y,t*.045,23,['#e7c48a','#b1c7ae','#c29bbc'][i],true);c.fillStyle='#9cae9d';c.fillRect(x-2,y+6,4,55);}const x=wrap(t*.9,1100)-50,y=row+245-Math.abs(Math.sin(t*.035))*52;oval(c,x,y,11,11,'#dec8a0');c.save();c.translate(x,y);c.rotate(t*.07);c.fillStyle='#716c67';c.fillRect(-4,-4,8,8);c.restore();}
   if(['enchanted','waterfall'].includes(key)) {for(let i=0;i<6;i++){const x=160+i*145+Math.sin(t*.016+i)*36,y=row+85+i%3*40+Math.cos(t*.022+i)*16;butterfly(c,x,y,t*.16+i,i%2?'#b1d7d9':'#c4acd6');}if(key==='enchanted'){for(let i=0;i<5;i++){const x=wrap(90+i*206+t*.2,1000),y=row+240-wrap(t*.18+i*37,200);oval(c,x,y,4,4,'#d9e1ab70');}}}
@@ -114,6 +111,8 @@ export function finaleLandmarks(c,t,level) {
  c.save();c.globalAlpha=.48;
  for(const p of level.setPieces||[]){
   const {left,right,y,room,form}=p,mid=(left+right)/2,w=right-left;
+  const depth={'circus-rings':74,'rooftop-towers':137,'stadium-bowl':132,'orbital-pods':84,'crystal-cascade':52}[form]??140;
+  if(y+depth>(level.height||560)-28)continue;
   if(form==='circus-rings'){
    const peak=y-102;c.strokeStyle='#d4ba9b';c.lineWidth=2;
    for(let i=0;i<8;i++)shape(c,[[mid,peak],[left+w*i/8,y+16],[left+w*(i+1)/8,y+16]],i%2?'#b37e9c':'#d5bfa2');

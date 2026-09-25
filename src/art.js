@@ -1,4 +1,5 @@
-import {hazardMarkers} from './hazard-art.js';
+import {rocketHeight} from './levels.js';
+import {toyGround} from './chapter-art.js';
 import {worldBackground,worldScenery} from './landscape-art.js';
 import { THEMES } from './levels.js';
 import { WIDTH,HEIGHT } from './engine.js';
@@ -59,7 +60,10 @@ export function renderTerrain(game,canvas) {
   const theme=THEMES[game.level.theme];const colors={1:theme.earth,2:theme.stone,3:palettes[3]};
   const pixels=c.createImageData(WIDTH,game.height),cache={};
   for(let y=0;y<game.height;y++)for(let x=0;x<WIDTH;x++){
-    const type=game.terrain[y*WIDTH+x];if(!type)continue;
+    let type=game.terrain[y*WIDTH+x];if(!type)continue;
+      if(game.level.hazard==='toys'&&y>=game.height-28)continue;
+      // Soil covers buried roots; keep the existing collision material intact.
+      if(type===2&&game.level.theme==='woodland'&&game.level.terrain.some(([tx,ty,w,h,material])=>material===1&&x>=tx&&x<tx+w&&y>=ty&&y<ty+h))type=1;
     const h=hash(Math.floor(x/4),Math.floor(y/4));
     let color=colors[type][h%5===0?h%colors[type].length:1];
     if(type===1){
@@ -80,6 +84,22 @@ export function renderTerrain(game,canvas) {
 
     }else if(type===2){if(y%17<2|| (x+(Math.floor(y/17)%2)*12)%25<2)color=theme.stone[3];else if(y%17===3)color=theme.stone[2];}
     else if(type===3)color=y%2?'#a57a45':'#dbb67a';
+    if(type===2&&game.level.theme==='woodland'){
+      const grain=(x+Math.floor(Math.sin(y*.055+x*.13)*3))%11;
+      color=grain<2?'#17241d':grain<5?'#304033':grain===7?'#4b5140':'#25352a';
+      if(!terrainAt(x-1,y)||!terrainAt(x+1,y))color='#14261c';
+      if(!terrainAt(x,y-1))color='#46543a';
+    }
+    if(type===2&&game.level.theme==='circus'){
+      color='#795c96';
+      if(y%17<2||x%32<2)color='#51425f';
+      else if(y%17<5)color='#ad94c4';
+    }
+    if(type===1&&game.level.theme==='circus'){
+      const prop=(game.level.circusProps||[]).find(p=>x>=p.x&&x<p.x+p.w&&y>=p.y&&y<p.y+p.h);
+      if(prop){if(prop.kind==='ball'){const a=Math.atan2(y-(prop.y+prop.h/2),x-(prop.x+prop.w/2));color=['#f23f68','#ffc932','#36a9db','#ffeec3'][Math.floor((a+Math.PI)/(Math.PI/2))%4];}
+       else color=Math.floor((x-prop.x)/8)%2?'#fff0d6':'#ef3351';}
+    }
     if(!cache[color])cache[color]=[parseInt(color.slice(1,3),16),parseInt(color.slice(3,5),16),parseInt(color.slice(5,7),16)];
     const rgb=cache[color],i=(y*WIDTH+x)*4;pixels.data[i]=rgb[0];pixels.data[i+1]=rgb[1];pixels.data[i+2]=rgb[2];pixels.data[i+3]=255;
   }
@@ -99,7 +119,7 @@ export function hatchOpening(tick,spawned,total,lastSpawnTick){
 }
 export function magicalEntrance(c,tick,level,spawned=0,lastSpawnTick=null){
   const open=hatchOpening(tick,spawned,level.total,lastSpawnTick);
-  c.save();c.translate(level.spawnX,level.spawnY);
+  c.save();c.translate(level.spawnX,level.spawnY);c.scale(level.rocketScale||1,level.rocketScale||1);
   c.lineJoin='round';c.lineCap='round';c.lineWidth=1.5;c.strokeStyle='#34243d';
   const shape=(draw,color)=>{c.beginPath();draw();c.closePath();c.fillStyle=color;c.fill();c.stroke();};
   // Red swept fins and white hull echo the supplied rocket reference.
@@ -127,7 +147,7 @@ export function magicalEntrance(c,tick,level,spawned=0,lastSpawnTick=null){
 }
 export function scenery(c,tick,level,spawned=0,lastSpawnTick=null,sceneryTick=tick) {
   worldScenery(c,sceneryTick,level);
-  if(level.entrances){for(const [i,e] of level.entrances.entries()){const n=level.entrances.length,count=Math.max(0,Math.ceil((spawned-i)/n));magicalEntrance(c,tick,{...level,spawnX:e.x,spawnY:e.y,total:Math.ceil((level.total-i)/n)},count,count?((count-1)*n+i)*level.interval:null);}}else magicalEntrance(c,tick,level,spawned,lastSpawnTick);
+  if(level.entrances){for(const [i,e] of level.entrances.entries()){const n=level.entrances.length,count=Math.max(0,Math.ceil((spawned-i)/n));magicalEntrance(c,tick,{...level,spawnX:e.x,spawnY:rocketHeight(level,e),rocketScale:i===0?1:.6,total:Math.ceil((level.total-i)/n)},count,count?((count-1)*n+i)*level.interval:null);}}else magicalEntrance(c,tick,{...level,spawnY:level.rocketY||90},spawned,lastSpawnTick);
   // Golden splayed arch and twin torches from the supplied classic exit reference.
   exitArch(c,level.exitX,level.exitY,tick);
   if(level.theme==='forest'){
@@ -143,8 +163,8 @@ export function exitArch(c,x,y,tick=0,scale=1) {
   poly([[-35,0],[-31,-10],[-15,-51],[-9,-57],[10,-57],[17,-51],[34,-7],[37,0]],'#775328');
   poly([[-33,-2],[-14,-51],[-8,-55],[9,-55],[15,-49],[33,-2],[20,-2],[6,-39],[-4,-39],[-19,-2]],'#d7ac43');
   poly([[-29,-3],[-12,-49],[-6,-52],[8,-52],[13,-47],[28,-3],[22,-3],[8,-43],[-5,-43],[-22,-3]],'#f0d16d');
-  poly([[-19,-2],[-4,-39],[6,-39],[20,-2]],'#152639');
-  poly([[-13,-4],[-2,-32],[4,-32],[14,-4]],'#263857');
+  poly([[-19,-2],[-4,-39],[6,-39],[20,-2]],'#146535');
+  poly([[-13,-4],[-2,-32],[4,-32],[14,-4]],'#45c96d');
   c.fillStyle='#ad7b35';c.fillRect(-21,-4,43,4);c.fillStyle='#eed180';c.fillRect(-16,-7,32,3);c.fillStyle='#aab9bc';c.fillRect(-10,-10,21,3);
   for(let side of [-1,1])for(let i=0;i<6;i++){
     c.fillStyle=i%2?'#fff09c':'#b58232';c.fillRect(side*(13+i*3)-2,-47+i*7,5,2);
@@ -273,6 +293,7 @@ export function enteringLemming(c,u,level,tick){
 // All hazard motion uses simulation time, so pause and 2x stay consistent.
 export function hazards(c,tick,theme,height=HEIGHT){
   const hazard=THEMES[theme].hazard;
+  if(hazard==='toys'){toyGround(c,height);return;}
   if(hazard==='snow'){
     const surface=height-28;c.save();
     const snow=c.createLinearGradient(0,surface,0,height);snow.addColorStop(0,'#f4fbf8');snow.addColorStop(1,'#a9c7d6');
@@ -282,9 +303,9 @@ export function hazards(c,tick,theme,height=HEIGHT){
     c.strokeStyle='#83aabd';c.lineWidth=1.5;
     for(let x=12;x<WIDTH;x+=67){c.beginPath();c.moveTo(x,height-9);c.quadraticCurveTo(x+15,height-15,x+33,height-10);c.stroke();}
     c.fillStyle='#ffffff';for(let i=0;i<60;i++)c.fillRect(i*83%WIDTH,surface+6+i*17%18,2,1);
-    hazardMarkers(c,height-14);c.restore();return;
+    c.restore();return;
   }
-  if(hazard==='void'){c.fillStyle='#0c1026';c.fillRect(0,height-28,WIDTH,28);for(let i=0;i<30;i++){c.fillStyle='#bfcaf166';c.fillRect((i*79+tick*.2)%WIDTH,height-25+i%20,1,1);}hazardMarkers(c,height-14);return;}
+  if(hazard==='void'){c.fillStyle='#0c1026';c.fillRect(0,height-28,WIDTH,28);for(let i=0;i<30;i++){c.fillStyle='#bfcaf166';c.fillRect((i*79+tick*.2)%WIDTH,height-25+i%20,1,1);}return;}
   const lava=hazard==='lava'||theme==='clockwork',surface=height-28;
   c.save();
   const fill=c.createLinearGradient(0,surface,0,height);
@@ -309,6 +330,6 @@ export function hazards(c,tick,theme,height=HEIGHT){
       if(i%4===0){c.strokeStyle='#86cad780';c.beginPath();c.ellipse(x,surface+13-phase*10,2+phase*4,1.2,0,0,Math.PI*2);c.stroke();}
     }
   }
-  hazardMarkers(c,height-14);
+
   c.restore();
 }

@@ -20,7 +20,7 @@ test('the first level can rescue all 20 with one of each skill',()=>{
 });
 test('a recorded solution replays deterministically',()=>{
   const original=solve(),g=new Game();
-  while(g.tick<original.tick){for(const e of original.events.filter(e=>e.tick===g.tick))assert.ok(g.assign(e.id,e.skill).ok);g.step();}
+  while(g.tick<original.tick&&!g.result){for(const e of original.events.filter(e=>e.tick===g.tick))assert.ok(g.assign(e.id,e.skill).ok);g.step();}
   assert.equal(g.saved,original.saved);assert.equal(g.result,original.result);assert.deepEqual(g.terrain,original.terrain);
 });
 test('doing nothing loses the level rather than walking across the gap',()=>{
@@ -40,7 +40,7 @@ test('restart restores both terrain and counters',()=>{
   const g=solve();g.reset();const clean=new Game();assert.deepEqual(g.terrain,clean.terrain);assert.deepEqual(g.stock,clean.stock);assert.equal(g.tick,0);assert.equal(g.spawned,0);assert.equal(g.saved,0);assert.equal(g.lost,0);assert.equal(g.result,null);
 });
 test('blockers turn an approaching walker and Walker releases them',()=>{
-  const g=new Game();const b=g.spawn(),w=g.spawn();Object.assign(b,{x:300,y:220,state:'walk'});Object.assign(w,{x:290,y:220,state:'walk'});
+  const g=new Game();const b=g.spawn(),w=g.spawn();Object.assign(b,{arrival:null,x:300,y:220,state:'walk'});Object.assign(w,{arrival:null,x:290,y:220,state:'walk'});
   assert.ok(g.assign(b.id,'block').ok);g.step();assert.equal(w.dir,-1);assert.equal(b.x,300);assert.ok(g.assign(b.id,'walk').ok);g.step();assert.ok(b.x<300);
 });
 test('a dangerous fall is fatal, a short fall is safe',()=>{

@@ -2,7 +2,7 @@
 // and its uninterrupted fall terminates in the level's actual water surface.
 const TAU=Math.PI*2;
 const SOURCES={waterfall:[{x:449,width:46,sourceY:76}],enchanted:[{x:757,width:68,sourceY:93}]};
-export function waterfallRoutes(level){return (SOURCES[level.theme]||[]).map(source=>({...source,waterY:(level.height||470)-28}));}
+export function waterfallRoutes(level){return (SOURCES[level.waterfallTheme||level.theme]||[]).map(source=>({...source,waterY:(level.height||470)-28}));}
 function polygon(c,points,color){c.fillStyle=color;c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fill();}
 function oval(c,x,y,rx,ry,color){c.fillStyle=color;c.beginPath();c.ellipse(x,y,rx,ry,0,0,TAU);c.fill();}
 function curtain(c,x,top,bottom,w,t){

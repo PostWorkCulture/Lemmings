@@ -1,11 +1,17 @@
 import {Game} from '../src/engine.js';
 export function solvePuzzle(id,variant='perfect',omit=null){
- const g=new Game(id),done=new Set();if(omit)g.stock[omit]=0;
+ const g=new Game(id),done=new Set();id=g.level.solutionId??id;if(omit)g.stock[omit]=0;
  const act=(key,uid,skill,condition)=>{if(done.has(key))return;const u=g.units.find(u=>u.id===uid);if(u&&condition(u,g)&&!g.canAssign(u,skill)){g.assign(uid,skill);done.add(key);}};
  const at=(key,uid,skill,x,y,dir=1)=>act(key,uid,skill,u=>u.state==='walk'&&u.dir===dir&&Math.abs(u.y-y)<2&&(dir===1?u.x>=x:u.x<=x));
  for(let t=0;t<50000&&!g.result;t++){
+  if(g.level.bottomEntry){const y=g.level.ascent.floor;
+   if(id===5)at('ascent-bridge',0,'platform',124,y);
+   if(id===12)at('ascent-bash',0,'bash',151,y);
+   if(id===15)at('ascent-stairs',0,'build',124,y);
+   if(id===19){at('ascent-stack',0,'stack',130,y);at('ascent-clear',1,'bash',113,y);}
+  }
   if(id===5){at('hold',1,'attract',105,300);at('stack',0,'stack',260,300);at('build',0,'build',260,264);at('bash',0,'bash',690,300);at('bridge',0,'platform',764,300);if(done.has('bridge')&&g.tick>4500)act('release',1,'walk',()=>true);if(done.has('release'))at('unstack',1,'bash',244,300);}
-  if(id===6){at('hold',1,'attract',105,340);at('build',0,'build',284,340);act('dune',0,'bash',u=>u.state==='walk'&&u.dir===1&&u.x>=432);at('bridge',0,'platform',684,340);at('tomb',0,'bash',811,340);if(done.has('tomb')&&g.tick>5000)act('release',1,'walk',()=>true);}
+  if(id===6){at('hold',1,'attract',105,340);at('build',0,'build',284,340);act('dune',0,'bash',u=>u.state==='walk'&&u.dir===1&&u.x>=412);at('bridge',0,'platform',684,340);at('tomb',0,'bash',811,340);if(done.has('tomb')&&g.tick>5000)act('release',1,'walk',()=>true);}
   if(id===15){at('hold',1,'attract',105,300);at('jump',0,'jump',460,300);at('drop',0,'dig',575,260);at('bash',0,'bash',631,300);at('bridge',0,'build',774,300);if(done.has('bridge')&&g.tick>4500)act('release',1,'walk',()=>true);}
   if(id===16){at('bridge',0,'build',334,220);at('chimney',0,'bash',731,220);at('roofs',0,'platform',804,220);at('climb',1,'climb',150,450);at('back',1,'turn',340,450);at('tunnel',1,'bash',315,450,-1);if(done.has('tunnel'))at('home',1,'turn',220,450,-1);}
 

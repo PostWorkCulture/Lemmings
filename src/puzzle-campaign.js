@@ -5,8 +5,8 @@ export function applyPuzzleCampaign(levels){
  [{type:'gate',id:'canopy',x:580,y:240,w:18,h:60},{type:'switch',x:430,y:264,target:'canopy'},{type:'pole',x:500,y:264,bottom:300,dir:1}],{stack:1,build:1,attract:1,bash:2,platform:1},
  {hints:['A raised switch controls the lower gate. The canopy is too high to reach directly.','Stack a foothold and build from its top. Hold the crowd with an Attractor.','The scaffold must be cleared for the crowd after the scout prepares the route.']});
  set(6,'The Shifting Dunes','dune-slide',[[40,340,260,28,2],[370,340,330,28,2],[770,340,190,28,2],[40,275,12,65,2],[948,275,12,65,2],[820,280,26,60,1]],[],{attract:1,build:1,bash:2,platform:1},
- {height:560,spawnY:290,exitY:340,shapes:[{type:1,points:[[100,340],[175,312],[215,312],[280,340]]},{type:1,points:[[430,340],[470,240],[495,240],[550,340]]},{type:1,points:[[565,340],[600,325],[630,325],[675,340]]}],
- slipperySlopes:[{x:430,y:200,w:120,h:140,uphill:1,ceiling:300,baseX:430,baseY:340}],
+ {height:560,spawnY:290,exitY:340,shapes:[{type:1,points:[[120,340],[175,284],[215,284],[280,340]]},{type:1,points:[[410,340],[490,140],[540,140],[650,340]]}],
+ slipperySlopes:[{x:410,y:100,w:240,h:240,uphill:1,ceiling:300,baseX:410,baseY:340}],
  hints:['Gentle dunes can be walked over, but the high dune sheds its sand and sends climbers sliding back.','Bridge the first ravine, then tunnel through the steep dune near its foot.','Prepare the second crossing and break through the tomb wall before releasing the waiting crowd.']});
  set(15,'The Opening Act','machine-access',[[40,300,260,30,2],[390,300,410,30,2],[870,268,90,30,2],[40,240,12,60,2],[948,208,12,60,2],[500,260,110,14,1],[640,240,28,60,1]],
  [{type:'trampoline',x:270,y:300,w:26,speed:2.4,vy:-5.4,dir:1},{type:'gate',id:'curtain',x:700,y:240,w:20,h:60},{type:'switch',x:560,y:260,target:'curtain'},{type:'rubble',x:640,y:240,w:28,h:60}],{attract:1,jump:1,dig:1,bash:1,build:1},

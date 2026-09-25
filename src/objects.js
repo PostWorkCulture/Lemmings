@@ -16,6 +16,11 @@ export function objectInteraction(g,u){
   if(o.requires&&!g.disabledObjects.has(o.requires))continue;
   if(isDangerous(o,g.tick,g.disabledObjects)&&u.x>=o.x&&u.x<=o.x+o.w&&u.y>o.y&&u.y-22<o.y+o.h){g.remove(u);return true;}
   if(u.state!=='walk')continue;
+  if(o.type==='portal'&&!o.arrivalOnly&&Math.abs(u.x-o.x)<4&&Math.abs(u.y-o.y)<4&&(u.portalUntil||0)<=g.tick){
+   const destination=g.level.objects.find(p=>p.type==='portal'&&p.id===o.target);
+   if(destination){u.x=destination.x+(destination.dir||u.dir)*16;u.y=destination.y;u.dir=destination.dir||u.dir;u.portalUntil=g.tick+60;u.portalFlash=g.tick;u.fallStart=u.y;return true;}
+  }
+
   if(o.type==='ladder'&&Math.abs(u.x-o.x)<3&&Math.abs(u.y-o.y)<4){u.state='ladder';u.object=o;u.x=o.x;return true;}
   if(o.type==='pole'&&Math.abs(u.x-o.x)<3&&Math.abs(u.y-o.y)<4){u.state='pole';u.object=o;u.x=o.x;return true;}
   if(o.type==='trampoline'&&u.x>=o.x&&u.x<=o.x+o.w&&Math.abs(u.y-o.y)<4){u.state='jump';u.vy=o.vy||-5.4;u.vx=(o.speed||2.4)*(o.dir||u.dir);u.dir=Math.sign(u.vx);u.fallStart=u.y;u.safeJump=true;return true;}

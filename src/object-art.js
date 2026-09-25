@@ -5,7 +5,12 @@ export function drawObjects(c,g){
  const badge=(id,x,y)=>{const i=controls.indexOf(id);if(i<0)return;c.save();c.fillStyle=['#e8c47d','#9cbede','#bbcf8a'][i%3];c.beginPath();c.arc(x,y,6,0,Math.PI*2);c.fill();c.fillStyle='#24312d';c.font='bold 8px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(String.fromCharCode(65+i),x,y);c.restore();};
  for(const z of g.level.oneWay||[]){c.fillStyle='#e4c787';for(let x=z.x+12;x<z.x+z.w-5;x+=20)for(let y=z.y+15;y<z.y+z.h-10;y+=26){if(g.at(x,y)!==1)continue;c.beginPath();c.moveTo(x+z.dir*5,y);c.lineTo(x-z.dir*4,y-4);c.lineTo(x-z.dir*4,y+4);c.closePath();c.fill();}}
  for(const o of g.level.objects||[]){const p=objectPosition(o,g.tick);c.save();if(o.requires&&!g.disabledObjects.has(o.requires))c.globalAlpha=.35;
-  if(o.type==='rubble'){
+  if(o.type==='portal'){
+   c.translate(o.x,o.y);c.fillStyle='#282542';c.fillRect(-20,-48,40,48);c.strokeStyle=o.color;c.lineWidth=4;c.strokeRect(-18,-46,36,44);
+   const glow=c.createRadialGradient(0,-23,2,0,-23,25);glow.addColorStop(0,'#fff2ff');glow.addColorStop(.35,o.color);glow.addColorStop(1,'#24233f');c.fillStyle=glow;c.fillRect(-14,-42,28,38);
+   c.strokeStyle='#ffffff9a';c.lineWidth=1.5;for(let n=0;n<3;n++){c.beginPath();c.ellipse(0,-23,4+n*4,7+n*5,g.tick*.025+n,0,Math.PI*1.5);c.stroke();}
+   c.fillStyle='#ffffff';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText(o.label||'',0,-53);
+  }else if(o.type==='rubble'){
    // Cracks are drawn only on surviving rock so a bashed tunnel stays visibly open.
    c.strokeStyle='#e7b180';c.lineWidth=1.5;
    for(let y=o.y+6;y<o.y+o.h-5;y+=13)for(let x=o.x+5;x<o.x+o.w-4;x+=15){if(g.at(x,y)!==1||g.at(x+5,y+6)!==1)continue;c.beginPath();c.moveTo(x,y);c.lineTo(x+5,y+3);c.lineTo(x+2,y+7);c.stroke();}
@@ -38,7 +43,7 @@ export function drawObjects(c,g){
 }
 export function skillEquipment(c,u,tick){
  c.save();c.translate(u.x,u.y);const state=u.state;
- if(u.abilities?.float&&state==='fall'){
+ if(u.arrival||(u.abilities?.float&&state==='fall')){
   c.strokeStyle='#d0d5c5';c.lineWidth=1;c.beginPath();c.moveTo(-15,-45);c.lineTo(-4,-12);c.moveTo(15,-45);c.lineTo(4,-12);c.stroke();c.fillStyle='#bd8f9c';c.beginPath();c.arc(0,-43,17,Math.PI,0);c.closePath();c.fill();c.strokeStyle='#e1c4be';c.beginPath();c.arc(0,-43,9,Math.PI,0);c.stroke();
  }
  if(['bash','mine'].includes(state)){c.rotate(Math.sin(tick*.15)*.4);c.strokeStyle='#c6ac75';c.lineWidth=2;c.beginPath();c.moveTo(0,-12);c.lineTo(u.dir*14,-22);c.stroke();c.strokeStyle='#b7c8c3';c.lineWidth=3;c.beginPath();c.moveTo(u.dir*8,-25);c.lineTo(u.dir*17,-19);c.stroke();}
