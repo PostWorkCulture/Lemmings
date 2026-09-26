@@ -26,6 +26,7 @@ export function iceCream(c,x,y,s=1){
  oval(c,-3,-21,6,6,'#ff9ab9');oval(c,4,-21,6,6,'#fff1c0');oval(c,0,-27,6,6,'#88d9bc');c.restore();
 }
 export function chapterBackdrop(c,key,height,level=null){
+ if(key==='circus'){c.fillStyle='#773b46';c.fillRect(0,0,1000,height);return;}
  const sky=c.createLinearGradient(0,0,0,height);
  sky.addColorStop(0,key==='circus'?'#252637':'#516d72');
  sky.addColorStop(1,key==='circus'?'#393346':'#85918a');
@@ -65,7 +66,7 @@ export function mountainWeather(c,t,height){
 }
 
 export function toyGround(c,height){
- c.fillStyle='#b76870';c.fillRect(0,height-28,1000,28);
+ c.fillStyle='#d8b94f';c.fillRect(0,height-28,1000,28);
 }
 
 export function driftingClouds(c,tick){

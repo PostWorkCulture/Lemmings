@@ -33,3 +33,6 @@
 .level-card .level-stars{display:flex;gap:3px;flex:0 0 auto;font-size:19px}.earned{color:#efc653}.unearned{color:#58645c}
 .result-stars{font-size:32px;letter-spacing:6px;margin:12px 0}#choose-level{margin:0 0 12px}#star-summary{font-size:11px}.star-rules{font-size:11px}
 @media(max-width:560px){.level-card .level-stars{font-size:15px;gap:1px}.level-card{gap:8px}.level-card canvas{width:75px}}
+
+/* Let every level occupy the full screen width, scrolling vertically as needed. */
+.shell{padding-left:0;padding-right:0}.masthead{padding-inline:12px;min-width:0}.game-panel{border-left:0;border-right:0;border-radius:0;min-width:0}.viewport{overflow-x:hidden;overflow-y:auto}.viewport>canvas,.viewport:not(.tall-world)>canvas,.viewport.tall-world>canvas{width:100%;height:auto;object-fit:initial;touch-action:pan-y}

@@ -83,7 +83,7 @@ function renderSkills(){
  }
 }
 function updateLevelUI(){
- canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.toggle('tall-world',game.height>HEIGHT);$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';$('#map-navigation').hidden=game.height<=HEIGHT;$('#map-depth').textContent='Depth 0%';
+ canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.add('tall-world');$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';$('#map-depth').textContent='Depth 0%';
  $('#difficulty-label').textContent=game.level.difficulty;$('#difficulty-label').dataset.difficulty=game.level.difficulty.toLowerCase();
  renderSkills();const l=game.level;$('#time-target').textContent='3★ < '+formatTime(l.targetTime);document.title=`Lemmings · ${l.world}`;$('#world-label').textContent=`${l.world.toUpperCase()} · ${String(l.id+1).padStart(2,'0')}`;$('h1').textContent=l.name;$('#level-number').textContent=`${l.id+1} / ${LEVELS.length}`;$('#total-count').textContent='/'+l.total;$('#target-count').textContent='/'+l.target;$('#help-goal').textContent=`Save ${l.target} of ${l.total}. Watch out for long falls and hazards. There’s no time limit.`;canvas.setAttribute('aria-label',`${l.world}: ${l.name}`);$('#music-status').textContent='';updateMusicUI();
  document.querySelectorAll('[data-help-skill]').forEach(el=>{el.hidden=el.dataset.helpSkill!=='walk'&&!(l.stock[el.dataset.helpSkill]>0);});
@@ -154,3 +154,11 @@ soundtrack.setLevel(game.levelIndex);updateLevelUI();sync();requestAnimationFram
 $('#map-up').addEventListener('click',()=>$('#viewport').scrollBy({top:-$('#viewport').clientHeight*.7,behavior:'smooth'}));
 $('#map-down').addEventListener('click',()=>$('#viewport').scrollBy({top:$('#viewport').clientHeight*.7,behavior:'smooth'}));
 $('#viewport').addEventListener('scroll',()=>{const v=$('#viewport');$('#map-depth').textContent=`Depth ${Math.min(100,Math.max(0,Math.round(v.scrollTop/Math.max(1,v.scrollHeight-v.clientHeight)*100)))}%`;pointer=null;hover=null;});
+// Fit terrain to the available width; expose navigation whenever its height overflows.
+const viewportResizeObserver=new ResizeObserver(()=>{
+ const v=$('#viewport');$('#map-navigation').hidden=canvas.getBoundingClientRect().height<=v.clientHeight+1;
+ if(game.result){$('#result').style.top=v.scrollTop+'px';$('#result').style.height=v.clientHeight+'px';}
+ pointer=null;hover=null;
+});
+viewportResizeObserver.observe(canvas);
+viewportResizeObserver.observe($('#viewport'));

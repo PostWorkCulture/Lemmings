@@ -7,7 +7,7 @@ import { WIDTH,HEIGHT } from './engine.js';
 const palettes={1:['#624734','#6c5038','#73583d','#594330','#806243'],2:['#455c59','#4a625d','#526d64','#3d534f'],3:['#b48c56','#c59a61','#d3ac72']};
 function hash(x,y){let a=Math.imul(x+773,y+179)^Math.imul(x,7919);return (a^a>>>11)>>>0;}
 export function character(c,x,y,state='walk',dir=1,tick=0,scale=1) {
-  c.save();c.translate(Math.round(x),Math.round(y));c.scale(dir*scale,scale);
+  c.save();c.translate(Math.round(x),Math.round(y));c.scale(dir*scale*.75,scale*.75);
   const phase=Math.floor(tick/7)%4,bob=state==='walk'&&phase%2?1:0;
   const r=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(x,y-bob,w,h);};
   // A compact, hand-drawn sprite; every job shares the same body and palette.
@@ -23,7 +23,7 @@ export function character(c,x,y,state='walk',dir=1,tick=0,scale=1) {
     const foot=state==='walk'?[-2,1,3,0][phase]:0;
     r(-5-foot,-2,5,3,'#f9dcba');r(2+foot,-2,5,3,'#f9dcba');
     if(state==='build'){
-      r(2,-11,7,3,'#fbf1d5');r(7,-12,4,3,'#f7cca3');r(6,-15,10,3,'#bc9156');r(6,-16,10,1,'#ead3a0');
+      r(2,-11,7,3,'#fbf1d5');r(7,-12,4,3,'#f7cca3');r(6,-15,10,3,'#c49a29');r(6,-16,10,1,'#efd25b');
     }else if(state==='dig'){
       r(3,-12,5,4,'#f2edd9');r(7,-11,3,9,'#b79159');r(5,-3,7,3,'#b1c7c0');r(7,0,3,2,'#819e98');
     }else if(state==='fall'){
@@ -83,7 +83,7 @@ export function renderTerrain(game,canvas) {
       }
 
     }else if(type===2){if(y%17<2|| (x+(Math.floor(y/17)%2)*12)%25<2)color=theme.stone[3];else if(y%17===3)color=theme.stone[2];}
-    else if(type===3)color=y%2?'#a57a45':'#dbb67a';
+    else if(type===3)color=y%2?'#c49a29':'#efd25b';
     if(type===2&&game.level.theme==='woodland'){
       const grain=(x+Math.floor(Math.sin(y*.055+x*.13)*3))%11;
       color=grain<2?'#17241d':grain<5?'#304033':grain===7?'#4b5140':'#25352a';
@@ -315,12 +315,12 @@ export function enteringLemming(c,u,level,tick){
   if(t<16){
     c.translate(u.x,u.y);c.scale(Math.max(.28,1-t/20),1);character(c,0,0,'walk',u.dir,tick);
   }else if(t<42){
-    c.translate(u.x,u.y);c.scale(.82,1);lemmingBack(c,tick);
+    c.translate(u.x,u.y);c.scale(.82*.75,.75);lemmingBack(c,tick);
   }else{
     // Once through the threshold, the doorway clips the miniature orbit.
     c.beginPath();c.moveTo(level.exitX-18,level.exitY-3);c.lineTo(level.exitX-4,level.exitY-39);c.lineTo(level.exitX+6,level.exitY-39);c.lineTo(level.exitX+19,level.exitY-3);c.closePath();c.clip();
     const p=(t-42)/54,r=5*(1-p),angle=p*Math.PI*4,scale=Math.max(.04,.84*(1-p));
-    c.translate(level.exitX+1+Math.cos(angle)*r,level.exitY-19+Math.sin(angle)*r*.65);c.rotate(angle);c.scale(scale,scale);c.globalAlpha=Math.min(1,(1-p)*3);c.translate(0,12);lemmingBack(c,tick);
+    c.translate(level.exitX+1+Math.cos(angle)*r,level.exitY-19+Math.sin(angle)*r*.65);c.rotate(angle);c.scale(scale*.75,scale*.75);c.globalAlpha=Math.min(1,(1-p)*3);c.translate(0,12);lemmingBack(c,tick);
   }
   c.restore();
 }

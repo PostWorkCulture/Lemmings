@@ -18,11 +18,7 @@ export function worldBackground(key,height=470,level=null){
   sky.addColorStop(0,key==='woodland'?'#0d211e':'#172a38');
   sky.addColorStop(1,key==='woodland'?'#1b342a':'#263e4c');
   c.fillStyle=sky;c.fillRect(0,0,1000,height);
-  if(key==='woodland'){
-   c.save();c.globalAlpha=.12;
-   for(const [x,y,size] of [[30,430,2.1],[185,450,2.5],[800,450,2.4],[970,440,2.2]])tree(c,x,y,size);
-   c.restore();
-  }else{
+  if(key==='alpine'){
    // One broad ridge on either edge leaves open space between puzzle shelves.
    poly(c,[[-100,430],[125,120],[305,430]],'#314a57');
    poly(c,[[600,470],[840,220],[1110,470]],'#2b424f');
@@ -77,12 +73,15 @@ export function worldBackground(key,height=470,level=null){
  if(key==='egypt'){const ground=height-28;pyramid(c,245,ground,660,330);pyramid(c,600,ground,460,230);pyramid(c,850,ground,580,300);}
  return canvas;
 }
-export function scenerySupported(level,x,y,terrainAt=null){
+export function scenerySupported(level,x,y,terrainAt=null,halfWidth=0,height=40){
  const solid=terrainAt||((px,py)=>{
   if(level.terrain.some(([tx,ty,w,h])=>px>=tx&&px<tx+w&&py>=ty&&py<ty+h))return true;
   return (level.shapes||[]).some(({points})=>{let inside=false;for(let i=0,j=points.length-1;i<points.length;j=i++){const [ax,ay]=points[i],[bx,by]=points[j];if((ay>py)!==(by>py)&&px<(bx-ax)*(py-ay)/(by-ay)+ax)inside=!inside;}return inside;});
  });
- return !!solid(x,y)&&![1,12,24,40].some(d=>solid(x,y-d));
+ if(!solid(x,y)||[1,12,24,40].some(d=>solid(x,y-d)))return false;
+ // Check the whole silhouette, not just its trunk: canopies must clear nearby walls.
+ if(halfWidth)for(let dx=-halfWidth;dx<=halfWidth;dx+=4)for(let dy=4;dy<=height;dy+=4)if(solid(x+dx,y-dy))return false;
+ return true;
 }
 function winterProp(c,x,y,sled=false){
  c.save();c.translate(x,y);c.lineJoin='round';c.lineCap='round';
@@ -121,7 +120,7 @@ export function worldScenery(c,tick,level,terrainAt=null){
  const placed=[];
  for(const [i,[x,y,w,h,type]] of level.terrain.entries()){
   if((type!==1&&!(key==='beach'&&type===2&&h<65))||w<100||y>(level.height||560)-30)continue;const px=x+Math.min(w*.22,60);
-  if(!scenerySupported(level,px,y,terrainAt))continue;
+  if(!scenerySupported(level,px,y,terrainAt,['beach','woodland','treehouse'].includes(key)?40:32,['beach','woodland','treehouse'].includes(key)?76:50))continue;
   // One small motif per area, with breathing room around functional items.
   if(key!=='woodland'&&(placed.length>=4||placed.some(p=>Math.abs(p.x-px)<150&&Math.abs(p.y-y)<140)))continue;
   if((level.objects||[]).some(o=>Math.abs(o.x-px)<65&&Math.abs(o.y-y)<80))continue;
