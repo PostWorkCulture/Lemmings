@@ -1,3 +1,4 @@
+import {CLASSIC_ENTRANCE} from './classic-entrance.js';
 import {rocketHeight} from './levels.js';
 import {toyGround} from './chapter-art.js';
 import {worldBackground,worldScenery} from './landscape-art.js';
@@ -62,8 +63,7 @@ export function renderTerrain(game,canvas) {
   for(let y=0;y<game.height;y++)for(let x=0;x<WIDTH;x++){
     let type=game.terrain[y*WIDTH+x];if(!type)continue;
       if(game.level.hazard==='toys'&&y>=game.height-28)continue;
-      // Soil covers buried roots; keep the existing collision material intact.
-      if(type===2&&game.level.theme==='woodland'&&game.level.terrain.some(([tx,ty,w,h,material])=>material===1&&x>=tx&&x<tx+w&&y>=ty&&y<ty+h))type=1;
+      // Buried hard roots keep their dark bark cue: soil must not disguise steel.
     const h=hash(Math.floor(x/4),Math.floor(y/4));
     let color=colors[type][h%5===0?h%colors[type].length:1];
     if(type===1){
@@ -88,16 +88,37 @@ export function renderTerrain(game,canvas) {
       const grain=(x+Math.floor(Math.sin(y*.055+x*.13)*3))%11;
       color=grain<2?'#17241d':grain<5?'#304033':grain===7?'#4b5140':'#25352a';
       if(!terrainAt(x-1,y)||!terrainAt(x+1,y))color='#14261c';
-      if(!terrainAt(x,y-1))color='#46543a';
+      if(!terrainAt(x,y-3))color='#5f704f';
+      if(!terrainAt(x,y-1))color='#9daa77';
     }
-    if(type===2&&['alpine','polar'].includes(game.level.theme)){
-      if(!terrainAt(x,y-1)||!terrainAt(x,y-2))color='#e8f1ef';
-      else if(!terrainAt(x,y-4))color='#b6d5df';
-    }
-    if(type===2&&game.level.theme==='circus'){
-      color='#795c96';
-      if(y%17<2||x%32<2)color='#51425f';
-      else if(y%17<5)color='#ad94c4';
+    // Quiet, larger material marks leave the route silhouette and tools in charge.
+    // Hard blocks stay regular; excavatable terrain has sparse organic strata.
+    const material=game.level.theme;
+    if((type===1||type===2)&&['beach','alpine','circus'].includes(material)){
+      const surface=!terrainAt(x,y-1),rim=!terrainAt(x,y-3),edge=!terrainAt(x-1,y)||!terrainAt(x+1,y)||!terrainAt(x,y+1);
+      const grain=hash(Math.floor(x/18),Math.floor(y/12));
+      if(material==='beach'){
+        color=type===1?'#bd965d':'#877350';
+        if(type===1&&grain%13===0)color='#c4a16b';
+        if(type===2&&(y%32===0||(x+(Math.floor(y/32)%2)*32)%64===0))color='#756344';
+        if(edge)color=type===1?'#967443':'#64583e';
+        if(rim)color=type===1?'#e6cc8b':'#bdaa78';
+        if(surface)color=type===1?'#f3dc9d':'#d4c695';
+      }else if(material==='alpine'){
+        color=type===1?'#e0ecef':'#b9ced6';
+        if(type===1&&((y+Math.floor(Math.sin(x*.025)*5))%43===0))color='#c9dde3';
+        if(type===2&&(y%36===0||(x+(Math.floor(y/36)%2)*36)%72===0))color='#96b2c0';
+        if(edge)color=type===1?'#a2c3cf':'#7495a6';
+        if(rim)color='#bdd9e0';
+        if(surface)color='#eff6f5';
+      }else{
+        color=type===1?'#947ba6':'#735c8d';
+        if(type===1&&grain%19===0)color='#9b84ad';
+        if(type===2&&(y%36===0||(x+(Math.floor(y/36)%2)*36)%72===0))color='#65517d';
+        if(edge)color=type===1?'#715982':'#503f65';
+        if(rim)color=type===1?'#c1accf':'#a58dba';
+        if(surface)color=type===1?'#d3c2df':'#bba6cd';
+      }
     }
     if(type===1&&game.level.theme==='circus'){
       const prop=(game.level.circusProps||[]).find(p=>x>=p.x&&x<p.x+p.w&&y>=p.y&&y<p.y+p.h);
@@ -109,7 +130,7 @@ export function renderTerrain(game,canvas) {
   }
   c.putImageData(pixels,0,0);
   // Grass follows the editable surface, including the rim of dug tunnels.
-  for(let x=46;x<960;x+=7)for(const y of [...new Set(game.level.terrain.filter(r=>r[4]===1).map(r=>r[1]))])if(terrainAt(x,y)===1&&!terrainAt(x,y-1)){
+  if(['forest','woodland','treehouse','highland'].includes(game.level.theme))for(let x=46;x<960;x+=7)for(const y of [...new Set(game.level.terrain.filter(r=>r[4]===1).map(r=>r[1]))])if(terrainAt(x,y)===1&&!terrainAt(x,y-1)){
     const h=hash(x,y)%5;c.fillStyle=theme.grass[1];c.fillRect(x,y-3-h,2,3+h);c.fillStyle=theme.grass[0];c.fillRect(x+2,y-2,2,2);
   }
 }
@@ -121,38 +142,43 @@ export function hatchOpening(tick,spawned,total,lastSpawnTick){
   // Let the final creature clear the doors before swinging them shut.
   return spawned<total?opening:opening*(1-smooth((tick-lastSpawnTick-24)/24));
 }
+let classicEntrance=null;
+function entranceArtwork(){
+ if(classicEntrance||typeof document==='undefined')return classicEntrance;
+ const sprite=document.createElement('canvas');sprite.width=73;sprite.height=46;
+ const c=sprite.getContext('2d'),pixels=c.createImageData(73,46),d=pixels.data;
+ const colors=CLASSIC_ENTRANCE.palette.map(color=>[1,3,5].map(i=>parseInt(color.slice(i,i+2),16)));
+ let pos=0;for(const row of CLASSIC_ENTRANCE.rows)for(let j=0;j<row.length;j+=2)for(let n=0;n<row[j];n++){const rgb=colors[row[j+1]];d[pos++]=rgb[0];d[pos++]=rgb[1];d[pos++]=rgb[2];d[pos++]=255;}
+ // Remove only the connected exterior stage, leaving the exact entrance pixels.
+ const bg=[d[0],d[1],d[2]],seen=new Set(),queue=[];
+ for(let x=0;x<73;x++)queue.push(x,45*73+x);for(let y=0;y<46;y++)queue.push(y*73,y*73+72);
+ while(queue.length){const n=queue.pop();if(seen.has(n))continue;seen.add(n);const i=n*4;
+  if(Math.abs(d[i]-bg[0])+Math.abs(d[i+1]-bg[1])+Math.abs(d[i+2]-bg[2])>12)continue;
+  d[i+3]=0;const x=n%73,y=Math.floor(n/73);if(x)queue.push(n-1);if(x<72)queue.push(n+1);if(y)queue.push(n-73);if(y<45)queue.push(n+73);
+ }
+ // The reference also catches a falling green head below the doorway.
+ for(let y=26;y<46;y++)for(let x=14;x<59;x++)d[(y*73+x)*4+3]=0;
+ c.putImageData(pixels,0,0);classicEntrance=sprite;return sprite;
+}
 export function magicalEntrance(c,tick,level,spawned=0,lastSpawnTick=null){
-  const open=hatchOpening(tick,spawned,level.total,lastSpawnTick);
-  c.save();c.translate(level.spawnX,level.spawnY);c.scale(level.rocketScale||1,level.rocketScale||1);
-  c.lineJoin='round';c.lineCap='round';c.lineWidth=1.5;c.strokeStyle='#34243d';
-  const shape=(draw,color)=>{c.beginPath();draw();c.closePath();c.fillStyle=color;c.fill();c.stroke();};
-  // Golden timber, dark ink outlines and diagonal braces echo the reference crate.
-  const panel=(points,color)=>shape(()=>points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y)),color);
-  c.strokeStyle='#484038';c.lineWidth=1.7;
-  panel([[-38,-57],[-23,-65],[33,-60],[33,-20],[-23,-17],[-38,-24]],'#ad8349');
-  panel([[-23,-65],[33,-60],[33,-20],[-23,-17]],'#c79c52');
-  panel([[-38,-57],[-23,-65],[-23,-17],[-38,-24]],'#aa8047');
-  for(let x=-13;x<32;x+=11){c.beginPath();c.moveTo(x,-59);c.lineTo(x,-23);c.stroke();}
-  for(let x=-34;x<-24;x+=5){c.beginPath();c.moveTo(x,-54);c.lineTo(x,-27);c.stroke();}
-  panel([[-38,-57],[-23,-65],[33,-60],[29,-54],[-22,-58]],'#dfbd7d');
-  panel([[-21,-56],[-15,-58],[29,-27],[26,-21]],'#ddba73');
-  panel([[-37,-29],[-34,-25],[-25,-54],[-27,-60]],'#d6ae69');
-  panel([[-38,-57],[-33,-58],[-33,-26],[-38,-24]],'#dbb777');
-  panel([[-25,-65],[-19,-65],[-19,-17],[-25,-18]],'#e3c38a');
-  panel([[28,-60],[33,-60],[33,-20],[28,-20]],'#dfba77');
-  panel([[-23,-25],[33,-28],[33,-20],[-23,-17]],'#d9b173');
-  c.strokeStyle='#805b2c';c.lineWidth=.7;
-  for(let i=0;i<7;i++){const x=-15+i*6,y=-48+(i%3)*7;c.beginPath();c.moveTo(x,y);c.quadraticCurveTo(x-2,y+5,x,y+10);c.stroke();}
-  c.beginPath();c.moveTo(-15,-61);c.quadraticCurveTo(4,-62,23,-58);c.moveTo(-16,-21);c.lineTo(23,-24);c.stroke();
-  c.fillStyle='#493b2b';for(const [x,y]of [[-22,-60],[30,-56],[-22,-21],[30,-23],[-35,-53],[-35,-28]]){c.beginPath();c.arc(x,y,1,0,Math.PI*2);c.fill();}
-  // Two wooden trapdoors open below the box and close after the last arrival.
-  c.strokeStyle='#484038';c.lineWidth=1.4;c.fillStyle='#251e1b';c.fillRect(-17,-18,34,4);
-  for(const side of [-1,1]){
-    const hinge=side*17,angle=open*Math.PI*.47,tip=hinge-side*17*Math.cos(angle),drop=17*Math.sin(angle);
-    panel([[hinge,-17],[tip,-17+drop],[tip,-13+drop],[hinge,-13]],'#c49e62');
-    c.fillStyle='#655f51';c.fillRect(hinge-1.5,-19,3,5);
+ const open=hatchOpening(tick,spawned,level.total,lastSpawnTick),sprite=entranceArtwork();
+ c.save();c.translate(Math.round(level.spawnX),Math.round(level.spawnY));c.scale(level.rocketScale||1,level.rocketScale||1);c.imageSmoothingEnabled=false;
+ if(sprite){
+  // Fully open is the exact original entrance, lifted from the supplied reference.
+  if(open>=.999)c.drawImage(sprite,-36,-46);
+  else{
+   c.drawImage(sprite,0,0,73,22,-36,-46,73,22);
+   // Swing the original hanging door panels up to meet beneath the canopy.
+   for(const side of [-1,1]){c.save();c.translate(side<0?-28:28,-24);c.rotate(side*(1-open)*Math.PI/2);
+    if(side<0)c.drawImage(sprite,0,22,14,24,-8,0,14,24+20*(1-open));
+    else c.drawImage(sprite,59,22,14,24,-5,0,14,24+20*(1-open));
+    c.restore();}
   }
-  c.restore();
+ }else{
+  // A brief pixel-art placeholder while the local reference decodes.
+  c.fillStyle='#78241d';c.fillRect(-34,-44,68,6);c.fillStyle='#a99c67';c.fillRect(-33,-44,66,2);c.fillStyle='#3939b5';c.fillRect(-28,-38,56,16);
+ }
+ c.restore();
 }
 export function scenery(c,tick,level,spawned=0,lastSpawnTick=null,sceneryTick=tick,game=null) {
   worldScenery(c,sceneryTick,level,game?(x,y)=>game.at(x,y):null);

@@ -19,7 +19,7 @@ export function drawObjects(c,g){
    c.fillStyle='#ffffff';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText(o.label||'',0,-53);
   }else if(o.type==='rubble'){
    // Cracks are drawn only on surviving rock so a bashed tunnel stays visibly open.
-   c.strokeStyle='#e7b180';c.lineWidth=1.5;
+   c.strokeStyle=g.level.theme==='alpine'?'#8aafbb':g.level.theme==='circus'?'#c7b2d6':'#e7b180';c.lineWidth=1.5;
    for(let y=o.y+6;y<o.y+o.h-5;y+=13)for(let x=o.x+5;x<o.x+o.w-4;x+=15){if(g.at(x,y)!==1||g.at(x+5,y+6)!==1)continue;c.beginPath();c.moveTo(x,y);c.lineTo(x+5,y+3);c.lineTo(x+2,y+7);c.stroke();}
   }else if(o.type==='ladder'||o.type==='pole'){
    const top=o.top??o.y,bottom=o.bottom??o.y;

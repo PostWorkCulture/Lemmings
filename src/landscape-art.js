@@ -12,6 +12,25 @@ export function worldBackground(key,height=470,level=null){
  const w=WORLDS.find(w=>w.key===key);if(!w)return null;
  const canvas=document.createElement('canvas');canvas.width=1000;canvas.height=height;const c=canvas.getContext('2d');
  if(['circus','beach'].includes(key)){chapterBackdrop(c,key,height,level);return canvas;}
+ // The active chapters keep their background deliberately quieter than the route.
+ if(key==='woodland'||key==='alpine'){
+  const sky=c.createLinearGradient(0,0,0,height);
+  sky.addColorStop(0,key==='woodland'?'#0d211e':'#172a38');
+  sky.addColorStop(1,key==='woodland'?'#1b342a':'#263e4c');
+  c.fillStyle=sky;c.fillRect(0,0,1000,height);
+  if(key==='woodland'){
+   c.save();c.globalAlpha=.12;
+   for(const [x,y,size] of [[30,430,2.1],[185,450,2.5],[800,450,2.4],[970,440,2.2]])tree(c,x,y,size);
+   c.restore();
+  }else{
+   // One broad ridge on either edge leaves open space between puzzle shelves.
+   poly(c,[[-100,430],[125,120],[305,430]],'#314a57');
+   poly(c,[[600,470],[840,220],[1110,470]],'#2b424f');
+   poly(c,[[125,120],[167,192],[147,181],[132,190],[107,145]],'#627984');
+  }
+  return canvas;
+ }
+
  const g=c.createLinearGradient(0,0,0,470);g.addColorStop(0,w.sky[0]);g.addColorStop(1,w.sky[1]);c.fillStyle=g;c.fillRect(0,0,1000,470);
  const hills=(color,offset=0)=>{c.fillStyle=color;c.beginPath();c.moveTo(0,470);for(let x=0;x<=1000;x+=10)c.lineTo(x,290+offset+Math.sin(x*.01)*30+Math.cos(x*.019)*20);c.lineTo(1000,470);c.fill();};
  const stars=()=>{for(let i=0;i<100;i++){c.fillStyle=i%3?'#d3e4e880':'#eff6ef';c.fillRect((i*173)%1000,(i*67)%380,1+i%2,1);}};
@@ -52,16 +71,8 @@ export function worldBackground(key,height=470,level=null){
  if(height>470){
   const fade=c.createLinearGradient(0,390,0,450);fade.addColorStop(0,w.sky[1]+'00');fade.addColorStop(1,w.sky[1]);c.fillStyle=fade;c.fillRect(0,390,1000,60);
   const depth=c.createLinearGradient(0,450,0,height);depth.addColorStop(0,w.sky[1]);depth.addColorStop(1,w.sky[0]);c.fillStyle=depth;c.fillRect(0,450,1000,height-450);
-  for(let y=480;y<height;y+=150)for(let i=0;i<8;i++){
-   const x=i*145+(y%47);c.globalAlpha=.22;
-   if(['space','station','night'].includes(key)){c.fillStyle='#9cadcf';c.fillRect(x,y,2,2);c.fillRect(x+46,y+52,1,1);if(key==='station'){c.strokeStyle='#8a9eb0';c.strokeRect(x-30,y-50,80,125);}}
-   else if(['candy','circus'].includes(key)){ellipse(c,x,y+80,70,75,i%2?w.earth[1]:w.grass[1]);}
-   else if(['woodland','treehouse','highland'].includes(key)){c.globalAlpha=.65;tree(c,x,y+130,1.6);}
-   else if(['egypt','marble','castle'].includes(key)){tower(c,x,y+130,110,w.earth[1]);}
-   else if(['alpine','polar'].includes(key)){poly(c,[[x-60,y+130],[x,y-20],[x+75,y+130]],'#557785');poly(c,[[x-17,y+20],[x,y-20],[x+20,y+20],[x+4,y+12]],'#d4e3df');}
-   else {poly(c,[[x-60,y+130],[x,y-20],[x+75,y+130]],w.earth[2]);crystal(c,x+20,y+80,45,w.grass[1]);}
-   c.globalAlpha=1;
-  }
+  // Quiet depth below the skyline keeps lower puzzle routes easy to read.
+  // Repeated trees and peaks here looked like unsupported foreground objects.
  }
  if(key==='egypt'){const ground=height-28;pyramid(c,245,ground,660,330);pyramid(c,600,ground,460,230);pyramid(c,850,ground,580,300);}
  return canvas;
@@ -72,6 +83,28 @@ export function scenerySupported(level,x,y,terrainAt=null){
   return (level.shapes||[]).some(({points})=>{let inside=false;for(let i=0,j=points.length-1;i<points.length;j=i++){const [ax,ay]=points[i],[bx,by]=points[j];if((ay>py)!==(by>py)&&px<(bx-ax)*(py-ay)/(by-ay)+ax)inside=!inside;}return inside;});
  });
  return !!solid(x,y)&&![1,12,24,40].some(d=>solid(x,y-d));
+}
+function winterProp(c,x,y,sled=false){
+ c.save();c.translate(x,y);c.lineJoin='round';c.lineCap='round';
+ if(sled){
+  // Low wooden sled with curled runners and a neatly resting pull rope.
+  c.strokeStyle='#53778a';c.lineWidth=3;c.beginPath();c.moveTo(-19,-2);c.lineTo(15,-2);c.quadraticCurveTo(23,-2,23,-10);c.stroke();
+  c.strokeStyle='#b5d3df';c.lineWidth=1;c.stroke();
+  c.strokeStyle='#735740';c.lineWidth=3;for(const dx of [-11,12]){c.beginPath();c.moveTo(dx,-3);c.lineTo(dx-2,-11);c.stroke();}
+  c.fillStyle='#8b6044';c.fillRect(-20,-15,37,5);c.fillStyle='#d2a76b';c.fillRect(-20,-16,37,3);
+  c.strokeStyle='#9e7650';c.lineWidth=1;for(let dx=-14;dx<16;dx+=8){c.beginPath();c.moveTo(dx,-16);c.lineTo(dx,-11);c.stroke();}
+  c.strokeStyle='#bf665f';c.lineWidth=1.5;c.beginPath();c.moveTo(16,-13);c.quadraticCurveTo(35,-8,29,-2);c.lineTo(24,-2);c.stroke();
+ }else{
+  const snowball=(cy,rx,ry)=>{ellipse(c,0,cy,rx,ry,'#edf7f7');c.strokeStyle='#91b5c4';c.lineWidth=1.2;c.stroke();ellipse(c,-rx*.35,cy-ry*.3,rx*.3,ry*.3,'#ffffff');};
+  c.strokeStyle='#795e4b';c.lineWidth=2;c.beginPath();c.moveTo(-10,-18);c.lineTo(-20,-25);c.lineTo(-22,-30);c.moveTo(-19,-25);c.lineTo(-25,-24);c.moveTo(10,-18);c.lineTo(20,-24);c.lineTo(23,-29);c.stroke();
+  snowball(-12,13,12);snowball(-29,9,9);
+  c.fillStyle='#bc626a';c.fillRect(-9,-23,18,4);c.fillRect(5,-21,4,10);
+  c.fillStyle='#36576b';c.fillRect(-8,-39,16,6);ellipse(c,0,-39,8,4,'#4d788d');ellipse(c,0,-44,3,3,'#b6d6df');
+  ellipse(c,-3,-30,1.1,1.3,'#253d4a');ellipse(c,3,-30,1.1,1.3,'#253d4a');poly(c,[[0,-28],[9,-26],[0,-25]],'#df9a58');
+  for(const cy of [-15,-8])ellipse(c,0,cy,1.5,1.5,'#547384');
+  c.strokeStyle='#668999';c.lineWidth=1;c.beginPath();c.arc(0,-27,4,.35,2.55);c.stroke();
+ }
+ c.restore();
 }
 export function worldScenery(c,tick,level,terrainAt=null){
  const key=level.theme;
@@ -85,11 +118,19 @@ export function worldScenery(c,tick,level,terrainAt=null){
   c.restore();
  }
  // Local details anchored to solid starting shelves, never floating scenery.
+ const placed=[];
  for(const [i,[x,y,w,h,type]] of level.terrain.entries()){
-  if((type!==1&&!(key==='beach'&&type===2&&h<65))||w<100||y>(level.height||560)-30)continue;const px=x+Math.min(w*.22,60);if(!scenerySupported(level,px,y,terrainAt))continue;c.save();c.globalAlpha=.85;
+  if((type!==1&&!(key==='beach'&&type===2&&h<65))||w<100||y>(level.height||560)-30)continue;const px=x+Math.min(w*.22,60);
+  if(!scenerySupported(level,px,y,terrainAt))continue;
+  // One small motif per area, with breathing room around functional items.
+  if(key!=='woodland'&&(placed.length>=4||placed.some(p=>Math.abs(p.x-px)<150&&Math.abs(p.y-y)<140)))continue;
+  if((level.objects||[]).some(o=>Math.abs(o.x-px)<65&&Math.abs(o.y-y)<80))continue;
+  if(Math.abs(level.exitX-px)<65&&Math.abs(level.exitY-y)<85)continue;
+  if((level.entrances||[{x:level.spawnX,y:level.spawnY}]).some(e=>Math.abs(e.x-px)<65&&Math.abs(e.y-y)<100))continue;
+  placed.push({x:px,y});c.save();c.globalAlpha=.85;
   if(['woodland','treehouse','highland'].includes(key)){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.025+i)*.055);tree(c,0,0,key==='treehouse'?.8:.65);c.restore();}
-  if(key==='beach'){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.024+i)*.07);tree(c,0,0,.7,true);c.restore();c.fillStyle='#c89777';c.fillRect(x+w-45,y-10,13,10);c.strokeStyle='#d5c596';c.strokeRect(x+w-43,y-15,9,6);}
-  if(['alpine','polar'].includes(key)){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.02+i)*.04);pine(c,0,0,.65,'#24884b');c.restore();}
+  if(key==='beach'){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.024+i)*.07);tree(c,0,0,.7,true);c.restore();}
+  if(['alpine','polar'].includes(key))winterProp(c,px,y,placed.length%2===0);
   if(key==='candy'){c.fillStyle='#d5c7b4';c.fillRect(px-2,y-42,4,42);ellipse(c,px,y-44,16,16,i%2?'#e2a6ba':'#b9d1b6');c.strokeStyle='#f5d6de';c.lineWidth=2;c.beginPath();c.arc(px,y-44,9,0,TAU*1.4);c.stroke();}
   if(['space','station','enchanted','waterfall'].includes(key))crystal(c,px,y,24+i%3*10,key==='station'?'#79acb1':'#9daacb');
   if(key==='egypt'){c.fillStyle='#bda170';c.fillRect(px-9,y-45,18,45);c.fillStyle='#dbc28f';c.fillRect(px-13,y-47,26,6);for(let j=0;j<4;j++){c.fillStyle='#7b715951';c.fillRect(px-4,y-38+j*8,8,3);}}
@@ -102,5 +143,5 @@ export function worldScenery(c,tick,level,terrainAt=null){
   if(['volcano','factory'].includes(key)){c.fillStyle='#57606a';c.fillRect(px-8,y-25,16,25);c.fillStyle='#b88c60';c.fillRect(px-10,y-28,20,5);}
   c.restore();
  }
- if(['polar','alpine'].includes(key)){for(let i=0;i<35;i++){c.fillStyle='#e4f1ee70';c.fillRect((i*97+tick*.15)%1000,(i*53+tick*.3)%440,2,2);}}
+ // Snow is drawn once, behind the route, by ambientWorld.
 }

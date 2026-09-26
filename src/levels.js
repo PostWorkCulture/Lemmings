@@ -1,3 +1,4 @@
+import {applyTerrainContours} from './terrain-contours.js';
 import {applyPuzzleCampaign} from './puzzle-campaign.js';
 import {LEVELS as BASE_LEVELS,THEMES} from './levels-base-for-authoring.js';
 import {DIFFICULT_LAYOUTS} from './difficulty-layouts.js';
@@ -86,3 +87,40 @@ for(const level of LEVELS.slice(5,10))level.backgroundStyle='inland-beach';
 
 // Extend the water downward without moving the playable shoreline.
 for(const level of LEVELS.slice(5,10)){level.waterDepth=72;level.height+=44;}
+
+// Describe the final chapter and entrance arrangement, after all layout overrides.
+const chapterHints={
+ 5:['Bridge the small starting gap to reach the ladder into the palm grove.','The raised switch opens the gate below. Stack a foothold, then build up to the switch.','Hold the crowd with an Attractor. Clear the scaffold, tunnel through the wall and prepare the final crossing before releasing them.'],
+ 6:['Walk over the small dune; the steep dune sends uphill walkers sliding back.','Build across the first gap, then bash through the foot of the steep dune.','Use a Platform for the second gap and bash through the sand wall. Release the waiting crowd once the route is ready.'],
+ 8:['Send one Swimmer across the harbour while an Attractor holds the crowd.','The lower switch opens the harbour gate; climb the ladder to reach the drawbridge lever.','Bash through the wall and build to the raised exit before releasing the crowd.'],
+ 9:['Give the scout your one Parachute before the cliff edge. Hold the crowd above.','The switch on the lower landing releases the rescue pole for everyone else.','Bash through the cliff wall and prepare the crossing, then release the waiting group.'],
+ 12:['Bash through the small wall at the bottom to reach the ascent ladder.','At the top, the thin fossil wall has two solutions: a Basher saves everyone; an Exploder costs one lemming.','Build across the ravine after opening the wall. The rescue target allows one loss.'],
+ 15:['Build up across the starting gap to reach the ladder onto the stage.','The springboard carries everyone; use a Jumper to reach the raised curtain switch.','Dig down from the switch balcony, bash through the ball and build to the exit. Release the Attractor when the route is ready.'],
+ 16:['Two entrances, two locked routes. Each group opens the other group’s curtain.','Send a Climber over the lower tent to its switch. Build across the upper gap to reach the other switch.','Turn the climber back and bash through the lower tent. Clear the upper tent and use a Platform across the final gap so both groups can reunite.'],
+ 18:['Three stages form a chain: each group opens the next group’s curtain.','Build across the upper gap. Bash through the tents on the middle and lower stages to reach their switches.','The lowest switch opens the exit curtain. Matching coloured portals carry the two lower groups to the upper stage.'],
+ 19:['Stack beneath the starting switch to unlock the ascent ladder, then bash away the stack for the crowd.','Hold the crowd above. Send a parachuting scout down through a dug shaft to open the exit curtain.','Repair the shaft with a Platform for the crowd. After they cross, turn the last performer towards the lower ladder to bring them home.']
+};
+for(const [id,hints] of Object.entries(chapterHints))LEVELS[id].hints=hints;
+LEVELS[1].hints[0]='Walk to the ladder to reach the woodland crossings above.';
+LEVELS[17].hints[0]='Three circus stages combine springboards, low crossings, uphill building and tunnel preparation.';
+// These repeated scenic ring backdrops add no puzzle information or collision.
+LEVELS[17].setPieces=[];
+
+const expeditionOpeners={
+ 7:'Ride the moving island to the far shore, then lead the group down through two sheltered crossings.',
+ 10:'Cross the open snowfield, then prepare a zigzag descent through three sheltered ledges.',
+ 11:'Build up the three snowy steps, then use the pole to begin the descent towards the exit.',
+ 13:'Travel left across the high ledges first. The lower route winds back and forth towards the sheltered exit.',
+ 14:'Build left across the broken ridge. The pole leads down to a route of tunnels and crossings.',
+ 17:'Clear the two springboards, then prepare the three circus stages below. The lever stops the press.'
+};
+for(const [id,hint] of Object.entries(expeditionOpeners))LEVELS[id].hints[0]=hint;
+
+// Remove isolated approach walls that repeat the later tunnelling lesson.
+// Keep chamber barriers, steel seams, crossings and exit containment intact.
+for(const [id,positions] of [[7,[[740,255]]],[10,[[230,245],[720,240]]],[17,[[820,255]]]]){
+ LEVELS[id].terrain=LEVELS[id].terrain.filter(([x,y])=>!positions.some(([px,py])=>x===px&&y===py));
+}
+
+// Rolling snowbanks, sandy ridges and rounded stage terrain remain fully physical.
+applyTerrainContours(LEVELS);
