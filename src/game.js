@@ -25,11 +25,11 @@ function message(text){$('#message').textContent=text;$('#message').classList.ad
 function select(skill){if(skill!=='walk'&&!(game.stock[skill]>0)&&!(['block','attract'].includes(skill)&&game.units.some(u=>u.state===skill)))return;selected=skill;document.querySelectorAll('.skill').forEach(b=>{const active=b.dataset.skill===skill;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});}
 function start(){impactAudio.unlock();started=true;paused=false;soundtrack.play();$('#intro').classList.add('hidden');$('#result').classList.add('hidden');canvas.focus({preventScroll:true});if(game.level.bottomEntry)$('#viewport').scrollTop=$('#viewport').scrollHeight;sync();}
 function reset(levelIndex=game.levelIndex){if(!isUnlocked(levelIndex,starRecords))return;clearTimeout(toastTimer);document.querySelector('#message').classList.remove('visible');soundtrack.pause();game.reset(levelIndex);background=makeBackground(game.level.theme,game.height,game.level);renderedRevision=-1;soundtrack.setLevel(levelIndex);updateLevelUI();started=false;paused=false;speed=1;hover=null;pointer=null;hintIndex=0;$('#hint-copy').textContent='Puzzle hints are optional.';$('#hint').textContent='Show a puzzle hint';accumulator=0;$('#result').classList.add('hidden');$('#intro').classList.remove('hidden');$('#speed').textContent='1\u00d7';$('#speed').setAttribute('aria-label','Speed: normal');$('#speed').classList.remove('active');select('walk');sync();}
-function togglePause(){if(!started)return;paused=!paused;paused?soundtrack.pause():soundtrack.play();sync();}
+function togglePause(){if(!started)return;if($('#pause-dialog').open){$('#pause-dialog').close();return;}if(paused){paused=false;soundtrack.play();sync();}else openDialog('#pause-dialog');}
 function singleStep(){if(!started||game.result)return;paused=true;soundtrack.pause();game.step();if(game.result)result();sync();}
 function toggleSpeed(){speed=speed===1?3:1;$('#speed').textContent=speed+'\u00d7';$('#speed').classList.toggle('active',speed===3);$('#speed').setAttribute('aria-label',speed===1?'Speed: normal':'Speed: 3 times normal');}
 function sync(){
-  $('#out').textContent=String(game.spawned).padStart(2,'0');$('#saved').textContent=String(game.saved).padStart(2,'0');$('#lost').textContent=String(game.lost).padStart(2,'0');
+  $('#saved').textContent=String(game.saved).padStart(2,'0');$('#lost').textContent=String(game.lost).padStart(2,'0');
   const seconds=Math.floor(game.tick/60);$('#timer').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
   for(const key of SKILL_ORDER.filter(k=>k!=='walk'&&game.level.stock[k]>0)){$('#count-'+key).textContent=game.stock[key];const button=$(`[data-skill="${key}"]`);button.disabled=game.stock[key]<=0&&!(['block','attract'].includes(key)&&game.units.some(u=>u.state===key));button.hidden=game.level.stock[key]===0;}
   $('#status-label').textContent=game.result?(game.result==='win'?'LEVEL COMPLETE':'LEVEL ENDED'):!started?'READY':paused?'PAUSED':'PLAYING';
@@ -62,19 +62,21 @@ canvas.addEventListener('pointerdown',e=>{
 });
 $('.skills').addEventListener('click',e=>{const b=e.target.closest('[data-skill]');if(b)select(b.dataset.skill);});
 $('#start').addEventListener('click',start);$('#pause').addEventListener('click',togglePause);$('#speed').addEventListener('click',toggleSpeed);$('#replay').addEventListener('click',()=>{reset();start();});
-function openDialog(id){dialogPause=paused;if(!game.result){paused=true;soundtrack.pause();}$(id).showModal();sync();}
-$('#help').addEventListener('click',()=>openDialog('#help-dialog'));
+function openDialog(id){dialogPause=paused;paused=true;soundtrack.pause();$(id).showModal();sync();}
+$('#help').addEventListener('click',()=>{hintIndex=0;$('#tip-title').textContent=game.level.name;showTip();openDialog('#help-dialog');});
+$('#plan-paused').addEventListener('click',()=>{dialogPause=true;$('#pause-dialog').close();});
 $('#restart').addEventListener('click',()=>{if(!started){reset();return;}openDialog('#restart-dialog');});
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>$('#'+b.dataset.close).close()));
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('close',()=>{paused=dialogPause;if(started&&!paused)soundtrack.play();sync();}));
 $('#confirm-restart').addEventListener('click',()=>{$('#restart-dialog').close();dialogPause=false;reset();start();});
-$('#hint').addEventListener('click',()=>{const hints=game.level.hints;$('#hint-copy').textContent=hints[Math.min(hintIndex++,hints.length-1)];$('#hint').textContent=hintIndex>=hints.length?'Repeat final hint':'Next hint';});
+function showTip(){const hints=game.level.hints;$('#hint-copy').textContent=hints[Math.min(hintIndex++,hints.length-1)];$('#hint').hidden=hintIndex>=hints.length;}
+$('#hint').addEventListener('click',showTip);
 $('#next-level').addEventListener('click',()=>{if(game.result==='win'&&isUnlocked(game.levelIndex+1,starRecords))reset(game.levelIndex+1);});
 function updateMusicUI(){
  $('#music-toggle').textContent=soundtrack.muted?'Music off':'Music on';$('#music-toggle').setAttribute('aria-pressed',String(!soundtrack.muted));$('#volume').value=Math.round(soundtrack.volume*100);$('#track-name').textContent=TRACKS[game.levelIndex][1];
 }
 function renderSkills(){
- const tray=$('.skills'),help=$('#help-dialog ul');tray.replaceChildren();help.replaceChildren();
+ const tray=$('.skills'),help=$('#skill-help');tray.replaceChildren();help.replaceChildren();
  for(const key of SKILL_ORDER){if(key!=='walk'&&!(game.level.stock[key]>0))continue;
   const b=document.createElement('button');b.className='skill'+(key===selected?' selected':'');b.dataset.skill=key;b.setAttribute('aria-pressed',String(key===selected));b.setAttribute('aria-label',SKILLS[key].name);
   const art=document.createElement('canvas');art.className='skill-picture';art.dataset.pose=key;art.width=116;art.height=88;art.setAttribute('aria-hidden','true');b.append(art);
@@ -83,9 +85,9 @@ function renderSkills(){
  }
 }
 function updateLevelUI(){
- canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.add('tall-world');$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';$('#map-depth').textContent='Depth 0%';
+ canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.add('tall-world');$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';
  $('#difficulty-label').textContent=game.level.difficulty;$('#difficulty-label').dataset.difficulty=game.level.difficulty.toLowerCase();
- renderSkills();const l=game.level;$('#time-target').textContent='3★ < '+formatTime(l.targetTime);document.title=`Lemmings · ${l.world}`;$('#world-label').textContent=`${l.world.toUpperCase()} · ${String(l.id+1).padStart(2,'0')}`;$('h1').textContent=l.name;$('#level-number').textContent=`${l.id+1} / ${LEVELS.length}`;$('#total-count').textContent='/'+l.total;$('#target-count').textContent='/'+l.target;$('#help-goal').textContent=`Save ${l.target} of ${l.total}. Watch out for long falls and hazards. There’s no time limit.`;canvas.setAttribute('aria-label',`${l.world}: ${l.name}`);$('#music-status').textContent='';updateMusicUI();
+ renderSkills();const l=game.level;$('#time-target').textContent=formatTime(l.targetTime);$('#star-total').textContent=l.total;document.title=`Lemmings · ${l.world}`;$('#world-label').textContent=`${l.world.toUpperCase()} · ${String(l.id+1).padStart(2,'0')}`;$('h1').textContent=l.name;$('#level-number').textContent=`${l.id+1} / ${LEVELS.length}`;$('#target-count').textContent='/'+l.target;$('#help-goal').textContent=`Save ${l.target} of ${l.total}. Watch out for long falls and hazards. There’s no time limit.`;canvas.setAttribute('aria-label',`${l.world}: ${l.name}`);$('#music-status').textContent='';updateMusicUI();
  document.querySelectorAll('[data-help-skill]').forEach(el=>{el.hidden=el.dataset.helpSkill!=='walk'&&!(l.stock[el.dataset.helpSkill]>0);});
  try{localStorage.setItem('lemmings-current-level',String(l.id));}catch{}
 }
@@ -111,7 +113,7 @@ function showLevels(){
  openDialog('#levels-dialog');
 }
 $('#choose-level').addEventListener('click',showLevels);$('#levels-button').addEventListener('click',showLevels);$('#cancel-level').addEventListener('click',()=>{$('#level-confirm').classList.add('hidden');pendingLevel=null;});$('#confirm-level').addEventListener('click',()=>{if(pendingLevel!==null)changeLevel(pendingLevel);});
-window.addEventListener('keydown',e=>{if(document.querySelector('dialog[open]'))return;if(e.code==='Space'){e.preventDefault();togglePause();}if(['1','2','3','4'].includes(e.key)){select(['walk','block','build','dig'][Number(e.key)-1]);}if(e.key.toLowerCase()==='f')toggleSpeed();if(e.key==='.')singleStep();});
+window.addEventListener('keydown',e=>{if(document.querySelector('dialog[open]')){if($('#pause-dialog').open&&e.code==='Space'){e.preventDefault();$('#pause-dialog').close();}return;}if(e.code==='Space'){e.preventDefault();togglePause();}if(['1','2','3','4'].includes(e.key)){select(['walk','block','build','dig'][Number(e.key)-1]);}if(e.key.toLowerCase()==='f')toggleSpeed();if(e.key==='.')singleStep();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&started){paused=true;soundtrack.pause();sync();}last=0;accumulator=0;});
 loadIconArt().then(()=>{
   for(const small of document.querySelectorAll('.skill-picture'))skillIcon(small.getContext('2d'),small.width,small.height,small.dataset.pose);
@@ -151,12 +153,10 @@ soundtrack.setLevel(game.levelIndex);updateLevelUI();sync();requestAnimationFram
 
 
 
-$('#map-up').addEventListener('click',()=>$('#viewport').scrollBy({top:-$('#viewport').clientHeight*.7,behavior:'smooth'}));
-$('#map-down').addEventListener('click',()=>$('#viewport').scrollBy({top:$('#viewport').clientHeight*.7,behavior:'smooth'}));
-$('#viewport').addEventListener('scroll',()=>{const v=$('#viewport');$('#map-depth').textContent=`Depth ${Math.min(100,Math.max(0,Math.round(v.scrollTop/Math.max(1,v.scrollHeight-v.clientHeight)*100)))}%`;pointer=null;hover=null;});
+$('#viewport').addEventListener('scroll',()=>{pointer=null;hover=null;});
 // Fit terrain to the available width; expose navigation whenever its height overflows.
 const viewportResizeObserver=new ResizeObserver(()=>{
- const v=$('#viewport');$('#map-navigation').hidden=canvas.getBoundingClientRect().height<=v.clientHeight+1;
+ const v=$('#viewport');
  if(game.result){$('#result').style.top=v.scrollTop+'px';$('#result').style.height=v.clientHeight+'px';}
  pointer=null;hover=null;
 });

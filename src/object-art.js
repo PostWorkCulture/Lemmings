@@ -9,7 +9,7 @@ function apparatusStroke(c,color,width=2){
 }
 export function drawObjects(c,g){
  const controls=[...new Set((g.level.objects||[]).filter(o=>o.type==='switch').flatMap(o=>o.targets||[o.target]))];
- const badge=(id,x,y)=>{const i=controls.indexOf(id);if(i<0)return;c.save();c.fillStyle=['#e8c47d','#9cbede','#bbcf8a'][i%3];c.beginPath();c.arc(x,y,6,0,Math.PI*2);c.fill();c.fillStyle='#24312d';c.font='bold 8px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(String.fromCharCode(65+i),x,y);c.restore();};
+ const badge=(id,x,y)=>{const i=controls.indexOf(id);if(i<0)return;c.save();c.globalAlpha=1;c.fillStyle=['#79e66d','#ff7777','#ffe15a','#ff9cdd'][i%4];c.beginPath();c.arc(x,y,10,0,Math.PI*2);c.fill();c.strokeStyle='#162323';c.lineWidth=3;c.stroke();c.strokeStyle='#fff3dc';c.lineWidth=1;c.stroke();c.fillStyle='#101b1d';c.font='900 13px Arial, sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(String.fromCharCode(65+i),x,y+.5);c.restore();};
  for(const z of g.level.oneWay||[]){c.fillStyle='#e4c787';for(let x=z.x+12;x<z.x+z.w-5;x+=20)for(let y=z.y+15;y<z.y+z.h-10;y+=26){if(g.at(x,y)!==1)continue;c.beginPath();c.moveTo(x+z.dir*5,y);c.lineTo(x-z.dir*4,y-4);c.lineTo(x-z.dir*4,y+4);c.closePath();c.fill();}}
  for(const o of g.level.objects||[]){const p=objectPosition(o,g.tick);c.save();if(o.requires&&!g.disabledObjects.has(o.requires))c.globalAlpha=.35;
   if(o.type==='portal'){
@@ -39,8 +39,8 @@ export function drawObjects(c,g){
   }else if(o.type==='laser'){
    cautionStripes(c,o.x-7,o.y-6,14,10);cautionStripes(c,o.x-7,o.y+o.h,14,10);const active=isDangerous(o,g.tick,g.disabledObjects);c.fillStyle=active?'#161911':'#f4df0030';c.fillRect(o.x-1,o.y,Math.max(4,o.w+2),o.h);if(active){c.fillStyle='#f4df00';c.fillRect(o.x,o.y,Math.max(2,o.w),o.h);}
   }
-  if(o.type==='switch')badge(o.target,o.x,o.y-29);
-  else if(o.type==='gate'||o.type==='bridge')badge(o.id,o.x+o.w/2,o.y-10);
+  if(o.type==='switch')badge(o.target,o.x,o.y-34);
+  else if(o.type==='gate'||o.type==='bridge')badge(o.id,o.x+o.w/2,o.y-15);
   else if(o.requires)badge(o.requires,o.x,o.y-15);
   c.restore();
  }

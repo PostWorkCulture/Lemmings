@@ -1,7 +1,33 @@
 const TAU=Math.PI*2;
 function oval(c,x,y,rx,ry,color){c.fillStyle=color;c.beginPath();c.ellipse(x,y,rx,ry,0,0,TAU);c.fill();}
 function poly(c,points,color){c.fillStyle=color;c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fill();}
-function cloud(c,x,y,s){for(const [dx,dy,r]of [[-30,7,25],[0,-4,35],[35,8,26]])oval(c,x+dx*s,y+dy*s,r*s,r*.58*s,'#f8ffff');}
+function cloud(c,x,y,s,variant=0){
+ c.save();c.translate(x,y);c.scale(s*(variant?-.94:1),s);
+ // One continuous scalloped silhouette, with a cool shaded underside.
+ c.beginPath();c.moveTo(-87,12);
+ c.bezierCurveTo(-97,-3,-81,-18,-65,-13);
+ c.bezierCurveTo(-63,-33,-40,-38,-28,-26);
+ c.bezierCurveTo(-25,-54,9,-57,23,-29);
+ c.bezierCurveTo(39,-41,58,-30,59,-14);
+ c.bezierCurveTo(81,-20,96,-5,90,12);
+ c.bezierCurveTo(108,15,124,16,135,21);
+ c.bezierCurveTo(113,28,94,24,80,26);
+ c.bezierCurveTo(66,42,39,42,27,32);
+ c.bezierCurveTo(10,51,-23,45,-34,33);
+ c.bezierCurveTo(-52,43,-74,32,-76,23);
+ c.bezierCurveTo(-91,26,-100,19,-110,17);
+ c.bezierCurveTo(-103,14,-94,14,-87,12);c.closePath();
+ c.fillStyle='#d3dede';c.fill();c.clip();
+ c.beginPath();c.moveTo(-115,25);
+ c.bezierCurveTo(-85,21,-84,-8,-65,1);
+ c.bezierCurveTo(-54,3,-53,11,-51,16);
+ c.bezierCurveTo(-50,-4,-27,-11,-15,3);
+ c.bezierCurveTo(-9,-16,16,-16,24,3);
+ c.bezierCurveTo(38,-10,55,-4,59,12);
+ c.bezierCurveTo(75,-1,88,7,92,17);
+ c.lineTo(143,24);c.lineTo(143,60);c.lineTo(-115,60);c.closePath();
+ c.fillStyle='#819fab';c.fill();c.restore();
+}
 export function tent(c,x,ground,w,h){
  const shoulder=ground-h*.48,top=ground-h;
  c.fillStyle='#f7f0de';c.fillRect(x-w*.42,shoulder,w*.84,ground-shoulder);
@@ -70,8 +96,9 @@ export function toyGround(c,height){
 }
 
 export function driftingClouds(c,tick){
- for(const [x,y,size,speed] of [[110,50,.8,.09],[820,45,.7,.065]]){
-  const position=((x+tick*speed+110)%1220)-110;
-  c.save();c.globalAlpha=.18;cloud(c,position,y,size);c.restore();
+ for(const [i,[x,y,size,speed]] of [[175,51,.58,.075],[785,73,.46,-.043]].entries()){
+  // Wrap only after the entire silhouette has left the screen, independently.
+  const position=((x+tick*speed+160)%1320+1320)%1320-160;
+  c.save();c.globalAlpha=.62;cloud(c,position,y+Math.sin(tick*.0009+i*2)*2,size,i);c.restore();
  }
 }
