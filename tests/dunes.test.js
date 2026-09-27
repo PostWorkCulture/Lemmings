@@ -9,7 +9,7 @@ test('steep dunes allow a 75 percent ascent then slide facing downhill',()=>{
  }
 });
 test('birds are rejected below terrain, outside the sky and below entrances',()=>{
- const g=new Game(6);assert.equal(clearSky(g.level,700,25),true);assert.equal(clearSky(g.level,700,200),false);
+ const g=new Game(6);assert.equal(clearSky({...g.level,shapes:[]},700,25),true);assert.equal(clearSky(g.level,700,200),false);
  assert.equal(clearSky({...g.level,terrain:[[600,10,200,8,2]]},700,40),false);
  assert.equal(clearSky({...g.level,spawnX:700,spawnY:90},700,25),false);
 });
