@@ -149,3 +149,7 @@ LEVELS[0].terrain.push([40,294,360,148,1]);
 LEVELS[6].terrain.push([40,365,920,211,1]);
 LEVELS[6].shapes.push({type:1,points:[[180,0],[960,0],[960,190],[840,172],[710,192],[600,162],[480,178],[320,160],[180,182]]});
 LEVELS[19].terrain.push([40,188,290,180,1],[400,188,560,180,1],[360,428,540,164,1]);
+
+import {expansionLevels} from './expansion-levels.js';
+LEVELS.push(...expansionLevels());
+CHAPTERS.push(...[20,25,30,35,40].map(i=>({name:LEVELS[i].chapter,theme:LEVELS[i].theme})));

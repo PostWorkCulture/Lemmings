@@ -138,5 +138,180 @@
     "seconds": 54.08,
     "peak": 0.356,
     "rms": 0.102
+  },
+  {
+    "title": "The Badger Burrow",
+    "file": "assets/audio/level-21.wav",
+    "seconds": 53.33,
+    "peak": 0.337,
+    "rms": 0.114
+  },
+  {
+    "title": "Acorn Staircase",
+    "file": "assets/audio/level-22.wav",
+    "seconds": 52.6,
+    "peak": 0.375,
+    "rms": 0.123
+  },
+  {
+    "title": "Heartwood Hollow",
+    "file": "assets/audio/level-23.wav",
+    "seconds": 51.89,
+    "peak": 0.356,
+    "rms": 0.096
+  },
+  {
+    "title": "The Root Cellar",
+    "file": "assets/audio/level-24.wav",
+    "seconds": 51.2,
+    "peak": 0.383,
+    "rms": 0.101
+  },
+  {
+    "title": "Moonlit Canopy",
+    "file": "assets/audio/level-25.wav",
+    "seconds": 50.53,
+    "peak": 0.369,
+    "rms": 0.104
+  },
+  {
+    "title": "Sandstone Steps",
+    "file": "assets/audio/level-26.wav",
+    "seconds": 49.87,
+    "peak": 0.36,
+    "rms": 0.113
+  },
+  {
+    "title": "The Buried Oasis",
+    "file": "assets/audio/level-27.wav",
+    "seconds": 49.23,
+    "peak": 0.381,
+    "rms": 0.127
+  },
+  {
+    "title": "The Sandglass",
+    "file": "assets/audio/level-28.wav",
+    "seconds": 49.23,
+    "peak": 0.367,
+    "rms": 0.099
+  },
+  {
+    "title": "Wind-carved Gallery",
+    "file": "assets/audio/level-29.wav",
+    "seconds": 49.23,
+    "peak": 0.369,
+    "rms": 0.104
+  },
+  {
+    "title": "The Last Sandbar",
+    "file": "assets/audio/level-30.wav",
+    "seconds": 49.23,
+    "peak": 0.348,
+    "rms": 0.102
+  },
+  {
+    "title": "Snowshoe Switchback",
+    "file": "assets/audio/level-31.wav",
+    "seconds": 49.23,
+    "peak": 0.357,
+    "rms": 0.113
+  },
+  {
+    "title": "The Blue Ice Cathedral",
+    "file": "assets/audio/level-32.wav",
+    "seconds": 49.23,
+    "peak": 0.376,
+    "rms": 0.126
+  },
+  {
+    "title": "Cornice Country",
+    "file": "assets/audio/level-33.wav",
+    "seconds": 49.23,
+    "peak": 0.362,
+    "rms": 0.098
+  },
+  {
+    "title": "The Hidden Summit",
+    "file": "assets/audio/level-34.wav",
+    "seconds": 49.23,
+    "peak": 0.374,
+    "rms": 0.1
+  },
+  {
+    "title": "Glacier Loop",
+    "file": "assets/audio/level-35.wav",
+    "seconds": 49.23,
+    "peak": 0.356,
+    "rms": 0.105
+  },
+  {
+    "title": "The Ribbon Rehearsal",
+    "file": "assets/audio/level-36.wav",
+    "seconds": 49.23,
+    "peak": 0.356,
+    "rms": 0.115
+  },
+  {
+    "title": "Backstage Labyrinth",
+    "file": "assets/audio/level-37.wav",
+    "seconds": 49.23,
+    "peak": 0.392,
+    "rms": 0.126
+  },
+  {
+    "title": "The Trapdoor Trick",
+    "file": "assets/audio/level-38.wav",
+    "seconds": 49.23,
+    "peak": 0.376,
+    "rms": 0.098
+  },
+  {
+    "title": "Up in the Rigging",
+    "file": "assets/audio/level-39.wav",
+    "seconds": 49.23,
+    "peak": 0.368,
+    "rms": 0.103
+  },
+  {
+    "title": "Encore in Reverse",
+    "file": "assets/audio/level-40.wav",
+    "seconds": 49.23,
+    "peak": 0.365,
+    "rms": 0.104
+  },
+  {
+    "title": "The Refresher Ravine",
+    "file": "assets/audio/level-41.wav",
+    "seconds": 49.23,
+    "peak": 0.361,
+    "rms": 0.113
+  },
+  {
+    "title": "Double Dip Depths",
+    "file": "assets/audio/level-42.wav",
+    "seconds": 49.23,
+    "peak": 0.378,
+    "rms": 0.119
+  },
+  {
+    "title": "Drumstick Downfall",
+    "file": "assets/audio/level-43.wav",
+    "seconds": 49.23,
+    "peak": 0.365,
+    "rms": 0.094
+  },
+  {
+    "title": "Love Hearts High Road",
+    "file": "assets/audio/level-44.wav",
+    "seconds": 49.23,
+    "peak": 0.357,
+    "rms": 0.099
+  },
+  {
+    "title": "The Pick n Mix Marathon",
+    "file": "assets/audio/level-45.wav",
+    "seconds": 49.23,
+    "peak": 0.333,
+    "rms": 0.1
   }
 ]

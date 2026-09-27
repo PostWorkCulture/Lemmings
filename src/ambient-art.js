@@ -109,7 +109,7 @@ export function ambientWorld(c,tick,level) {
    for(let i=0;i<4;i++){const x=wrap(i*289+t*(i%2?.15:-.2),1120)-60;rock(c,x,row+70+i*48+Math.sin(t*.009+i)*17,12+i*3,t*.006+i);}
    const x=wrap(t*.7+450,1200)-100,y=row+104+Math.sin(t*.014)*18;c.save();c.translate(x,y);c.rotate(Math.sin(t*.008)*.25);c.fillStyle='#9dadc4';c.fillRect(-8,-7,16,14);c.fillStyle='#668db6';c.fillRect(-43,-12,29,24);c.fillRect(14,-12,29,24);c.strokeStyle='#d2dfda';c.lineWidth=2;c.beginPath();c.moveTo(-8,0);c.lineTo(-14,0);c.moveTo(8,0);c.lineTo(14,0);c.stroke();rotor(c,0,0,t*.015,11,'#cedbc9');c.restore();
   }
-  if(key==='candy') {for(let i=0;i<3;i++){const x=170+i*330,y=row+120+i%2*35;c.fillStyle='#dacbbb';c.fillRect(x-3,y,6,90);oval(c,x,y,26,26,'#e4c4c4');rotor(c,x,y,t*.025*(i%2?-1:1),23,i%2?'#a5c7b9':'#c885a6',true);}}
+  if(key==='candy'&&!level.quietScenery) {for(let i=0;i<3;i++){const x=170+i*330,y=row+120+i%2*35;c.fillStyle='#dacbbb';c.fillRect(x-3,y,6,90);oval(c,x,y,26,26,'#e4c4c4');rotor(c,x,y,t*.025*(i%2?-1:1),23,i%2?'#a5c7b9':'#c885a6',true);}}
   if(key==='marble') {for(let i=0;i<3;i++){const x=180+i*310,y=row+178;c.strokeStyle='#bcdde5';c.lineWidth=2;for(let j=0;j<5;j++){const p=wrap(t*.025+j*.6,3)/3;c.beginPath();c.arc(x+(j-2)*p*15,y-Math.sin(p*Math.PI)*43,2,0,TAU);c.stroke();}oval(c,x,y+3,33,5,'#a6c1c380');}}
   if(key==='castle') {for(let i=0;i<3;i++){const x=190+i*305,y=row+85;c.fillStyle='#abb6b6';c.fillRect(x,y,3,85);const wave=Math.sin(t*.07+i)*9;shape(c,[[x+3,y],[x+44,y+wave],[x+35,y+16+wave],[x+3,y+20]],'#b27f88');}}
   if(key==='circus'&&row===0){for(const {x,y,i} of circusBalloonAnchors(level))skyBalloon(c,x+Math.sin(t*.012+i)*12,y+Math.sin(t*.018+i)*5,t,i);}

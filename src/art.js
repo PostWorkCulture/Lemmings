@@ -1,3 +1,4 @@
+import {paintSweetTerrain} from './expansion-art.js';
 import {CLASSIC_ENTRANCE} from './classic-entrance.js';
 import {rocketHeight} from './levels.js';
 import {toyGround} from './chapter-art.js';
@@ -125,10 +126,11 @@ export function renderTerrain(game,canvas) {
       if(prop){if(prop.kind==='ball'){const a=Math.atan2(y-(prop.y+prop.h/2),x-(prop.x+prop.w/2));color=['#f23f68','#ffc932','#36a9db','#ffeec3'][Math.floor((a+Math.PI)/(Math.PI/2))%4];}
        else color=Math.floor((x-prop.x)/8)%2?'#fff0d6':'#ef3351';}
     }
+    if(type===1&&game.level.sweetPieces){color=game.level.sweetBase||'#c5aecf';if(!terrainAt(x,y-1))color='#f1dfeb';}
     if(!cache[color])cache[color]=[parseInt(color.slice(1,3),16),parseInt(color.slice(3,5),16),parseInt(color.slice(5,7),16)];
     const rgb=cache[color],i=(y*WIDTH+x)*4;pixels.data[i]=rgb[0];pixels.data[i+1]=rgb[1];pixels.data[i+2]=rgb[2];pixels.data[i+3]=255;
   }
-  c.putImageData(pixels,0,0);
+  c.putImageData(pixels,0,0); if(game.level.sweetPieces)paintSweetTerrain(c,game);
   // Grass follows the editable surface, including the rim of dug tunnels.
   if(['forest','woodland','treehouse','highland'].includes(game.level.theme))for(let x=46;x<960;x+=7)for(const y of [...new Set(game.level.terrain.filter(r=>r[4]===1).map(r=>r[1]))])if(terrainAt(x,y)===1&&!terrainAt(x,y-1)){
     const h=hash(x,y)%5;c.fillStyle=theme.grass[1];c.fillRect(x,y-3-h,2,3+h);c.fillStyle=theme.grass[0];c.fillRect(x+2,y-2,2,2);
@@ -158,7 +160,7 @@ function entranceArtwork(){
  }
  // The reference also catches a falling green head below the doorway.
  for(let y=26;y<46;y++)for(let x=14;x<59;x++)d[(y*73+x)*4+3]=0;
- c.putImageData(pixels,0,0);classicEntrance=sprite;return sprite;
+ c.putImageData(pixels,0,0); classicEntrance=sprite;return sprite;
 }
 export function magicalEntrance(c,tick,level,spawned=0,lastSpawnTick=null){
  const open=hatchOpening(tick,spawned,level.total,lastSpawnTick),sprite=entranceArtwork();

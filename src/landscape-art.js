@@ -11,6 +11,7 @@ function crystal(c,x,y,h,color){poly(c,[[x-13,y],[x-17,y-h*.7],[x,y-h],[x+16,y-h
 export function worldBackground(key,height=470,level=null){
  const w=WORLDS.find(w=>w.key===key);if(!w)return null;
  const canvas=document.createElement('canvas');canvas.width=1000;canvas.height=height;const c=canvas.getContext('2d');
+ if(key==='candy'&&level?.quietScenery){c.fillStyle='#292035';c.fillRect(0,0,1000,height);return canvas;}
  if(['circus','beach'].includes(key)){chapterBackdrop(c,key,height,level);return canvas;}
  // The active chapters keep their background deliberately quieter than the route.
  if(key==='woodland'||key==='alpine'){
@@ -118,8 +119,8 @@ export function worldScenery(c,tick,level,terrainAt=null){
  }
  // Local details anchored to solid starting shelves, never floating scenery.
  const placed=[];
- for(const [i,[x,y,w,h,type]] of level.terrain.entries()){
-  if((type!==1&&!(key==='beach'&&type===2&&h<65))||w<100||y>(level.height||560)-30)continue;const px=x+Math.min(w*.22,60);
+ for(const [i,[x,y,w,h,type]] of (level.sceneryShelves||level.terrain).entries()){
+  if((type!==1&&!(key==='beach'&&type===2&&h<65))||w<100||y>(level.height||560)-30)continue;const px=x+Math.min(w*.22,60);if(level.expansion&&placed.length>=2)continue;
   if(!scenerySupported(level,px,y,terrainAt,['beach','woodland','treehouse'].includes(key)?40:32,['beach','woodland','treehouse'].includes(key)?76:50))continue;
   // One small motif per area, with breathing room around functional items.
   if(key!=='woodland'&&(placed.length>=4||placed.some(p=>Math.abs(p.x-px)<150&&Math.abs(p.y-y)<140)))continue;

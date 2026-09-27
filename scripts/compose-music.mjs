@@ -1,6 +1,6 @@
 import {LEVELS} from '../src/levels.js';
 // Five original DOS/FM-inspired arrangements; no audio sampled from the reference video.
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, readFileSync } from 'node:fs';
 export const SCORES=[
  {file:'mossy-hollows',title:'Little Green Parade',bpm:116,root:48,tone:'reed',progress:[0,3,4,0,5,3,4,0],phrases:[[0,2,4,4,5,4,2,1],[3,3,5,7,6,5,3,2],[4,6,8,7,6,4,2,1],[2,1,0,0,2,4,2,-1],[5,7,9,8,7,5,4,2],[3,5,7,5,6,5,3,1],[4,4,6,8,7,6,4,1],[2,4,2,1,0,0,0,-1]]},
  {file:'sunstone-ruins',title:'Sunstone Stroll',bpm:128,root:50,tone:'pluck',progress:[0,4,5,3,0,3,4,0],phrases:[[4,2,0,2,4,-1,7,6],[6,4,1,4,6,8,7,-1],[5,7,9,7,5,4,2,4],[3,5,6,5,3,-1,2,1],[0,4,7,4,2,4,0,2],[3,3,5,6,7,5,3,-1],[4,6,8,6,4,1,2,1],[0,2,4,2,0,0,-1,-1]]},
@@ -10,12 +10,13 @@ export const SCORES=[
 ];
 for(let i=5;i<LEVELS.length;i++){
  const base=SCORES[i%5],variant=Math.floor(i/5),shift=(i*3)%8;
- SCORES.push({...base,file:`level-${i+1}`,title:LEVELS[i].name,bpm:104+i*2,root:base.root+variant-2,
+ SCORES.push({...base,file:`level-${i+1}`,title:LEVELS[i].name,bpm:Math.min(156,104+i*2),root:base.root+variant-2,
  progress:base.progress.map((n,j)=>base.progress[(j+variant)%8]),
  phrases:base.phrases.map((_,bar)=>base.phrases[(bar+shift)%8].map((n,j)=>n<0?-1:((variant===2?9-n:n)+((j+bar)%3===0?variant:0))%10))});
 }
 const SR=22050,TAU=Math.PI*2;const report=[];
-for(const score of SCORES){
+for(const [scoreIndex,score] of SCORES.entries()){
+ if(process.argv.includes('--new')&&scoreIndex<20)continue;
  const beat=60/score.bpm,bars=32,duration=bars*4*beat,length=Math.round(duration*SR),left=new Float32Array(length),right=new Float32Array(length),scale=score.minor?[0,2,3,5,7,8,10]:[0,2,4,5,7,9,11];
  const degree=(d,oct=0)=>score.root+12*oct+12*Math.floor(d/7)+scale[((d%7)+7)%7];
  function note(time,midi,duration,gain,tone,pan=0){
@@ -71,4 +72,4 @@ for(const score of SCORES){
  const header=Buffer.alloc(44);header.write('RIFF');header.writeUInt32LE(36+pcm.length,4);header.write('WAVEfmt ',8);header.writeUInt32LE(16,16);header.writeUInt16LE(1,20);header.writeUInt16LE(2,22);header.writeUInt32LE(SR,24);header.writeUInt32LE(SR*4,28);header.writeUInt16LE(4,32);header.writeUInt16LE(16,34);header.write('data',36);header.writeUInt32LE(pcm.length,40);
  writeFileSync(`assets/audio/${score.file}.wav`,Buffer.concat([header,pcm]));report.push({title:score.title,file:`assets/audio/${score.file}.wav`,seconds:+duration.toFixed(2),peak:+peak.toFixed(3),rms:+Math.sqrt(sum/(length*2)).toFixed(3)});
 }
-writeFileSync('assets/audio/manifest.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+writeFileSync('assets/audio/manifest.json',JSON.stringify(process.argv.includes('--new')?[...JSON.parse(readFileSync('assets/audio/manifest.json')).filter(r=>!report.some(n=>n.file===r.file)),...report]:report,null,2));console.log(JSON.stringify(report,null,2));
