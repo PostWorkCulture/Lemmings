@@ -1,0 +1,7 @@
+export const BEAD_COLORS=['#f2d54d','#ef80ad','#50bddb','#84c990','#f4a16d'];
+export function candyBead(c,x,y,r,color){
+ c.save();c.translate(x,y);const shade=c.createLinearGradient(0,-r,0,r);shade.addColorStop(0,color);shade.addColorStop(.4,color);shade.addColorStop(1,'#79647b');c.fillStyle=shade;c.beginPath();c.ellipse(0,3,r,r*.72,0,0,Math.PI*2);c.fill();c.fillStyle=color;c.beginPath();c.ellipse(0,-2,r,r*.69,0,0,Math.PI*2);c.fill();c.save();c.clip();for(let i=0;i<100;i++){c.fillStyle=i%3?'#fffbe54a':'#694a6528';c.fillRect(-r+(i*17.37)%(r*2),-r+(i*11.13)%(r*2),.8,.7);}c.restore();c.strokeStyle='#fff8d849';c.lineWidth=1.2;c.beginPath();c.ellipse(0,-2,r-1,r*.69-1,0,Math.PI,Math.PI*1.8);c.stroke();c.fillStyle='#594256';c.beginPath();c.ellipse(0,-1,r*.23,r*.19,0,0,Math.PI*2);c.fill();c.strokeStyle='#dce3d1';c.lineWidth=1;c.beginPath();c.moveTo(-r*.18,0);c.lineTo(r*.18,-2);c.stroke();c.restore();
+}
+export function candyNecklace(c,points,r=16){c.save();c.strokeStyle='#e9e8db';c.lineWidth=2;c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.stroke();points.forEach(([x,y],i)=>candyBead(c,x,y,r,BEAD_COLORS[i%5]));c.restore();}
+export const BRIDGE_BEADS=Array.from({length:8},(_,i)=>[292+i*16,344+Math.sin(i/7*Math.PI)*4]);
+export function necklaceShapes(){return BRIDGE_BEADS.map(([x,y])=>({type:1,points:Array.from({length:32},(_,i)=>{const a=i/32*Math.PI*2;return [x+12*Math.cos(a),y+12*Math.sin(a)];})}));}

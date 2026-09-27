@@ -1,3 +1,5 @@
+import {PlayerStore} from './player-store.js';
+import {CloudSave} from './cloud-save.js';
 import {drawDrowning,drawSplats,ImpactAudio} from './impact-effects.js';
 import {ambientWorld,finaleLandmarks} from './ambient-art.js';
 import {SKILLS,SKILL_ORDER} from './skills.js';
@@ -8,13 +10,14 @@ import { Soundtrack,TRACKS } from './music.js';
 import { Game,WIDTH,HEIGHT } from './engine.js';
 import { character,makeBackground,renderTerrain,scenery,skillIcon,uiIcon,loadIconArt,exitPortal,enteringLemming,hazards } from './art.js';
 const $=s=>document.querySelector(s),canvas=$('#game'),ctx=canvas.getContext('2d');
-let best={};try{const stored=JSON.parse(localStorage.getItem('lemmings-best')||'{}');if(stored&&typeof stored==='object'&&!Array.isArray(stored))best=stored;}catch{}
-let perfectRescues={};try{const records=JSON.parse(localStorage.getItem('lemmings-perfect-v2')||'{}');if(records&&typeof records==='object'&&!Array.isArray(records))perfectRescues=records;}catch{}
-let starRecords={};try{const stored=JSON.parse(localStorage.getItem('lemmings-stars-v1')||'{}');if(stored&&typeof stored==='object'&&!Array.isArray(stored))starRecords=stored;}catch{}
+const playerStore=new PlayerStore(localStorage);
+let best={};try{const stored=JSON.parse(playerStore.getItem('lemmings-best')||'{}');if(stored&&typeof stored==='object'&&!Array.isArray(stored))best=stored;}catch{}
+let perfectRescues={};try{const records=JSON.parse(playerStore.getItem('lemmings-perfect-v2')||'{}');if(records&&typeof records==='object'&&!Array.isArray(records))perfectRescues=records;}catch{}
+let starRecords={};try{const stored=JSON.parse(playerStore.getItem('lemmings-stars-v1')||'{}');if(stored&&typeof stored==='object'&&!Array.isArray(stored))starRecords=stored;}catch{}
 starRecords=migrateStars(best,perfectRescues,starRecords);
 const formatTime=seconds=>String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
 function starsMarkup(count){return [1,2,3].map(n=>`<span class="${n<=count?'earned':'unearned'}" aria-hidden="true">★</span>`).join('');}
-let initialLevel=0;try{initialLevel=Number(localStorage.getItem('lemmings-current-level'))||0;}catch{}
+let initialLevel=0;try{initialLevel=Number(playerStore.getItem('lemmings-current-level'))||0;}catch{}
 if(!isUnlocked(initialLevel,starRecords))initialLevel=0;
 const game=new Game(initialLevel),terrain=document.createElement('canvas');let background=makeBackground(game.level.theme,game.height,game.level);terrain.width=WIDTH;terrain.height=game.height;
 const soundtrack=new Soundtrack($('#soundtrack'));const impactAudio=new ImpactAudio();
@@ -40,13 +43,13 @@ function sync(){
 function result(){
  const run={completed:game.result==='win',saved:game.saved,lost:game.lost,ticks:game.tick};
  const stars=earnedStars(game.level,run);
- if(stars){starRecords[game.levelIndex]=recordResult(game.level,starRecords[game.levelIndex],run);try{localStorage.setItem('lemmings-stars-v1',JSON.stringify(starRecords));}catch{}}
+ if(stars){starRecords[game.levelIndex]=recordResult(game.level,starRecords[game.levelIndex],run);try{playerStore.setItem('lemmings-stars-v1',JSON.stringify(starRecords));}catch{}}
  $('#result-stars').innerHTML=starsMarkup(stars);$('#result-stars').setAttribute('aria-label',stars+' of 3 stars earned this run');
  $('#star-summary').textContent=stars===3?'Completed · Everyone saved · Under target time':stars===2?'Completed · Everyone saved. Beat '+formatTime(game.level.targetTime)+' for the third star.':stars===1?'Completed. Save everyone to earn a second star.':'Reach the rescue target to earn your first star.';
 
  const viewport=$('#viewport');$('#result').style.top=viewport.scrollTop+'px';$('#result').style.height=viewport.clientHeight+'px';$('#result').style.bottom='auto';viewport.style.overflowY='hidden';
-  if(game.result==='win'&&game.saved===20&&game.level.total===20&&game.lost===0&&game.spawned===20&&game.units.length===0){perfectRescues[game.levelIndex]={completed:true,saved:20,total:20,lost:0,puzzleId:game.level.puzzleId};try{localStorage.setItem('lemmings-perfect-v2',JSON.stringify(perfectRescues));}catch{}}
-  if(game.result==='win'){best[game.levelIndex]=Math.max(best[game.levelIndex]||0,game.saved);try{localStorage.setItem('lemmings-best',JSON.stringify(best));}catch{}}
+  if(game.result==='win'&&game.saved===20&&game.level.total===20&&game.lost===0&&game.spawned===20&&game.units.length===0){perfectRescues[game.levelIndex]={completed:true,saved:20,total:20,lost:0,puzzleId:game.level.puzzleId};try{playerStore.setItem('lemmings-perfect-v2',JSON.stringify(perfectRescues));}catch{}}
+  if(game.result==='win'){best[game.levelIndex]=Math.max(best[game.levelIndex]||0,game.saved);try{playerStore.setItem('lemmings-best',JSON.stringify(best));}catch{}}
   $('#next-level').classList.toggle('hidden',game.result!=='win'||game.levelIndex===LEVELS.length-1);
   $('#result').classList.remove('hidden');$('#result-eyebrow').textContent=game.result==='win'?`LEVEL ${String(game.levelIndex+1).padStart(2,'0')} COMPLETE`:'A LITTLE PRACTICE';
   $('#result-title').textContent=game.result==='win'?(game.saved===game.level.total?'Not one left behind.':'Home, sweet home.'):'Another little plan?';
@@ -62,7 +65,7 @@ canvas.addEventListener('pointerdown',e=>{
 });
 $('.skills').addEventListener('click',e=>{const b=e.target.closest('[data-skill]');if(b)select(b.dataset.skill);});
 $('#start').addEventListener('click',start);$('#pause').addEventListener('click',togglePause);$('#speed').addEventListener('click',toggleSpeed);$('#replay').addEventListener('click',()=>{reset();start();});
-function openDialog(id){dialogPause=paused;paused=true;soundtrack.pause();$(id).showModal();sync();}
+function openDialog(id){dialogPause=paused;paused=true;soundtrack.pause();if(id==='#pause-dialog')$('#pause-skills').open=false;$(id).showModal();sync();}
 $('#help').addEventListener('click',()=>{hintIndex=0;$('#tip-title').textContent=game.level.name;showTip();openDialog('#help-dialog');});
 $('#plan-paused').addEventListener('click',()=>{dialogPause=true;$('#pause-dialog').close();});
 $('#restart').addEventListener('click',()=>{if(!started){reset();return;}openDialog('#restart-dialog');});
@@ -89,7 +92,7 @@ function updateLevelUI(){
  $('#difficulty-label').textContent=game.level.difficulty;$('#difficulty-label').dataset.difficulty=game.level.difficulty.toLowerCase();
  renderSkills();const l=game.level;$('#time-target').textContent=formatTime(l.targetTime);$('#star-total').textContent=l.total;document.title=`Lemmings · ${l.world}`;$('#world-label').textContent=`${l.world.toUpperCase()} · ${String(l.id+1).padStart(2,'0')}`;$('h1').textContent=l.name;$('#level-number').textContent=`${l.id+1} / ${LEVELS.length}`;$('#target-count').textContent='/'+l.target;$('#help-goal').textContent=`Save ${l.target} of ${l.total}. Watch out for long falls and hazards. There’s no time limit.`;canvas.setAttribute('aria-label',`${l.world}: ${l.name}`);$('#music-status').textContent='';updateMusicUI();
  document.querySelectorAll('[data-help-skill]').forEach(el=>{el.hidden=el.dataset.helpSkill!=='walk'&&!(l.stock[el.dataset.helpSkill]>0);});
- try{localStorage.setItem('lemmings-current-level',String(l.id));}catch{}
+ try{playerStore.setItem('lemmings-current-level',String(l.id));}catch{}
 }
 $('#music-toggle').addEventListener('click',()=>{soundtrack.toggle();if(started&&!paused&&!soundtrack.muted)soundtrack.play();updateMusicUI();});
 $('#volume').addEventListener('input',e=>soundtrack.setVolume(Number(e.target.value)/100));
@@ -126,7 +129,7 @@ function draw(){
   ambientWorld(ctx,sceneryTick,game.level);finaleLandmarks(ctx,sceneryTick,game.level);
   ctx.drawImage(terrain,0,0);drawObjects(ctx,game);scenery(ctx,game.tick,game.level,game.spawned,game.lastSpawnTick,sceneryTick,game);
   if(game.level.theme==='woodland')for(let i=0;i<16;i++){const t=game.tick/100+i*4,x=80+(i*67)%870+Math.sin(t)*8,y=65+(i*47)%260+Math.cos(t*.7)*5;ctx.globalAlpha=.2+(Math.sin(t)+1)*.2;ctx.fillStyle='#e5db91';ctx.fillRect(x,y,2,2);}ctx.globalAlpha=1;
-  drawSplats(ctx,game.effects,game.tick);impactAudio.consume(game.effects,soundtrack.volume,soundtrack.muted);
+  drawSplats(ctx,game.effects,game.tick);impactAudio.consume([...game.effects,...game.soundEvents],soundtrack.volume,soundtrack.muted);
   exitPortal(ctx,game.level,game.tick,game.units.some(u=>u.state==='exit'));
   if(pointer)hover=pick(pointer.x,pointer.y);else hover=null;
   for(const u of game.units){
@@ -162,3 +165,35 @@ const viewportResizeObserver=new ResizeObserver(()=>{
 });
 viewportResizeObserver.observe(canvas);
 viewportResizeObserver.observe($('#viewport'));
+
+// Keep the compact pause window movable without obscuring or blurring the map.
+const pauseWindow=$('#pause-dialog'),pauseHandle=$('#pause-handle');
+function movePauseWindow(x,y){
+ const r=pauseWindow.getBoundingClientRect();
+ pauseWindow.style.margin='0';
+ pauseWindow.style.left=Math.max(8,Math.min(x,innerWidth-r.width-8))+'px';
+ pauseWindow.style.top=Math.max(8,Math.min(y,innerHeight-r.height-8))+'px';
+}
+let pauseDrag=null;
+pauseHandle.addEventListener('pointerdown',e=>{if(e.button!==0)return;const r=pauseWindow.getBoundingClientRect();pauseDrag={id:e.pointerId,x:e.clientX-r.left,y:e.clientY-r.top};pauseHandle.setPointerCapture(e.pointerId);e.preventDefault();});
+pauseHandle.addEventListener('pointermove',e=>{if(pauseDrag?.id===e.pointerId)movePauseWindow(e.clientX-pauseDrag.x,e.clientY-pauseDrag.y);});
+for(const event of ['pointerup','pointercancel','lostpointercapture'])pauseHandle.addEventListener(event,()=>{pauseDrag=null;});
+pauseHandle.addEventListener('keydown',e=>{const directions={ArrowLeft:[-20,0],ArrowRight:[20,0],ArrowUp:[0,-20],ArrowDown:[0,20]},d=directions[e.key];if(!d)return;e.preventDefault();const r=pauseWindow.getBoundingClientRect();movePauseWindow(r.left+d[0],r.top+d[1]);});
+function keepPauseVisible(){if(pauseWindow.open){const r=pauseWindow.getBoundingClientRect();movePauseWindow(r.left,r.top);}}
+window.addEventListener('resize',keepPauseVisible);
+$('#pause-skills').addEventListener('toggle',keepPauseVisible);
+
+const cloudSave=new CloudSave(playerStore,progress=>{best=progress.best;perfectRescues=progress.perfect;starRecords=progress.stars;if(!started&&progress.currentLevel!==game.levelIndex&&isUnlocked(progress.currentLevel,starRecords))reset(progress.currentLevel);},text=>{$('#cloud-status').textContent=text;});
+function renderPlayers(){
+ $('#player-button').textContent=playerStore.player.name;
+ const list=$('#player-list');list.replaceChildren();
+ for(const p of playerStore.registry.players){const button=document.createElement('button');button.className='quiet';button.textContent=p.name+(p.id===playerStore.activeId?' · Playing':'');button.disabled=p.id===playerStore.activeId;button.addEventListener('click',()=>{playerStore.select(p.id);location.reload();});list.append(button);}
+ $('#cloud-form').hidden=!cloudSave.configured;$('#sync-player').hidden=!cloudSave.configured;$('#signout-player').hidden=!cloudSave.configured;
+}
+$('#player-button').addEventListener('click',()=>{renderPlayers();openDialog('#players-dialog');});
+$('#add-player-form').addEventListener('submit',e=>{e.preventDefault();try{const p=playerStore.add($('#player-name').value);playerStore.select(p.id);location.reload();}catch(error){$('#player-error').textContent=error.message;}});
+$('#cloud-form').addEventListener('submit',async e=>{e.preventDefault();const button=$('#cloud-login');button.disabled=true;try{await cloudSave.signIn($('#player-email').value.trim(),$('#player-password').value);$('#player-error').textContent='Signed in. Check the save status above.';}catch(error){$('#player-error').textContent=error.message;}finally{$('#player-password').value='';button.disabled=false;}});
+$('#sync-player').addEventListener('click',()=>cloudSave.sync());
+$('#signout-player').addEventListener('click',async()=>{try{await cloudSave.signOut();}catch(error){$('#player-error').textContent=error.message;}});
+window.addEventListener('online',()=>cloudSave.sync());
+renderPlayers();cloudSave.init();

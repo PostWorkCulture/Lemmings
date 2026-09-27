@@ -8,9 +8,17 @@ export function drawSplats(c,effects,tick){
  }
 }
 export class ImpactAudio{
- constructor(){this.context=null;this.played=new WeakSet();this.lastSound=-Infinity;}
+ constructor(){this.context=null;this.played=new WeakSet();this.lastSound=-Infinity;this.lastByType={};}
  unlock(){try{this.context??=new (window.AudioContext||window.webkitAudioContext)();if(this.context.state==='suspended')this.context.resume().catch(()=>{});}catch{}}
- consume(effects,volume,muted){for(const e of effects){if(this.played.has(e))continue;this.played.add(e);if(!muted&&volume>0)this.splat(volume);}}
+ consume(effects,volume,muted){for(const e of effects){if(this.played.has(e))continue;this.played.add(e);if(!muted&&volume>0){if(e.type==='slide'||e.type==='splash')this.swoosh(volume,e.type);else this.splat(volume);}}}
+ swoosh(volume,type){
+  const c=this.context;if(!c||c.state!=='running')return;const now=c.currentTime;
+  if(now-(this.lastByType[type]??-Infinity)<.18)return;this.lastByType[type]=now;
+  const duration=type==='slide'?.55:.3,gain=c.createGain(),filter=c.createBiquadFilter();
+  gain.gain.setValueAtTime(.001,now);gain.gain.linearRampToValueAtTime(volume*.18,now+.025);gain.gain.exponentialRampToValueAtTime(.001,now+duration);gain.connect(c.destination);
+  const noise=c.createBuffer(1,Math.ceil(c.sampleRate*duration),c.sampleRate),samples=noise.getChannelData(0);for(let i=0;i<samples.length;i++)samples[i]=Math.random()*2-1;
+  const source=c.createBufferSource();source.buffer=noise;filter.type='bandpass';filter.Q.value=.7;filter.frequency.setValueAtTime(type==='slide'?1800:1000,now);filter.frequency.exponentialRampToValueAtTime(type==='slide'?300:180,now+duration);source.connect(filter);filter.connect(gain);source.start(now);source.stop(now+duration);source.onended=()=>{source.disconnect();filter.disconnect();gain.disconnect();};
+ }
  splat(volume){const c=this.context;if(!c||c.state!=='running'||c.currentTime-this.lastSound<.045)return;const now=c.currentTime;this.lastSound=now;
   const gain=c.createGain();gain.gain.setValueAtTime(Math.min(.32,volume*.45),now);gain.gain.exponentialRampToValueAtTime(.001,now+.2);gain.connect(c.destination);
   const noise=c.createBuffer(1,Math.ceil(c.sampleRate*.18),c.sampleRate),samples=noise.getChannelData(0);for(let i=0;i<samples.length;i++)samples[i]=(Math.random()*2-1)*(1-i/samples.length);

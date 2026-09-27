@@ -48,3 +48,9 @@ test('sharks appear for some water deaths and never target swimmers',()=>{
  const u={id:0,x:500,y:g.hazardY+2,state:'fall',dir:1,vy:0,abilities:{swim:true}};g.units=[u];g.step();
  assert.equal(u.state,'swim');assert.equal(u.shark,undefined);assert.equal(g.lost,0);
 });
+
+test('only one shark can chase a group of drowning lemmings at once',()=>{
+ const g=new Game();g.spawned=20;g.level={...g.level,hazard:'water',objects:[]};g.terrain.fill(0);
+ g.units=[0,3,6,9].map(id=>({id,x:200+id*20,y:g.hazardY+2,state:'fall',dir:1,vy:0}));g.step();
+ assert.equal(g.units.filter(u=>u.shark).length,1);assert.equal(g.units.filter(u=>u.state==='drown').length,4);
+});

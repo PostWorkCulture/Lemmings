@@ -1,0 +1,35 @@
+<!doctype html><meta charset="utf-8"><title>Sweet route checks</title><pre id="report">Checking routes…</pre><script type="module">
+import {LEVELS} from './src/levels.js';import {Game} from './src/engine.js';import {prepareSweetPuzzle} from './src/sweet-puzzles.js';let output=[];
+for(let i=0;i<5;i++){const art=document.createElement('canvas');LEVELS[20]=prepareSweetPuzzle(i,art);const g=new Game(20);g.spawned=20;g.saved=19;const u={id:0,x:g.level.spawnX,y:g.level.spawnY+4,state:'walk',dir:g.level.dir};g.units=[u];const jobs=[];let lastJob=-1000;
+for(let tick=0;tick<36000&&!g.result;tick++){
+let job=null;
+if(i===2&&u.state==='mine'&&u.x>350&&u.y<300){g.assign(0,'walk');job='dig';}
+if(i===2&&u.state==='dig'&&u.y>382){g.assign(0,'walk');job='mine';}
+if(i===2&&u.state==='mine'&&u.x>435){g.assign(0,'walk');job='bash';}
+if(i===4&&u.state==='dig'&&u.y>440){g.assign(0,'walk');job='bash';}
+if(u.state==='walk'&&tick-lastJob>12){
+if(i===0){if(u.y<400&&u.dir===1){if(u.x>192&&u.x<360)job='bash';else if(u.x>385&&u.x<557)job='build';}if(u.y>500&&u.dir===-1&&u.x<620&&u.x>410)job='build';}
+if(i===1){if(u.y>500&&u.dir===1&&u.x>325&&u.x<610)job='build';if(u.y<500&&u.dir===-1&&u.x<642&&u.x>340)job='platform';}
+if(i===2){if(u.x>170&&u.x<200&&u.y<200)job='mine';else if(u.x>650&&u.x<850&&u.y>500)job='bash';}
+if(i===3){if(u.dir===1&&(u.x>80&&u.x<800))job='build';}
+if(i===4){if(u.dir===-1&&u.x<532&&u.y<200)job='dig';if(u.dir===1&&u.x>405&&u.x<595&&u.y>500)job='bash';if(u.dir===1&&u.x>595&&u.x<725&&u.y>500)job='build';}
+}
+if(job&&g.stock[job]>0){const r=g.assign(u.id,job);if(r.ok){jobs.push([job,Math.round(u.x),Math.round(u.y)]);lastJob=tick;}}g.step();}
+let follow=null;if(g.saved===20&&g.lost===0){g.units=[];g.spawned=0;g.saved=0;g.lost=0;g.result=null;g.tick=0;for(let k=0;k<36000&&!g.result;k++)g.step();follow={saved:g.saved,lost:g.lost,disabled:[...g.disabledObjects],effects:g.effects.slice(-1)};}output.push({exit:[g.level.exitX,g.level.exitY],follow,level:i+1,result:g.result,x:Math.round(u.x),y:Math.round(u.y),state:u.state,saved:g.saved,lost:g.lost,jobs});}document.querySelector('#report').textContent=JSON.stringify(output,null,2);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

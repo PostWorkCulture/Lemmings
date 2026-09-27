@@ -124,3 +124,20 @@ for(const [id,positions] of [[7,[[740,255]]],[10,[[230,245],[720,240]]],[17,[[82
 
 // Rolling snowbanks, sandy ridges and rounded stage terrain remain fully physical.
 applyTerrainContours(LEVELS);
+
+// Give the complete exit arch a supported landing, including its outer feet.
+// Narrow rescue ledges need a little extra ground rather than an overhanging door.
+for(const id of [16]){
+ const l=LEVELS[id],ledge=l.terrain.find(r=>r[1]===l.exitY&&r[0]>850&&r[2]<100);
+ if(ledge){const right=ledge[0]+ledge[2];ledge[0]=870;ledge[2]=right-870;}
+ l.exitX=908;
+}
+LEVELS[15].exitX=908;
+LEVELS[18].exitX=906;
+LEVELS[19].exitX=909;
+for(const [id,x,y,depth] of [[1,905,227,9],[4,94,364,7]]){
+ const l=LEVELS[id];l.exitX=x;l.exitY=y;l.terrain.push([x-38,y,77,depth,1]);
+}
+
+// Widen the harbour landing away from the approach so its existing bridge remains valid.
+{const l=LEVELS[8],ledge=l.terrain.find(r=>r[0]===910&&r[1]===268),back=l.terrain.find(r=>r[0]===948&&r[1]===208);ledge[2]=75;back[0]=986;l.exitX=947;}

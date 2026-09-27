@@ -9,5 +9,11 @@
     "test": "node --test",
     "check": "node scripts/check.mjs",
     "compose": "node scripts/compose-music.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.2"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
   }
 }

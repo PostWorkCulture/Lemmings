@@ -14,7 +14,7 @@ export class Game {
     for(const rect of this.level.terrain)this.rect(...rect);
     for(const shape of this.level.shapes||[])this.polygon(shape.points,shape.type);
     if(this.level.hazard==='toys')this.rect(0,this.hazardY,WIDTH,28,2);
-    this.units=[];this.effects=[]; this.lastSpawnTick=null; this.spawned=0; this.saved=0; this.lost=0; this.tick=0;
+    this.units=[];this.effects=[];this.soundEvents=[]; this.lastSpawnTick=null; this.spawned=0; this.saved=0; this.lost=0; this.tick=0;
     this.disabledObjects=new Set();this.stock={...this.level.stock}; this.result=null; this.events=[]; this.revision=(this.revision||0)+1;
   }
   rect(x,y,w,h,type) {
@@ -61,7 +61,7 @@ export class Game {
   step() {
     if(this.result)return;
     if(this.spawned<this.level.total && this.tick%this.level.interval===0)this.spawn();
-    updateObjects(this);this.tick++;this.effects=this.effects.filter(e=>this.tick-e.tick<=150);
+    updateObjects(this);this.tick++;this.effects=this.effects.filter(e=>this.tick-e.tick<=150);this.soundEvents=this.soundEvents.filter(e=>this.tick-e.tick<=150);
     for(const u of this.units) {
       if(u.state==='saved'||u.state==='lost')continue;
       if(u.arrival){
@@ -71,15 +71,15 @@ export class Game {
         continue;
       }
       if(u.state==='slide'){
-        const slope=u.slideSlope;u.x-=slope.uphill*1.8;
+        const slope=u.slideSlope;u.dir=-slope.uphill;u.x+=u.dir*1.8;
         let floor=null;for(let y=u.y-5;y<=u.y+10;y++)if(this.at(u.x,y)&&!this.at(u.x,y-1)){floor=y;break;}
         if(floor!==null)u.y=floor;
-        if((u.x-slope.baseX)*slope.uphill<=0||floor===null){u.state='walk';u.dir=-slope.uphill;u.slideSlope=null;}
+        if((u.x-slope.baseX)*slope.uphill<=0||floor===null){u.state='walk';u.dir=-slope.uphill;u.slideSlope=null;if(floor===null)this.fall(u);}
         continue;
       }
       if(u.state==='walk'||u.state==='climb'){
-        const slope=(this.level.slipperySlopes||[]).find(s=>u.x>=s.x&&u.x<s.x+s.w&&u.y>=s.y&&u.y<s.y+s.h&&u.y<s.ceiling&&u.dir===s.uphill&&this.at(u.x,u.y)!==3);
-        if(slope){u.state='slide';u.slideSlope=slope;u.dir=-slope.uphill;continue;}
+        const slope=(this.level.slipperySlopes||[]).find(s=>u.x>=s.x&&u.x<s.x+s.w&&u.y>=s.y&&u.y<s.y+s.h&&u.y<=(s.summitY===undefined?s.ceiling:s.baseY-(s.baseY-s.summitY)*.75)&&u.dir===s.uphill&&this.at(u.x,u.y)!==3);
+        if(slope){u.state='slide';u.slideSlope=slope;u.dir=-slope.uphill;this.soundEvents.push({type:'slide',tick:this.tick});continue;}
       }
       if(u.state==='drown'){
         if(this.tick-u.drownStart>=180)this.remove(u);
@@ -94,7 +94,7 @@ export class Game {
       }
       if(u.y>=this.hazardY&&u.abilities?.swim&&!['lava','void','sand','syrup','snow','toys'].includes(this.level.hazard)){u.state='swim';u.y=this.hazardY;}
       if(u.y>=this.hazardY&&this.level.hazard==='water'&&!u.abilities?.swim){
-        u.state='drown';u.y=this.hazardY+3;u.drownStart=this.tick;u.shark=u.id%3===0;continue;
+        u.state='drown';u.y=this.hazardY+3;u.drownStart=this.tick;this.soundEvents.push({type:'splash',tick:this.tick});u.shark=u.id%3===0&&!this.units.some(other=>other!==u&&other.state==='drown'&&other.shark);continue;
       }
       if((u.y>=this.hazardY&&u.state!=='swim'&&this.level.hazard!=='toys')||u.x<8||u.x>990){this.remove(u);continue;}
       if(objectInteraction(this,u))continue;

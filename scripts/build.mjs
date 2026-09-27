@@ -1,8 +1,9 @@
+import './vendor.mjs';
 import { mkdir, cp, writeFile } from 'node:fs/promises';
 
-// Publish only the playable game, not test routes or local reference boards.
+// Publish the game and the approved sweet adventures and terrain gallery.
 await mkdir('dist', { recursive: true });
-for (const file of ['index.html', 'style.css', 'src', 'assets']) {
+for (const file of ['index.html', 'style.css', 'src', 'assets', 'sweets-review.html', 'sweet-level-review.html', 'sweet-range-review.html', 'terrain-review.html']) {
   await cp(file, `dist/${file}`, { recursive: true });
 }
 await writeFile('dist/.nojekyll', '');
