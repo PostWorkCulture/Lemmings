@@ -33,6 +33,9 @@ function singleStep(){if(!started||game.result)return;paused=true;soundtrack.pau
 function toggleSpeed(){speed=speed===1?3:1;$('#speed').textContent=speed+'\u00d7';$('#speed').classList.toggle('active',speed===3);$('#speed').setAttribute('aria-label',speed===1?'Speed: normal':'Speed: 3 times normal');}
 function sync(){
   $('#saved').textContent=String(game.saved).padStart(2,'0');$('#lost').textContent=String(game.lost).padStart(2,'0');
+  $('#lost').classList.toggle('alert-value',game.lost>0);
+  $('#timer').classList.toggle('alert-value',game.tick>=game.level.targetTime*60);
+  $('#time-target').classList.toggle('alert-value',game.tick>=game.level.targetTime*60);
   const seconds=Math.floor(game.tick/60);$('#timer').textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
   for(const key of SKILL_ORDER.filter(k=>k!=='walk'&&game.level.stock[k]>0)){$('#count-'+key).textContent=game.stock[key];const button=$(`[data-skill="${key}"]`);button.disabled=game.stock[key]<=0&&!(['block','attract'].includes(key)&&game.units.some(u=>u.state===key));button.hidden=game.level.stock[key]===0;}
   $('#status-label').textContent=game.result?(game.result==='win'?'LEVEL COMPLETE':'LEVEL ENDED'):!started?'READY':paused?'PAUSED':'PLAYING';
@@ -48,7 +51,7 @@ function result(){
  $('#star-summary').textContent=stars===3?'Completed · Everyone saved · Under target time':stars===2?'Completed · Everyone saved. Beat '+formatTime(game.level.targetTime)+' for the third star.':stars===1?'Completed. Save everyone to earn a second star.':'Reach the rescue target to earn your first star.';
 
  const viewport=$('#viewport');$('#result').style.top=viewport.scrollTop+'px';$('#result').style.height=viewport.clientHeight+'px';$('#result').style.bottom='auto';viewport.style.overflowY='hidden';
-  if(game.result==='win'&&game.saved===20&&game.level.total===20&&game.lost===0&&game.spawned===20&&game.units.length===0){perfectRescues[game.levelIndex]={completed:true,saved:20,total:20,lost:0,puzzleId:game.level.puzzleId};try{playerStore.setItem('lemmings-perfect-v2',JSON.stringify(perfectRescues));}catch{}}
+  if(game.result==='win'&&game.saved===game.level.total&&game.lost===0&&game.spawned===game.level.total&&game.units.length===0){perfectRescues[game.levelIndex]={completed:true,saved:game.saved,total:game.level.total,lost:0,puzzleId:game.level.puzzleId};try{playerStore.setItem('lemmings-perfect-v2',JSON.stringify(perfectRescues));}catch{}}
   if(game.result==='win'){best[game.levelIndex]=Math.max(best[game.levelIndex]||0,game.saved);try{playerStore.setItem('lemmings-best',JSON.stringify(best));}catch{}}
   $('#next-level').classList.toggle('hidden',game.result!=='win'||nextLevelId(game.levelIndex)===undefined);
   $('#result').classList.remove('hidden');$('#result-eyebrow').textContent=game.result==='win'?`LEVEL ${String(game.level.campaignIndex+1).padStart(2,'0')} COMPLETE`:'A LITTLE PRACTICE';

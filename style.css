@@ -42,3 +42,56 @@
 #pause-dialog{width:330px;padding:14px 16px;border-radius:9px;box-shadow:0 8px 28px #0006;background:#213128fa}#pause-dialog::backdrop{background:transparent;backdrop-filter:none}#pause-handle{display:flex;align-items:center;justify-content:space-between;cursor:grab;touch-action:none;user-select:none;padding:2px 0 12px}#pause-handle:active{cursor:grabbing}#pause-handle h2{font-size:20px;letter-spacing:0;margin:0}#pause-handle>span{font-size:23px;color:#a8b99c}#pause-handle:focus-visible{outline:2px solid var(--lime);outline-offset:3px}#pause-skills summary{cursor:pointer;color:#c7d5be;font-size:12px;padding:8px 0}#pause-skills[open]{max-height:55dvh;overflow-y:auto;padding-right:4px}#pause-dialog .dialog-actions{margin-top:12px;justify-content:space-between;gap:8px}#pause-dialog .dialog-actions button{padding:10px 12px}#pause-dialog .dialog-actions .primary{margin:0}
 #player-list{display:flex;flex-wrap:wrap;gap:8px}#players-dialog form{display:grid;gap:9px;margin-top:20px}#players-dialog label{font-size:12px;color:#c4d3ba}#players-dialog input{width:100%;padding:10px;border:1px solid #647756;border-radius:5px;background:#13241c;color:#edf4df;font:inherit}#player-error{color:#ffd099}#cloud-status{color:#c5e889}#player-button{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #players-dialog [hidden]{display:none!important}
+
+/* Neutral black menus keep the colour in the levels and character artwork. */
+:root{--bg:#08090b;--text:#f3f3f5;--muted:#b1b3bb;--line:#34363d;--lime:#c5e889}
+.masthead{background:#08090b}
+.game-panel{border-color:#34363d}
+.game-topbar,.tool-dock{background:#101114;border-color:#303238}
+.quiet,.sound-settings summary{background:#15161a;border-color:#3c3e46}
+.quiet:hover,.sound-settings summary:hover{background:#25272d;border-color:#656975}
+.control{background:#202126;border-color:#454750}
+.control:hover{background:#34363e;border-color:#858995}
+.control.active{background:#292e24;border-color:var(--lime)}
+.skill{background:#17181c;border-color:#3b3d45}
+.skill:hover{background:#292b32}
+.skill.selected{background:#242920;border-color:var(--lime);box-shadow:inset 0 0 0 1px #c5e88925}
+.skill kbd,kbd,.live-label,.stats,.timer,.star-target{color:#b9bbc3}
+.skill kbd,kbd{border-color:#555862}
+.game-clock{background:#0c0d10d9;border-color:#ffffff24;color:#fff}
+.viewport.tall-world,dialog{scrollbar-color:#60636c #111216}
+dialog,.sound-panel,.intro-card{background:#101114;border-color:#454750;box-shadow:0 20px 64px #0009}
+dialog::backdrop{background:#0009}
+dialog p,dialog li,#players-dialog label,#pause-skills summary{color:#bec0c8}
+.dialog-close{color:#c3c5cd}
+.dialog-close:hover{color:#fff}
+.difficulty-heading{color:#efeff2;border-bottom:1px solid #303238;padding-bottom:9px}
+.level-card{background:#1a1b20;border-color:#3c3e47}
+.level-card:hover,.level-card.current{background:#24262b;border-color:var(--lime)}
+.level-card strong{color:#f0f0f3}
+.level-card:disabled{opacity:1;background:#141519;border-color:#30323a}
+.level-card:disabled strong{color:#b6b8c0}
+.level-card:disabled small{color:#9b9ea8}
+.level-card:disabled canvas{opacity:.55}
+.level-card:disabled:hover{background:#141519;border-color:#30323a}
+.unearned{color:#5d606c}
+#level-confirm{background:#101114;border-color:#454750}
+#pause-dialog{background:#111216fa;border-color:#4b4e58}
+#pause-handle>span{color:#b3b6c0}
+#skill-help li{background:#1b1c21}
+#skill-help strong{color:#e8eedf}
+#players-dialog input{background:#1b1c21;border-color:#525560;color:#f2f2f5}
+#map-navigation button{background:#24262b;border-color:#565963;color:#e7e8ed}
+dialog a{color:#c5e889;text-underline-offset:3px}
+dialog a:hover{color:#e2f7c0}
+/* Match the rescue target to the Home / Lost label-and-number hierarchy. */
+.star-target{font-size:11px;letter-spacing:.6px;gap:10px}
+.star-target>span:first-child{font-size:19px;letter-spacing:2px;line-height:1}
+.star-target b{font:500 19px 'Space Grotesk',sans-serif;letter-spacing:0}
+
+/* One right-aligned rescue information group. */
+.level-info{margin-left:auto;display:flex;align-items:center;gap:22px;flex:0 0 auto;color:#fff}
+.level-info .stats,.level-info .stats b,.level-info .stats small,.level-info .star-target,.level-info .star-target b,.level-info .star-target>span:first-child,.game-clock,.live-label{color:#fff}
+.level-info .star-target{margin-left:0;padding-left:22px;border-left:1px solid #454750}
+.level-info .alert-value,#timer.alert-value{color:#ff6666!important}
+@media(max-width:800px){.level-info{gap:14px}.level-info .star-target{padding-left:14px}}

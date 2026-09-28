@@ -27,9 +27,9 @@ begin
   for n in 0..49 loop
    k:=n::text;
    value:=source #> array['best',k];
-   if value::text ~ '^[0-9]{1,2}$' then
+   if value::text ~ '^[0-9]{1,4}$' then
     saved:=(value::text)::integer;
-    if saved<=20 then result:=jsonb_set(result,array['best',k],to_jsonb(greatest(coalesce((result #>> array['best',k])::integer,0),saved))); end if;
+    if saved<=9999 then result:=jsonb_set(result,array['best',k],to_jsonb(greatest(coalesce((result #>> array['best',k])::integer,0),saved))); end if;
    end if;
    value:=source #> array['stars',k];
    if (value->>'stars') ~ '^[1-3]$' then
@@ -42,8 +42,8 @@ begin
     if ticks is not null then result:=jsonb_set(result,array['stars',k,'bestPerfectTicks'],to_jsonb(ticks)); end if;
    end if;
    value:=source #> array['perfect',k];
-   if value->>'completed'='true' and value->>'saved'='20' and value->>'total'='20' and value->>'lost'='0' then
-    result:=jsonb_set(result,array['perfect',k],jsonb_build_object('completed',true,'saved',20,'total',20,'lost',0,'puzzleId',left(value->>'puzzleId',200)));
+   if value->>'completed'='true' and (value->>'total') ~ '^[1-9][0-9]{0,3}$' and value->>'saved'=value->>'total' and value->>'lost'='0' then
+    result:=jsonb_set(result,array['perfect',k],jsonb_build_object('completed',true,'saved',(value->>'saved')::integer,'total',(value->>'total')::integer,'lost',0,'puzzleId',left(value->>'puzzleId',200)));
    end if;
   end loop;
   if (source->>'currentLevel') ~ '^[0-9]{1,2}$' and (source->>'currentLevel')::integer<50 then result:=jsonb_set(result,'{currentLevel}',source->'currentLevel'); end if;

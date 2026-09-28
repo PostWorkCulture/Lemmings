@@ -37,3 +37,12 @@ test('redesigned puzzles require a fresh perfect rescue while earlier unlocks re
  const r={completed:true,saved:20,total:20,lost:0};assert.equal(isPerfect(5,{5:r}),false);
  assert.equal(isPerfect(5,{5:{...r,puzzleId:'stack-access'}}),true);
 });
+
+test('micro levels award full stars for their own total, with the same time rule',()=>{
+ for(const total of [5,10,35]){
+  const level={total,target:total-1,targetTime:90};
+  assert.equal(earnedStars(level,{completed:true,saved:total,lost:0,ticks:5399}),3);
+  assert.equal(earnedStars(level,{completed:true,saved:total,lost:0,ticks:5400}),2);
+  assert.equal(earnedStars(level,{completed:true,saved:total-1,lost:1,ticks:4000}),1);
+ }
+});

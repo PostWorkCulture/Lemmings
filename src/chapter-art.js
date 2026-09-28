@@ -65,7 +65,7 @@ export function chapterBackdrop(c,key,height,level=null){
  }else{
   // A single sand silhouette: no background sea, props or grain texture.
   const sandTop=height-110;
-  c.fillStyle='#a49672';c.beginPath();c.moveTo(0,height);
+  c.fillStyle='#cbb365';c.beginPath();c.moveTo(0,height);
   for(let x=0;x<=1000;x+=12)c.lineTo(x,sandTop+Math.sin(x*.005)*18);
   c.lineTo(1000,height);c.closePath();c.fill();
  }

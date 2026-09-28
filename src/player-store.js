@@ -1,5 +1,5 @@
 import {LEVELS} from './levels.js';
-import {migrateStars} from './progress.js';
+import {migrateStars,isPerfect} from './progress.js';
 export const SAVE_KEYS=['lemmings-best','lemmings-perfect-v2','lemmings-stars-v1','lemmings-current-level'];
 const REGISTRY='lemmings-players-v1';
 const object=v=>v&&typeof v==='object'&&!Array.isArray(v)?v:{};
@@ -7,8 +7,8 @@ export function mergeProgress(a={},b={}){
  const result={best:{},perfect:{},stars:{},currentLevel:0};
  for(const source of [a,b]){
   for(let i=0;i<LEVELS.length;i++){
-   const saved=object(source.best)[i];if(Number.isInteger(saved)&&saved>=0&&saved<=20)result.best[i]=Math.max(result.best[i]||0,saved);
-   const perfect=object(source.perfect)[i];if(perfect?.completed===true&&perfect.saved===20&&perfect.total===20&&perfect.lost===0)result.perfect[i]={...perfect};
+   const saved=object(source.best)[i];if(Number.isInteger(saved)&&saved>=0&&saved<=LEVELS[i].total)result.best[i]=Math.max(result.best[i]||0,saved);
+   const perfect=object(source.perfect)[i];if(isPerfect(i,{[i]:perfect}))result.perfect[i]={...perfect};
    const r=object(source.stars)[i];if(Number.isInteger(r?.stars)&&r.stars>=1&&r.stars<=3){const previous=result.stars[i]||{};result.stars[i]={stars:Math.max(previous.stars||0,r.stars)};const times=[previous.bestPerfectTicks,r.bestPerfectTicks].filter(t=>Number.isInteger(t)&&t>=0&&t<100000000);if(times.length)result.stars[i].bestPerfectTicks=Math.min(...times);}
   }
   if(Number.isInteger(source.currentLevel)&&source.currentLevel>=0&&source.currentLevel<LEVELS.length)result.currentLevel=source.currentLevel;

@@ -15,7 +15,7 @@ export function earnedStars(level,{completed,saved,lost,ticks}){
  if(saved!==level.total||lost!==0)return 1;
  return Number.isFinite(ticks)&&ticks>=0&&ticks<level.targetTime*60?3:2;
 }
-export function isPerfect(index,records){const r=records[index];return !!LEVELS[index]&&(!LEVELS[index].puzzleId||r?.puzzleId===LEVELS[index].puzzleId)&&r?.completed===true&&r.saved===20&&r.total===20&&r.lost===0;}
+export function isPerfect(index,records){const r=records[index];return !!LEVELS[index]&&(!LEVELS[index].puzzleId||r?.puzzleId===LEVELS[index].puzzleId)&&r?.completed===true&&r.saved===LEVELS[index].total&&r.total===LEVELS[index].total&&r.lost===0;}
 export function migrateStars(best,perfect,records={}){
  const result={...records};
  for(const l of LEVELS){

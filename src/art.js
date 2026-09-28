@@ -60,10 +60,12 @@ export function renderTerrain(game,canvas) {
   const terrainAt=(x,y)=>x<0||x>=WIDTH||y<0||y>=game.height?0:game.terrain[Math.floor(y)*WIDTH+Math.floor(x)];
   const c=canvas.getContext('2d');c.clearRect(0,0,WIDTH,game.height);
   const theme=THEMES[game.level.theme];const colors={1:theme.earth,2:theme.stone,3:palettes[3]};
-  const pixels=c.createImageData(WIDTH,game.height),cache={};
+  const pixels=c.createImageData(WIDTH,game.height),cache={},snowDepth=new Uint16Array(WIDTH);
   for(let y=0;y<game.height;y++)for(let x=0;x<WIDTH;x++){
-    let type=game.terrain[y*WIDTH+x];if(!type)continue;
+    let type=game.terrain[y*WIDTH+x];if(!type){snowDepth[x]=0;continue;}snowDepth[x]++;
       if(game.level.hazard==='toys'&&y>=game.height-28)continue;
+      // Liquid has one consistent foreground shoreline; submerged terrain never cuts through it.
+      if(['water','lava'].includes(game.level.hazard)&&y>=game.hazardY)continue;
       // Buried hard roots keep their dark bark cue: soil must not disguise steel.
     const h=hash(Math.floor(x/4),Math.floor(y/4));
     let color=colors[type][h%5===0?h%colors[type].length:1];
@@ -99,12 +101,12 @@ export function renderTerrain(game,canvas) {
       const surface=!terrainAt(x,y-1),rim=!terrainAt(x,y-3),edge=!terrainAt(x-1,y)||!terrainAt(x+1,y)||!terrainAt(x,y+1);
       const grain=hash(Math.floor(x/18),Math.floor(y/12));
       if(material==='beach'){
-        color=type===1?'#bd965d':'#877350';
-        if(type===1&&grain%13===0)color='#c4a16b';
-        if(type===2&&(y%32===0||(x+(Math.floor(y/32)%2)*32)%64===0))color='#756344';
-        if(edge)color=type===1?'#967443':'#64583e';
-        if(rim)color=type===1?'#e6cc8b':'#bdaa78';
-        if(surface)color=type===1?'#f3dc9d':'#d4c695';
+        color=type===1?'#e0b84f':'#a58749';
+        if(type===1&&grain%13===0)color='#ebc65e';
+        if(type===2&&(y%32===0||(x+(Math.floor(y/32)%2)*32)%64===0))color='#846d3b';
+        if(edge)color=type===1?'#b88b33':'#736138';
+        if(rim)color=type===1?'#f4d875':'#d5bd75';
+        if(surface)color=type===1?'#ffea9a':'#ebd59a';
       }else if(material==='volcano'){
         color=type===1?'#76574d':'#49505b';
         if(type===1&&grain%11===0)color='#826154';
@@ -114,10 +116,11 @@ export function renderTerrain(game,canvas) {
         if(rim)color=type===1?'#bf8c65':'#9299a3';
         if(surface)color=type===1?'#e1ac7c':'#b5bdc6';
       }else if(material==='alpine'){
-        color=type===1?'#e0ecef':'#b9ced6';
-        if(type===1&&((y+Math.floor(Math.sin(x*.025)*5))%43===0))color='#c9dde3';
+        const capped=snowDepth[x]<26+Math.round(Math.sin(x*.065)*7);
+        color=type===1?(capped?'#e0ecef':'#738895'):'#b9ced6';
+        if(type===1&&((y+Math.floor(Math.sin(x*.025)*5))%43===0))color=capped?'#c9dde3':'#607583';
         if(type===2&&(y%36===0||(x+(Math.floor(y/36)%2)*36)%72===0))color='#96b2c0';
-        if(edge)color=type===1?'#a2c3cf':'#7495a6';
+        if(edge)color=type===1?(capped?'#a2c3cf':'#4f6472'):'#7495a6';
         if(rim)color='#bdd9e0';
         if(surface)color='#eff6f5';
       }else{

@@ -34,7 +34,7 @@ export function expansionLevels(){return EXPANSION_PLANS.map(([name,height,legs,
  const first=legs[0],dir=Math.sign(first[1]-first[0]),bottomEntry=first[2]>height*.75;
  for(let i=0;i<legs.length;i++){
   const [a,b,y,jobs,transfer]=legs[i],d=Math.sign(b-a),left=Math.min(a,b)-55,right=Math.max(a,b)+55,depth=mass?height-y-40:Math.min(['dig','mine'].includes(transfer)?80:([1,3,4,5,9,10,13,14,17,18].includes(index)?height-y-40:160+(i%2)*25),height-y-40);
-  corridors.push(B(left,y-85,right-left,85,0));
+  corridors.push(B(left+(group===2?24:0),y-85,right-left-(group===2?48:0),85,0));
   if(!mass)landforms.push({type:1,points:[[left,y],[right,y],[right,y+depth-24],[right-60,y+depth-5],[left+(right-left)*.58,y+depth],[left+70,y+depth-12],[left,y+depth-40]]});
   const cuts=jobs.filter(j=>j[0]!=='bash').map(([,x,w])=>d===1?[x,x+w]:[x-w,x]).sort((a,b)=>a[0]-b[0]);let fragment=left;for(const [start,end]of [...cuts,[right,right]]){if(start>fragment)sweetPieces.push({x:fragment,y,w:start-fragment,h:depth,kind:index===23&&i===legs.length-1?3:[0,2,3,4,9][(i+index)%5]});fragment=end;}
   if(i===0){terrain.push([a-d*48-(d===1?12:0),y-55,12,55,2]);if(mass)shapes.push(B(a-30,0,60,y,0));}
@@ -60,6 +60,18 @@ export function expansionLevels(){return EXPANSION_PLANS.map(([name,height,legs,
  }
  if([7,18].includes(index)){delete stock.block;stock.attract=1;}
  if(group===4&&mass){sweetPieces.splice(0,sweetPieces.length,{x:35,y:120,w:930,h:height-160,kind:5});}
+ // Mountain paths pass through substantial, peaked snow masses rather than thin shelves.
+ if(group===2){
+  const peaks=[.38,.62,.27,.55,.72];
+  if(mass){terrain.splice(0,1);landforms.unshift({type:1,contour:true,points:[[35,220],[150,150],[290,45],[430,130],[570,65],[735,160],[850,105],[965,240],[965,height-40],[35,height-40]]});}
+  else for(let n=0;n<landforms.length;n++){
+   const shape=landforms[n],left=shape.points[0][0],right=shape.points[1][0],y=shape.points[0][1],w=right-left;
+   const peak=peaks[(index-10+n)%peaks.length],rise=Math.min(260,y-45);
+   shape.contour=true;
+   shape.points=[[left,y],[left,y-rise*.55],[left+w*.12,y-rise*.65],[left+w*peak,y-rise],[left+w*Math.min(.9,peak+.18),y-rise*.52],[right,y-rise*.55],[right,y],...shape.points.slice(2)];
+  }
+  if([11,12,14].includes(index)){stock.float=20;}
+ }
  const last=legs.at(-1),exitX=last[1]-(index===8?30:0),exitY=last[2];
  return {id:20+index,difficulty:group===3?'Extreme':group<2||group===4?'Medium':'Hard',name,world:chapter,chapter,theme,hazard:group===2?'snow':group===3?'toys':group===4?'void':'water',height,total:20,target:group===3?19:18,targetTime:[135,120,210,120,150,120,210,150,210,210,195,210,150,210,210,165,210,150,210,195,135,210,150,210,195][index],interval:120,spawnX:first[0],spawnY:first[2]-45,rocketY:bottomEntry?first[2]-100:90,dir,bottomEntry,exitX,exitY,terrain,shapes:[...landforms,...corridors,...shapes],objects,stock,hints:[hint+(stock.climb?' Send a climber over the closed gate to reach its release switch.':'')+(stock.attract?' Use the Attractor to hold the crowd; Walker stops the music.':'')],expansion:true,expansionRoutes:routes,quietScenery:true,sceneryShelves:group===4?[]:legs.map(([a,b,y])=>[Math.min(a,b)-55,y,Math.abs(a-b)+110,100,1]),oneWay:[],slipperySlopes:[],setPieces:[],...(group===4?{sweetPieces,sweetBase:mass?'#e6b852':'#c5aecf'}:{})};
  });}

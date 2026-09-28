@@ -14,6 +14,7 @@ test('25 new campaign maps preserve existing IDs and form five coherent chapters
   assert.ok(l.height>700);assert.ok(l.hints.length>0);
   signatures.add(JSON.stringify([l.terrain,l.shapes,l.objects]));
   const required=new Set(l.expansionRoutes.map(r=>r[2]));required.add(l.stock.attract?'attract':'block');
+  if([31,32,34].includes(i))required.add('float');
   assert.deepEqual(Object.keys(l.stock).sort(),[...required].sort(),'inventory must serve the tested route');
  }
  assert.equal(signatures.size,25);
