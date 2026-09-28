@@ -9,7 +9,7 @@ The game remains on GitHub Pages. Local profiles work without Supabase.
 5. Build and publish. Each person chooses/adds their local player and signs into their own account from Players. On another device, create a local profile and sign into the same account. Stars, best rescue counts and best perfect times merge without decreasing.
 6. Verify with both accounts: each can sync its own save, cannot read the other account's row, offline completions upload after reconnection, and signing out keeps the local save.
 
-Existing browser progress is copied into Player 1 once. Original storage keys remain as a backup. Unfinished runs are not saved; switching players restarts the run. Local profiles are not a privacy boundary on a shared browser; use separate browser profiles if needed.
+The approved new-game reset uses save version 2. All pre-release progress starts at zero, while local player names and preferences remain. Old storage keys are ignored. Run the updated setup.sql when configuring Supabase: version-1 cloud results are excluded, and older clients cannot write into the new save. Unfinished runs are not saved; switching players restarts the run. Local profiles are not a privacy boundary on a shared browser; use separate browser profiles if needed.
 
 Cloud saves are not anti-cheat or verified leaderboard scores. Free projects can pause after inactivity; if that happens, restore the project in Supabase. Local progress remains usable. There is no application-email provider needed for these two manually created accounts. Password recovery can be managed in Supabase until a public account/recovery flow is added.
 

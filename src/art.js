@@ -1,3 +1,4 @@
+import {paintRebootTerrain,sweetDoors,sweetBackdrop} from './sweet-reboot-art.js';
 import {paintSculptedMaterials} from './sculpted-materials.js';
 import {paintSweetTerrain} from './expansion-art.js';
 import {CLASSIC_ENTRANCE} from './classic-entrance.js';
@@ -12,12 +13,17 @@ export function character(c,x,y,state='walk',dir=1,tick=0,scale=1) {
   c.save();c.translate(Math.round(x),Math.round(y));c.scale(dir*scale*.75,scale*.75);
   const phase=Math.floor(tick/7)%4,bob=state==='walk'&&phase%2?1:0;
   const r=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(x,y-bob,w,h);};
-  // A compact, hand-drawn sprite; every job shares the same body and palette.
+  // Keep the compact classic silhouette, with a restrained material pass.
+  const skin=c.createLinearGradient(-4,-20,7,-10);skin.addColorStop(0,'#ffe3bf');skin.addColorStop(.6,'#f5cda5');skin.addColorStop(1,'#d7a17d');
+  const coat=c.createLinearGradient(-5,-11,6,-1);coat.addColorStop(0,'#7d94ee');coat.addColorStop(.32,'#526fd7');coat.addColorStop(1,'#3447a0');
+  if(!['fall','jump','climb','swim'].includes(state)){c.fillStyle='#09161a35';c.beginPath();c.ellipse(0,1,7,1.4,0,0,Math.PI*2);c.fill();}
   r(-5,-23,10,2,'#142628');r(-7,-21,14,8,'#142628');r(-6,-13,13,12,'#142628');
-  r(-4,-20,10,9,'#f8d7ad');r(5,-17,4,4,'#f8d7ad');r(-3,-13,7,3,'#e8b88d');
+  r(-4,-20,10,9,skin);r(5,-17,4,4,'#f8d7ad');r(-3,-13,7,3,'#e8b88d');
   r(4,-20,2,3,'#26352c');r(0,-20,2,2,'#ffead0');
   r(-6,-24,9,3,'#7aca50');r(-8,-21,13,4,'#75c94c');r(-7,-18,5,5,'#56a842');r(-9,-17,3,3,'#59ad45');r(-4,-25,6,2,'#a4e671');r(-2,-23,7,2,'#8eda5b');r(-6,-20,3,2,'#a1e569');
-  r(-5,-11,10,9,'#425dcc');r(-5,-11,3,7,'#6482e5');r(-4,-3,10,2,'#3348a8');
+  r(-5,-11,10,9,coat);r(-5,-11,3,7,'#6482e5');r(-4,-3,10,2,'#3348a8');
+  r(-5,-23,4,1,'#b6eb87');r(-7,-19,2,2,'#95df6a');r(-5,-15,2,2,'#388940');
+  r(-2,-17,2,2,'#ffe8cb');r(5,-12,2,1,'#be8b70');r(-4,-10,2,4,'#91a4ee');r(3,-8,2,5,'#35499f');
   if(state==='block'){
     r(-12,-11,8,3,'#f5f1d9');r(4,-11,9,3,'#f5f1d9');r(-14,-11,3,3,'#f8d7ad');r(12,-11,3,3,'#f8d7ad');
     r(-6,-1,5,2,'#f9dcba');r(3,-1,5,2,'#f9dcba');
@@ -35,6 +41,7 @@ export function character(c,x,y,state='walk',dir=1,tick=0,scale=1) {
   c.restore();
 }
 export function makeBackground(theme='forest',height=HEIGHT,level=null) {
+  if(level?.embeddedDoors)return sweetBackdrop(level);
   const world=worldBackground(theme,height,level);if(world)return world;
   if(theme!=='forest')return themedBackground(theme);
   const canvas=document.createElement('canvas');canvas.width=WIDTH;canvas.height=HEIGHT;
@@ -60,6 +67,7 @@ export function renderTerrain(game,canvas) {
   if(canvas.height!==game.height)canvas.height=game.height;
   const terrainAt=(x,y)=>x<0||x>=WIDTH||y<0||y>=game.height?0:game.terrain[Math.floor(y)*WIDTH+Math.floor(x)];
   const c=canvas.getContext('2d');c.clearRect(0,0,WIDTH,game.height);
+  if(game.level.sweetReboot!==undefined){paintRebootTerrain(c,game);return;}
   const theme=THEMES[game.level.theme];const colors={1:theme.earth,2:theme.stone,3:palettes[3]};
   const pixels=c.createImageData(WIDTH,game.height),cache={},snowDepth=new Uint16Array(WIDTH);
   for(let y=0;y<game.height;y++)for(let x=0;x<WIDTH;x++){
@@ -196,6 +204,7 @@ export function magicalEntrance(c,tick,level,spawned=0,lastSpawnTick=null){
  c.restore();
 }
 export function scenery(c,tick,level,spawned=0,lastSpawnTick=null,sceneryTick=tick,game=null) {
+  if(level.embeddedDoors){sweetDoors(c,tick,level,spawned,lastSpawnTick);return;}
   worldScenery(c,sceneryTick,level,game?(x,y)=>game.at(x,y):null);
   if(level.entrances){for(const [i,e] of level.entrances.entries()){const n=level.entrances.length,count=Math.max(0,Math.ceil((spawned-i)/n));magicalEntrance(c,tick,{...level,spawnX:e.x,spawnY:rocketHeight(level,e),rocketScale:i===0?1:.6,total:Math.ceil((level.total-i)/n)},count,count?((count-1)*n+i)*level.interval:null);}}else magicalEntrance(c,tick,{...level,spawnY:level.rocketY||90},spawned,lastSpawnTick);
   // Golden splayed arch and twin torches from the supplied classic exit reference.
@@ -306,6 +315,7 @@ function themedBackground(theme){
 export function exitPortal(c,level,tick,active){
   if(!active)return;
   c.save();c.translate(level.exitX,level.exitY);
+  if(level.embeddedDoors){c.beginPath();c.roundRect(-7,-26,14,26,[7,7,0,0]);c.clip();}
   c.beginPath();c.moveTo(-18,-3);c.lineTo(-4,-39);c.lineTo(6,-39);c.lineTo(19,-3);c.closePath();c.clip();
   const glow=c.createRadialGradient(1,-19,1,1,-19,25);glow.addColorStop(0,'#e3ffd7');glow.addColorStop(.18,'#92eea2');glow.addColorStop(.5,'#26935b');glow.addColorStop(1,'#123a29');c.fillStyle=glow;c.fillRect(-20,-40,40,40);
   for(let arm=0;arm<3;arm++){

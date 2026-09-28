@@ -1,3 +1,4 @@
+import {SAVE_VERSION} from './player-store.js';
 import {CLOUD_CONFIG} from './cloud-config.js';
 export class CloudSave{
  constructor(store,onProgress,onStatus){this.store=store;this.onProgress=onProgress;this.onStatus=onStatus;this.client=null;this.pending=false;this.running=null;this.retry=null;store.onSave=()=>this.schedule();}
@@ -31,6 +32,7 @@ export class CloudSave{
    this.onStatus('Saving to cloud…');
    const incoming=this.store.snapshot();if(!Object.keys(incoming.stars).length&&incoming.currentLevel===0)delete incoming.currentLevel;
    const {data,error:saveError}=await this.client.rpc('sync_lemmings_progress',{incoming});if(saveError)throw saveError;
+   if(data?.campaignVersion!==SAVE_VERSION){this.onStatus('Cloud save needs the new-game update. Progress is saved on this device.');return;}
    const merged=this.store.merge(data);this.onProgress(merged);this.onStatus('Saved on this device and in the cloud.');
   }catch{this.onStatus('Saved on this device. Cloud save pending—check your connection and retry.');clearTimeout(this.retry);this.retry=setTimeout(()=>this.sync(),30000);}
  }

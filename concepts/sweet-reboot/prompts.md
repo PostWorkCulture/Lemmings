@@ -1,6 +1,6 @@
 # Fresh sweet terrain studies
 
-Status: local concepts only; not published or playable. Generated using the built-in image-generation tool, from written briefs with no previous sweet reference images. The five source sheets each contain two terrains. CSS displays the selected image regions without altering the originals.
+Status: approved artwork, now used by ten playable Sweet Worlds levels. The original studies remain visible alongside links to the finished maps. Generated using the built-in image-generation tool, from written briefs with no previous sweet reference images. The five source sheets each contain two terrains. CSS displays the selected image regions without altering the originals.
 
 ## Saved artwork
 

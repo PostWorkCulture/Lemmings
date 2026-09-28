@@ -16,7 +16,7 @@ $('#rescue').onclick=()=>{if(demonstrating){demonstrating=false;$('#rescue').tex
 $('#collision').onclick=()=>{solid=!solid;revision=-1;$('#collision').setAttribute('aria-pressed',String(solid));};
 $('#zoom').onclick=()=>{const zoom=$('#canvas-wrap').classList.toggle('zoom');$('#canvas-wrap').classList.toggle('fit',!zoom);$('#zoom').setAttribute('aria-pressed',String(zoom));$('#zoom').textContent=zoom?'Fit whole journey':'Explore full size';};
 function draw(t){const delta=Math.min(100,t-last);last=t;if(demonstrating){accumulator+=delta*.18;while(accumulator>=1&&!g.result){const route=routes[g.level.id];while(route.events[cursor]?.tick===g.tick){const e=route.events[cursor++],r=g.assign(e.id,e.skill);if(!r.ok){demonstrating=false;$('#status').textContent='Demonstration interrupted: '+r.message;break;}}if(!demonstrating)break;g.step();accumulator--;}if(g.result){demonstrating=false;$('#rescue').textContent='Replay rescue';$('#status').textContent=`${g.saved}/${g.level.total} home · ${g.lost} lost · ${Math.floor(g.tick/3600)}:${String(Math.floor(g.tick/60)%60).padStart(2,'0')} · ${g.result==='win'?'Rescue complete':'Retry needed'}`;}else if(demonstrating)$('#status').textContent=`Rescue demonstration · 3× speed · ${g.saved}/${g.level.total} home · ${g.lost} lost`;}
- c.drawImage(bg,0,0);hazards(c,t*.06,g.level.theme,g.height);ambientWorld(c,t*.06,g.level);finaleLandmarks(c,t*.06,g.level);
+ c.drawImage(bg,0,0);if(!g.level.embeddedDoors)hazards(c,t*.06,g.level.theme,g.height);ambientWorld(c,t*.06,g.level);finaleLandmarks(c,t*.06,g.level);
  if(revision!==g.revision){const renderStart=performance.now();renderTerrain(g,terrain);canvas.dataset.renderMilliseconds=String(Math.round(performance.now()-renderStart));if(solid){const tc=terrain.getContext('2d'),im=tc.createImageData(1000,g.height);for(let p=0;p<g.terrain.length;p++)if(g.terrain[p]){const rgb=g.terrain[p]===1?[91,193,155]:g.terrain[p]===2?[185,191,201]:[255,214,90];im.data.set([...rgb,255],p*4);}tc.putImageData(im,0,0);}revision=g.revision;}
  c.drawImage(terrain,0,0);drawObjects(c,g);scenery(c,g.tick,g.level,g.spawned,g.lastSpawnTick,t*.06,g);exitPortal(c,g.level,g.tick,g.units.some(u=>u.state==='exit'));
  for(const u of g.units){if(['saved','lost'].includes(u.state))continue;if(u.state==='exit')enteringLemming(c,u,g.level,g.tick);else{character(c,u.x,u.y,u.state,u.dir,g.tick);skillEquipment(c,u,g.tick);}}
@@ -24,3 +24,5 @@ function draw(t){const delta=Math.min(100,t-last);last=t;if(demonstrating){accum
 }
 window.addEventListener('hashchange',()=>{const wanted=(Number(location.hash.slice(1))||1)-1;if(wanted!==index)select(wanted);});
 select((Number(location.hash.slice(1))||1)-1);requestAnimationFrame(draw);
+
+window.addEventListener('sweet-art-ready',()=>{if(g?.level.embeddedDoors){bg=makeBackground(g.level.theme,g.height,g.level);revision=-1;}});

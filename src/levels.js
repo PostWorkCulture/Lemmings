@@ -189,3 +189,11 @@ CAMPAIGN.splice(0,CAMPAIGN.length,...CAMPAIGN.filter(l=>!RETIRED_LEVEL_IDS.inclu
 CHAPTERS.splice(0,CHAPTERS.length,...CHAPTERS.filter(c=>c.theme!=='candy'));
 CAMPAIGN.forEach((level,index)=>{level.campaignIndex=index;});
 export const isCampaignLevel=id=>Number.isInteger(id)&&CAMPAIGN.some(level=>level.id===id);
+
+// Fresh sweet puzzles use new save identities; the withdrawn prototypes stay archived.
+import {sweetRebootLevels} from './sweet-reboot-levels.js';
+const freshSweets=sweetRebootLevels();
+LEVELS.push(...freshSweets);
+CAMPAIGN.splice(30,0,...freshSweets);
+CHAPTERS.splice(3,0,{name:'Sweet Worlds',theme:'candy',difficulty:'Hard'});
+CAMPAIGN.forEach((l,index)=>{l.campaignIndex=index;});

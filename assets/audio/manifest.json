@@ -348,5 +348,75 @@
     "seconds": 49.23,
     "peak": 0.368,
     "rms": 0.103
+  },
+  {
+    "title": "Honeycomb Hollow",
+    "file": "assets/audio/level-51.wav",
+    "seconds": 49.23,
+    "peak": 0.356,
+    "rms": 0.111
+  },
+  {
+    "title": "Ribbonfall Ravine",
+    "file": "assets/audio/level-52.wav",
+    "seconds": 49.23,
+    "peak": 0.388,
+    "rms": 0.126
+  },
+  {
+    "title": "Waferworks",
+    "file": "assets/audio/level-53.wav",
+    "seconds": 49.23,
+    "peak": 0.362,
+    "rms": 0.099
+  },
+  {
+    "title": "Gummy Grotto",
+    "file": "assets/audio/level-54.wav",
+    "seconds": 49.23,
+    "peak": 0.364,
+    "rms": 0.1
+  },
+  {
+    "title": "Meringue Summit",
+    "file": "assets/audio/level-55.wav",
+    "seconds": 49.23,
+    "peak": 0.343,
+    "rms": 0.105
+  },
+  {
+    "title": "Liquorice Lock",
+    "file": "assets/audio/level-56.wav",
+    "seconds": 49.23,
+    "peak": 0.353,
+    "rms": 0.113
+  },
+  {
+    "title": "Bonbon Borough",
+    "file": "assets/audio/level-57.wav",
+    "seconds": 49.23,
+    "peak": 0.391,
+    "rms": 0.126
+  },
+  {
+    "title": "Peppermint Aqueduct",
+    "file": "assets/audio/level-58.wav",
+    "seconds": 49.23,
+    "peak": 0.369,
+    "rms": 0.098
+  },
+  {
+    "title": "Macaron Switchback",
+    "file": "assets/audio/level-59.wav",
+    "seconds": 49.23,
+    "peak": 0.371,
+    "rms": 0.1
+  },
+  {
+    "title": "Sugar Cathedral",
+    "file": "assets/audio/level-60.wav",
+    "seconds": 49.23,
+    "peak": 0.366,
+    "rms": 0.102
   }
 ]

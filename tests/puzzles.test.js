@@ -6,7 +6,7 @@ import {objectInteraction} from '../src/objects.js';
 import {solvePuzzle} from './puzzle-solutions.js';
 
 test('ten bespoke puzzles have distinct inventories and puzzle identities',()=>{
- const maps=LEVELS.filter(l=>l.puzzleId);
+ const maps=LEVELS.filter(l=>l.id<50&&l.puzzleId);
  assert.equal(maps.length,10);assert.equal(new Set(maps.map(l=>l.puzzleId)).size,10);
  assert.equal(new Set(maps.map(l=>JSON.stringify(l.stock))).size,10);
 });

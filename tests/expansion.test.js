@@ -6,8 +6,8 @@ import {mergeProgress} from '../src/player-store.js';
 import {isUnlocked} from '../src/progress.js';
 
 test('25 new campaign maps preserve existing IDs and form five coherent chapters',()=>{
- assert.equal(LEVELS.length,50);
- assert.deepEqual(LEVELS.map(l=>l.id),Array.from({length:50},(_,i)=>i));
+ assert.equal(LEVELS.length,60);
+ assert.deepEqual(LEVELS.map(l=>l.id),Array.from({length:60},(_,i)=>i));
  const signatures=new Set();
  for(let i=20;i<45;i++){
   const l=LEVELS[i];assert.ok(l.expansion);assert.equal(l.total,20);assert.ok(l.target<=20);

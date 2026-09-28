@@ -1,3 +1,4 @@
+import {shapeSweetReboot} from './sweet-reboot-terrain.js';
 import {sculptOriginalTerrain} from './original-terrain.js';
 import {SKILLS} from './skills.js';
 import {objectPosition,updateObjects,objectInteraction} from './objects.js';
@@ -16,6 +17,7 @@ export class Game {
     for(const shape of this.level.shapes||[])this.polygon(shape.points,shape.type);
     if(this.level.hazard==='toys')this.rect(0,this.hazardY,WIDTH,28,2);
     sculptOriginalTerrain(this);
+    shapeSweetReboot(this);
     this.units=[];this.effects=[];this.soundEvents=[]; this.lastSpawnTick=null; this.spawned=0; this.saved=0; this.lost=0; this.tick=0;
     this.disabledObjects=new Set();this.stock={...this.level.stock}; this.result=null; this.events=[]; this.revision=(this.revision||0)+1;
   }
