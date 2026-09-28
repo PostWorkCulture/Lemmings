@@ -1,0 +1,108 @@
+{
+  "mode": "Built-in image generation",
+  "base": "Use case: stylized-concept. Production game terrain sprite sheet with TWO DISTINCT COMPLETE CONNECTED SIDE-VIEW LANDSCAPES stacked vertically, TOP is first named landscape and BOTTOM second. Each landscape spans nearly full width and occupies less than half the sheet, separated by a generous TRANSPARENT gutter. Genuine transparent alpha background, no sky/backdrop. Premium tactile hand-painted cartoon material textures, dimensional rounded edges, readable silhouettes. A FEW ENORMOUS recognisable objects form the actual contiguous walkable landform with ramps, natural tunnels and supporting connections. Every object physically connects, no floating props, no repeated horizontal slices, no rows of disconnected shelves. Broad terrain masses, useful lower and upper routes, one small repair gap per landscape. Keep safe broad end ledges. No lettering, labels, UI, characters, entrances or exits. Strict 2D side view, no isometric perspective. Not an infographic. Full square sheet at highest detail. ",
+  "pairs": [
+    [
+      "neon",
+      1,
+      "Cassette Canyon: a huge cassette with an open central well, tape spilling into a curved bridge towards a sloped keyboard; one tape break. Synth Summit: ascending piano keys connect an old synthesizer to a plugged-in cable that climbs a speaker cabinet, one cracked key obstruction."
+    ],
+    [
+      "space",
+      1,
+      "Lunar Lander: a squat lander stands on a crescent crater, its lowered ramp connects to a broken solar array bridging a second moon. Asteroid Foundry: a giant rocky asteroid with one curved interior tunnel, a drill rig anchored into its lip and a fallen antenna bridge to a smaller rock."
+    ],
+    [
+      "food",
+      1,
+      "Sushi Express: three oversized sushi rolls joined by an angled chopstick bridge, a rice tunnel through the biggest roll and a wasabi plug. Taco Gorge: one giant curved taco shell forms a valley, cheese drapes into a bridge to a tortilla stack, one small missing tortilla step."
+    ],
+    [
+      "sports",
+      1,
+      "Skatepark Switchback: a huge skateboard bridges two concrete halfpipes, the wheels rest on supported ledges and a broken deck leaves one gap. Cricket Crease: a large bat leans from a grounded red round cricket ball towards wickets, a loose bail bridges two stumps and the ball has a low tunnel."
+    ],
+    [
+      "dino",
+      1,
+      "Amber Falls: a colossal curled ammonite fossil bridges from a flat nest bank across a small amber basin to a fern-rooted rock arch; one missing shell segment. Triceratops Trail: a single huge horned skull on the left, its frill makes a ramp into layered fossil cliffs and a fallen rib bridges the final gap."
+    ],
+    [
+      "neon",
+      2,
+      "Joystick Junction: one huge arcade joystick leans as a ramp over its broad purple cabinet base, a cyan cable snakes uphill into a large luminous coin slot building at right. Laser Harp: a broad curved chrome harp frame connects a low-left circuit slab to a high-right platform, five magenta light strings inside the arch and one cracked circuit obstruction below."
+    ],
+    [
+      "space",
+      2,
+      "Rocket Graveyard: a massive grounded retro rocket lies diagonally, its open cutaway fuselage forms a ramp to a lunar crater shelf, an engine nozzle makes a lower tunnel. Satellite Sling: two enormous satellite dishes face one another with a supported antenna truss joining their lips, a small truss gap above a lower crescent moon recovery route."
+    ],
+    [
+      "food",
+      2,
+      "Pretzel Pass: one colossal pretzel with three natural tunnel holes leans on a round bread roll; a breadstick connects its top loop to a cheese shelf at right. Noodle Nest: one enormous bowl full of thick curled noodles has a clean cutaway side opening, a chopstick bridges from its lip to a dumpling bank, noodles form lower spiral routes."
+    ],
+    [
+      "sports",
+      2,
+      "Bowling Alley: an enormous fallen bowling pin is a bridge from a bowling-ball cave to a sloped wooden lane, remaining pins create a high zigzag route, one split in the fallen pin. Rugby Run: a large oval RUGBY ball (no American football stitches) nestles between two grassy banks, its low tunnel links to a sloping goalpost fallen as a bridge and a supported high scoreboard base; no letters."
+    ],
+    [
+      "dino",
+      2,
+      "Stegosaur Steps: a connected stegosaurus skeleton lies partly buried, its broad back plates make a mountain ridge and its rib cage encloses a single winding lower tunnel, tail bridges to a rock ledge. Pterosaur Perch: a huge fossilised outstretched wing slopes from a low amber nest to a high crag, a second folded wing forms a natural lower cave, one missing bone connection."
+    ],
+    [
+      "neon",
+      3,
+      "Turntable Terrace: a giant violet turntable disk slopes out of its dark cabinet, a silver tonearm bridges a central well to a cyan speaker tower; lower cabinet tunnel provides recovery. Neon Raceway: a huge deep-purple toy racing loop is joined by curved magenta ramps to low-left and high-right starting banks, one missing track segment above a lower cable crossing. NO greenery, dirt or vegetation: only purple chrome, black plastic, cyan/magenta luminous trim."
+    ],
+    [
+      "space",
+      3,
+      "Meteor Mail: a massive silver space station airlock ring sits tilted between two cratered asteroids, fallen docking tubes form zigzag ramps, one broken tube above a lower rock bridge. Frozen Relay: a giant pale-blue comet makes a C shaped cavern, a crashed silver relay dish braces its lower lip and a radio mast rises to the top ledge, one ice plug in the lower passage."
+    ],
+    [
+      "food",
+      3,
+      "Waffle Works: a huge central stack of golden waffles fills most of the landscape, butter slabs form short internal stepping ledges and a spoon leans diagonally up through a single tall shaft; begin low centre and finish high left, no separate left/right islands. Melon Drop: a huge sloped half watermelon rests over a hollow coconut, a peeled banana makes a curved chute from high right into the low left coconut interior; one short broken banana segment and broad lower recovery bowl."
+    ],
+    [
+      "sports",
+      3,
+      "Climbing Club: a single colossal curved climbing wall on solid gym mats, bold coloured holds form three switchback ledges inside an overhanging arch, a rope joins upper left to lower right, no separate islands, route bottom centre to high left. Poolside Plunge: a high diving board on the right slopes towards a giant inflated swim ring at lower left, the ring rests on tiled pool steps; empty transparent pool cavity for runtime water, simple sparse turquoise tiles and yellow ring."
+    ],
+    [
+      "dino",
+      3,
+      "Footprint Hollow: one giant three-toed fossil footprint pressed deep into an amber-streaked stone slab, cutaway SIDE VIEW shows three finger-like chambers at differing depths joined by inclined tunnels, main descent high right to low left, no bridges between islands. Root of the Rex: a huge fossil skull trapped within one thick petrified tree root, roots twist into a tall central spiral climbing route through eye socket and jaw, cracked amber at its base, low left entry and high middle finish."
+    ],
+    [
+      "neon",
+      4,
+      "Inside the Cabinet: one giant purple arcade cabinet lies tilted, a cutaway reveals three descending stepped circuit chambers connected by diagonal chrome rails, begin upper right and finish lower left, occupies most of its landscape. Fibre-optic Crown: a single huge dark-purple crystalline lightbulb base grows three thick cyan fibre-optic cable branches that twist into a central climb, a curved magenta glass crown forms upper route and one cracked circuit blocks the low entry. Neon cyan magenta on purple chrome ONLY, no vegetation, moss, dirt or brown stone."
+    ],
+    [
+      "space",
+      4,
+      "Saturn Within: one colossal orange ringed planet dominates, a cutaway central cavern exposes two sloping mineral ledges and a small rocky plug; its golden tilted ring enters the cavern from lower right and exits at upper left, NO separate island banks. Observatory Ascent: a huge central hollow blue-gray asteroid with three connected spiral ledges, a grounded silver telescope at the summit and a long broken solar-panel ramp coiling around the rock; start bottom centre and finish high right."
+    ],
+    [
+      "food",
+      4,
+      "Croissant Cavern: one colossal curved croissant dominates the landscape, its layered pastry shell encloses a large lower cavity, a butter knife acts as a diagonal inside ramp and a small jam plug blocks an upper tunnel; start low right and finish high left. Cheese Fortress: one monumental Swiss-cheese wedge with three uneven connected curved interior tunnels, a crispbread ramp joins lower centre to upper right, one small missing crispbread piece and a grape as a local plug, no separate islands."
+    ],
+    [
+      "sports",
+      4,
+      "Golf Gully: giant round dimpled golf ball in central turf hill, a curved bunker tunnel underneath, golf club leans diagonally from lower right onto the ball summit and a putting flag marks a small bare upper-left ledge, no words; one broken turf connection. Velodrome Vault: one enormous tilted bicycle wheel is embedded in a curved wooden velodrome bank; thick tyre makes a high circular arch, frame tube forms a diagonal ramp through open centre and the lower bank makes a recovery bowl, one broken spoke bridge."
+    ],
+    [
+      "dino",
+      4,
+      "Volcanic Nursery: one monumental dark volcanic cone with three chunky sloping internal lava-tube caverns, large dinosaur eggs in a low-left nest, fossil ribs support an upward cave ramp, contained small lava pocket in lower centre, finish high right on a broad cooled ledge; most terrain dark stone with amber warmth. Brontosaurus Bend: one giant long-necked dinosaur fossil rises from a lower-right ribcage to an upper-left skull ledge, its neck vertebrae form a steep supported winding route, petrified roots brace the skeleton and its tail encloses a lower recovery cave, one missing neck vertebra."
+    ]
+  ],
+  "neonCorrection": "Replaced earthy moss-covered cassette landscape with purple chrome and black plastic, cyan and magenta edge lighting; kept connections and shapes.",
+  "status": "Landscape studies; gameplay conversion requires hand-authored collision and rescue verification."
+}

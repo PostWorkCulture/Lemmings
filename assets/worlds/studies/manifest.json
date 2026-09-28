@@ -1,0 +1,462 @@
+{
+  "neon": [
+    {
+      "file": "assets/worlds/studies/neon-connected.png",
+      "source": [
+        4,
+        8,
+        1249,
+        526
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/neon-connected.png",
+      "source": [
+        4,
+        596,
+        1243,
+        645
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/neon-1.png",
+      "source": [
+        4,
+        54,
+        1248,
+        520
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/neon-1.png",
+      "source": [
+        2,
+        626,
+        1249,
+        570
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/neon-2.png",
+      "source": [
+        1,
+        49,
+        1253,
+        535
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/neon-2.png",
+      "source": [
+        0,
+        596,
+        1254,
+        602
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/neon-3.png",
+      "source": [
+        0,
+        25,
+        1254,
+        496
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/neon-3.png",
+      "source": [
+        0,
+        558,
+        1254,
+        631
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/neon-4.png",
+      "source": [
+        0,
+        0,
+        1254,
+        609
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/neon-4.png",
+      "source": [
+        12,
+        611,
+        1242,
+        639
+      ]
+    }
+  ],
+  "space": [
+    {
+      "file": "assets/worlds/studies/space-connected.png",
+      "source": [
+        4,
+        9,
+        1250,
+        558
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/space-connected.png",
+      "source": [
+        0,
+        567,
+        1253,
+        682
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/space-1.png",
+      "source": [
+        4,
+        0,
+        1247,
+        565
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/space-1.png",
+      "source": [
+        0,
+        606,
+        1254,
+        648
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/space-2.png",
+      "source": [
+        0,
+        12,
+        1254,
+        534
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/space-2.png",
+      "source": [
+        0,
+        569,
+        1254,
+        656
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/space-3.png",
+      "source": [
+        0,
+        0,
+        1254,
+        597
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/space-3.png",
+      "source": [
+        6,
+        597,
+        1248,
+        657
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/space-4.png",
+      "source": [
+        6,
+        0,
+        1248,
+        543
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/space-4.png",
+      "source": [
+        150,
+        543,
+        1104,
+        711
+      ]
+    }
+  ],
+  "food": [
+    {
+      "file": "assets/worlds/studies/food-connected.png",
+      "source": [
+        0,
+        16,
+        1253,
+        553
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/food-connected.png",
+      "source": [
+        0,
+        668,
+        1254,
+        462
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/food-1.png",
+      "source": [
+        0,
+        96,
+        1254,
+        426
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/food-1.png",
+      "source": [
+        0,
+        619,
+        1254,
+        515
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/food-2.png",
+      "source": [
+        0,
+        0,
+        1254,
+        627
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/food-2.png",
+      "source": [
+        0,
+        679,
+        1254,
+        553
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/food-3.png",
+      "source": [
+        0,
+        6,
+        1254,
+        611
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/food-3.png",
+      "source": [
+        0,
+        650,
+        1254,
+        572
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/food-4.png",
+      "source": [
+        12,
+        0,
+        1234,
+        617
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/food-4.png",
+      "source": [
+        7,
+        636,
+        1238,
+        597
+      ]
+    }
+  ],
+  "sports": [
+    {
+      "file": "assets/worlds/studies/sports-connected.png",
+      "source": [
+        3,
+        36,
+        1251,
+        570
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/sports-connected.png",
+      "source": [
+        6,
+        745,
+        1248,
+        442
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/sports-1.png",
+      "source": [
+        0,
+        122,
+        1254,
+        450
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/sports-1.png",
+      "source": [
+        0,
+        681,
+        1254,
+        452
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/sports-2.png",
+      "source": [
+        2,
+        18,
+        1251,
+        546
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/sports-2.png",
+      "source": [
+        10,
+        655,
+        1240,
+        540
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/sports-3.png",
+      "source": [
+        0,
+        5,
+        1254,
+        576
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/sports-3.png",
+      "source": [
+        0,
+        611,
+        1250,
+        625
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/sports-4.png",
+      "source": [
+        0,
+        40,
+        1254,
+        511
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/sports-4.png",
+      "source": [
+        0,
+        594,
+        1254,
+        559
+      ]
+    }
+  ],
+  "dino": [
+    {
+      "file": "assets/worlds/studies/dino-connected.png",
+      "source": [
+        3,
+        5,
+        1245,
+        564
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/dino-connected.png",
+      "source": [
+        7,
+        573,
+        1242,
+        665
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/dino-1.png",
+      "source": [
+        0,
+        117,
+        1254,
+        497
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/dino-1.png",
+      "source": [
+        0,
+        700,
+        1254,
+        488
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/dino-2.png",
+      "source": [
+        2,
+        30,
+        1251,
+        505
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/dino-2.png",
+      "source": [
+        3,
+        574,
+        1250,
+        609
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/dino-3.png",
+      "source": [
+        0,
+        0,
+        1254,
+        578
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/dino-3.png",
+      "source": [
+        0,
+        578,
+        1254,
+        676
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/dino-4.png",
+      "source": [
+        0,
+        0,
+        1254,
+        571
+      ]
+    },
+    {
+      "file": "assets/worlds/studies/dino-4.png",
+      "source": [
+        0,
+        585,
+        1254,
+        615
+      ]
+    }
+  ]
+}

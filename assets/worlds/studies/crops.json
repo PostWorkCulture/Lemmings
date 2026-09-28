@@ -1,0 +1,107 @@
+{
+  "dino": {
+    "file": "assets/worlds/studies/dino-connected.png",
+    "boxes": [
+      [
+        0,
+        1,
+        1252,
+        558
+      ],
+      [
+        3,
+        569,
+        1250,
+        673
+      ]
+    ],
+    "size": [
+      1254,
+      1254
+    ]
+  },
+  "food": {
+    "file": "assets/worlds/studies/food-connected.png",
+    "boxes": [
+      [
+        0,
+        12,
+        1254,
+        547
+      ],
+      [
+        0,
+        664,
+        1254,
+        470
+      ]
+    ],
+    "size": [
+      1254,
+      1254
+    ]
+  },
+  "neon": {
+    "file": "assets/worlds/studies/neon-connected.png",
+    "boxes": [
+      [
+        0,
+        4,
+        1254,
+        520
+      ],
+      [
+        0,
+        592,
+        1251,
+        653
+      ]
+    ],
+    "size": [
+      1254,
+      1254
+    ]
+  },
+  "space": {
+    "file": "assets/worlds/studies/space-connected.png",
+    "boxes": [
+      [
+        0,
+        5,
+        1254,
+        552
+      ],
+      [
+        0,
+        563,
+        1254,
+        690
+      ]
+    ],
+    "size": [
+      1254,
+      1254
+    ]
+  },
+  "sports": {
+    "file": "assets/worlds/studies/sports-connected.png",
+    "boxes": [
+      [
+        0,
+        32,
+        1254,
+        564
+      ],
+      [
+        2,
+        741,
+        1252,
+        450
+      ]
+    ],
+    "size": [
+      1254,
+      1254
+    ]
+  }
+}
