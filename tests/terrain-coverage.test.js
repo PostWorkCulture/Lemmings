@@ -9,6 +9,6 @@ test('each campaign chapter includes a majority-terrain adventure',()=>{
  }
 });
 test('Lava Land replaces all ten circus maps with dangerous lava and no circus props',()=>{
- const maps=CAMPAIGN.slice(40);assert.equal(maps.length,10);
+ const maps=CAMPAIGN.filter(l=>l.theme==='volcano');assert.equal(maps.length,10);
  for(const l of maps){assert.equal(l.theme,'volcano');assert.equal(l.hazard,'lava');assert.equal(l.chapter,'Lava Land');assert.equal(l.difficulty,'Extreme');assert.deepEqual(l.circusProps,[]);assert.deepEqual(l.setPieces,[]);assert.ok(!l.hints.some(h=>/circus|curtain|backstage|audience|encore/.test(h)));}
 });

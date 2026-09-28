@@ -93,7 +93,7 @@ function renderSkills(){
 function updateLevelUI(){
  canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.add('tall-world');$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';
  $('#difficulty-label').textContent=game.level.difficulty;$('#difficulty-label').dataset.difficulty=game.level.difficulty.toLowerCase();
- renderSkills();const l=game.level;$('#time-target').textContent=formatTime(l.targetTime);$('#star-total').textContent=l.total;document.title=`Lemmings · ${l.world}`;$('#world-label').textContent=`${l.world.toUpperCase()} · ${String(l.campaignIndex+1).padStart(2,'0')}`;$('h1').textContent=l.name;$('#level-number').textContent=`${l.campaignIndex+1} / ${LEVELS.length}`;$('#target-count').textContent='/'+l.target;$('#help-goal').textContent=`Save ${l.target} of ${l.total}. Watch out for long falls and hazards. There’s no time limit.`;canvas.setAttribute('aria-label',`${l.world}: ${l.name}`);$('#music-status').textContent='';updateMusicUI();
+ renderSkills();const l=game.level;$('#time-target').textContent=formatTime(l.targetTime);$('#star-total').textContent=l.total;document.title=`Lemmings · ${l.world}`;$('#world-label').textContent=`${l.world.toUpperCase()} · ${String(l.campaignIndex+1).padStart(2,'0')}`;$('h1').textContent=l.name;$('#level-number').textContent=`${l.campaignIndex+1} / ${CAMPAIGN.length}`;$('#target-count').textContent='/'+l.target;$('#help-goal').textContent=`Save ${l.target} of ${l.total}. Watch out for long falls and hazards. There’s no time limit.`;canvas.setAttribute('aria-label',`${l.world}: ${l.name}`);$('#music-status').textContent='';updateMusicUI();
  document.querySelectorAll('[data-help-skill]').forEach(el=>{el.hidden=el.dataset.helpSkill!=='walk'&&!(l.stock[el.dataset.helpSkill]>0);});
  try{playerStore.setItem('lemmings-current-level',String(l.id));}catch{}
 }
@@ -106,7 +106,7 @@ function changeLevel(index){if(!isUnlocked(index,starRecords))return;reset(index
 let levelPreviewObserver;const previewDrawers=new WeakMap();
 function showLevels(){
  levelPreviewObserver?.disconnect();levelPreviewObserver=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){levelPreviewObserver.unobserve(entry.target);requestAnimationFrame(()=>previewDrawers.get(entry.target)?.());}},{root:document.querySelector('#levels-dialog'),rootMargin:'100px'});
- $('#campaign-stars').textContent=totalStars(starRecords)+' / '+LEVELS.length*3+' stars · Earn stars to open the next two levels';const list=$('#level-list');list.replaceChildren();$('#level-confirm').classList.add('hidden');pendingLevel=null;
+ $('#campaign-stars').textContent=totalStars(starRecords)+' / '+CAMPAIGN.length*3+' stars · Earn stars to open the next two levels';const list=$('#level-list');list.replaceChildren();$('#level-confirm').classList.add('hidden');pendingLevel=null;
  for(const level of CAMPAIGN){
   if(level.campaignIndex%10===0){const heading=document.createElement('h3');heading.className='difficulty-heading';heading.textContent=`${level.chapter} · ${level.difficulty} · Levels ${level.campaignIndex+1}-${level.campaignIndex+10}`;list.append(heading);}
   const unlocked=isUnlocked(level.id,starRecords),stars=starCount(starRecords[level.id]);

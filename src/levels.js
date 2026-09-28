@@ -164,7 +164,7 @@ CHAPTERS.splice(0,CHAPTERS.length,
 const groups=[[0,1,2,3,4,20,21,22,23,24],[5,6,7,8,9,25,26,27,28,29],[10,11,12,13,14,30,31,32,33,34],[45,46,47,48,49,40,41,42,43,44],[15,16,17,18,19,35,36,37,38,39]];
 export const CAMPAIGN=groups.flat().map(id=>LEVELS[id]);
 CAMPAIGN.forEach((level,index)=>{const c=CHAPTERS[Math.floor(index/10)];level.campaignIndex=index;level.chapter=c.name;level.world=c.name;level.difficulty=c.difficulty;});
-export const nextLevelId=id=>CAMPAIGN[LEVELS[id]?.campaignIndex+1]?.id;
+export const nextLevelId=id=>{const index=CAMPAIGN.findIndex(level=>level.id===id);return index<0?undefined:CAMPAIGN[index+1]?.id;};
 
 // Preserve map identities and routes while replacing the final chapter's material and hazard.
 const lavaNames=['Into the Caldera','Basalt Rendezvous','The Magma Circuit','Three Crater Crossing','Last Lemming from the Furnace','The Cinder Crossing','Obsidian Labyrinth','The Ashfall Chute','Up the Chimney','Escape from Emberjaw'];
@@ -182,3 +182,10 @@ for(const [id,x,y,w] of [[35,300,260,150],[36,500,270,65],[37,580,380,60],[38,36
  l.objects.push({type:'lavaPool',x,y,w,h});
  l.hints.push('The recessed lava is lethal. Prepare the crossing before releasing the crowd.');
 }
+
+// Pick 'n' Mix is temporarily withdrawn. Save keys and source maps remain intact.
+export const RETIRED_LEVEL_IDS=Object.freeze(CAMPAIGN.filter(l=>l.theme==='candy').map(l=>l.id));
+CAMPAIGN.splice(0,CAMPAIGN.length,...CAMPAIGN.filter(l=>!RETIRED_LEVEL_IDS.includes(l.id)));
+CHAPTERS.splice(0,CHAPTERS.length,...CHAPTERS.filter(c=>c.theme!=='candy'));
+CAMPAIGN.forEach((level,index)=>{level.campaignIndex=index;});
+export const isCampaignLevel=id=>Number.isInteger(id)&&CAMPAIGN.some(level=>level.id===id);

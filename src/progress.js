@@ -1,8 +1,8 @@
-import {LEVELS,CAMPAIGN} from './levels.js';
+import {LEVELS,CAMPAIGN,isCampaignLevel} from './levels.js';
 export function starCount(record){return Number.isInteger(record?.stars)&&record.stars>=0&&record.stars<=3?record.stars:0;}
-export function totalStars(records,before=LEVELS.length){return CAMPAIGN.slice(0,before).reduce((n,l)=>n+starCount(records[l.id]),0);}
+export function totalStars(records,before=CAMPAIGN.length){return CAMPAIGN.slice(0,before).reduce((n,l)=>n+starCount(records[l.id]),0);}
 export function isUnlocked(index,records){
- if(!Number.isInteger(index)||index<0||index>=LEVELS.length)return false;
+ if(!isCampaignLevel(index))return false;
  if(starCount(records[index])>0)return true;
  const position=LEVELS[index].campaignIndex;
  if(position===0)return true;
