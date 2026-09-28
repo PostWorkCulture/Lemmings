@@ -18,7 +18,12 @@ export function worldBackground(key,height=470,level=null){
   poly(c,[[1000,height],[1000,height*.4],[825,height*.66],[735,height]],'#47151e');
   return canvas;
  }
- if(key==='candy'&&level?.quietScenery){c.fillStyle='#292035';c.fillRect(0,0,1000,height);return canvas;}
+ if(key==='candy'&&level?.quietScenery){
+  // A soft shop-window glow, without scenic objects competing with edible ground.
+  const glow=c.createRadialGradient(410,height*.43,30,500,height*.5,Math.max(700,height*.8));
+  glow.addColorStop(0,'#36273e');glow.addColorStop(.55,'#271e32');glow.addColorStop(1,'#171621');
+  c.fillStyle=glow;c.fillRect(0,0,1000,height);return canvas;
+ }
  if(['circus','beach'].includes(key)){chapterBackdrop(c,key,height,level);return canvas;}
  // The active chapters keep their background deliberately quieter than the route.
  if(key==='woodland'||key==='alpine'){

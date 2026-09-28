@@ -1,13 +1,19 @@
-import {prepareSweetPuzzle} from './sweet-puzzles.js';
-import {drawSweetKind} from './sweet-range.js';
-const crops={5:[89,25,182,168],0:[32,58,296,80],1:[139,30,82,140],2:[32,54,296,88],3:[32,51,296,95],4:[25,62,310,78],9:[61,55,238,91]};
+import {SWEET_PUZZLES} from './sweet-puzzles.js';
+import {paintPolishedSweet} from './sweet-materials.js';
 const artCache=new WeakMap();
 export function paintSweetTerrain(c,game){
  let art=artCache.get(game.level);
- if(!art){art=document.createElement('canvas');art.width=1000;art.height=game.height;const a=art.getContext('2d'),tile=document.createElement('canvas');tile.width=360;tile.height=200;const t=tile.getContext('2d');
-  if(game.level.bonusSweet!==undefined)prepareSweetPuzzle(game.level.bonusSweet,art);
-  for(const p of game.level.sweetPieces||[]){t.clearRect(0,0,360,200);drawSweetKind(t,p.kind,p.kind!==5);a.drawImage(tile,...crops[p.kind],p.x,p.y,p.w,p.h);}
-  if(game.level.sweetPieces?.some(p=>p.kind===5)){a.textAlign='center';a.textBaseline='middle';a.font='900 34px Arial';a.lineWidth=3;a.strokeStyle='#694934';a.strokeText('Double Dip',610,350);a.fillStyle='#ffe757';a.fillText('Double Dip',610,350);a.font='700 13px Arial';a.fillStyle='#fff5df';a.fillText('ORANGE + CHERRY',610,378);}
+ if(!art){
+  art=document.createElement('canvas');art.width=1000;art.height=game.height;const a=art.getContext('2d');
+  // Runtime painting uses the saved outlines, never regenerates physics from artwork.
+  if(game.level.bonusSweet!==undefined){
+   const puzzle=SWEET_PUZZLES[game.level.bonusSweet];
+   for(const [kind,x,y,w,h]of puzzle.pieces)paintPolishedSweet(a,{kind,x,y,w,h});
+   // The authored exit has a tiny flattened landing; extend its own material into that lip.
+   const ex=Math.round(game.level.exitX),ey=Math.round(game.level.exitY);
+   for(let x=ex-42;x<=ex+42;x++)a.drawImage(art,x,ey+8,1,1,x,ey,1,8);
+  }
+  for(const p of game.level.sweetPieces||[])paintPolishedSweet(a,p,false);
   artCache.set(game.level,art);
  }
  // Keep every excavated hole visible and leave yellow player-built steps untouched.
