@@ -1,0 +1,5 @@
+<!doctype html><title>Sweet campaign export</title><pre id="export">Preparing five sweet levels</pre><script type="module">
+import {prepareSweetPuzzle} from './src/sweet-puzzles.js';
+const levels=Array.from({length:5},(_,i)=>({...prepareSweetPuzzle(i,document.createElement('canvas')),stock:{...Object.fromEntries(Object.entries(prepareSweetPuzzle(i,document.createElement('canvas')).stock).filter(([key])=>key!=='block')),attract:1},id:45+i,bonusSweet:i,quietScenery:true,sceneryShelves:[],bottomEntry:false}));
+document.querySelector('#export').textContent=JSON.stringify(levels);
+</script>

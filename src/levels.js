@@ -152,4 +152,16 @@ LEVELS[19].terrain.push([40,188,290,180,1],[400,188,560,180,1],[360,428,540,164,
 
 import {expansionLevels} from './expansion-levels.js';
 LEVELS.push(...expansionLevels());
-CHAPTERS.push(...[20,25,30,35,40].map(i=>({name:LEVELS[i].chapter,theme:LEVELS[i].theme})));
+import {sweetCampaignLevels} from './sweet-campaign-data.js';
+LEVELS.push(...structuredClone(sweetCampaignLevels));
+// IDs are permanent save keys. Campaign order is independent of those IDs.
+CHAPTERS.splice(0,CHAPTERS.length,
+ {name:'Freaky Forest',theme:'woodland',difficulty:'Easy'},
+ {name:'Dunes',theme:'beach',difficulty:'Medium'},
+ {name:'Mountain Rescue',theme:'alpine',difficulty:'Medium'},
+ {name:'Pick ’n’ Mix',theme:'candy',difficulty:'Hard'},
+ {name:'What a Circus!',theme:'circus',difficulty:'Extreme'});
+const groups=[[0,1,2,3,4,20,21,22,23,24],[5,6,7,8,9,25,26,27,28,29],[10,11,12,13,14,30,31,32,33,34],[45,46,47,48,49,40,41,42,43,44],[15,16,17,18,19,35,36,37,38,39]];
+export const CAMPAIGN=groups.flat().map(id=>LEVELS[id]);
+CAMPAIGN.forEach((level,index)=>{const c=CHAPTERS[Math.floor(index/10)];level.campaignIndex=index;level.chapter=c.name;level.world=c.name;level.difficulty=c.difficulty;});
+export const nextLevelId=id=>CAMPAIGN[LEVELS[id]?.campaignIndex+1]?.id;

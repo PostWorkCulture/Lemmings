@@ -313,5 +313,40 @@
     "seconds": 49.23,
     "peak": 0.333,
     "rms": 0.1
+  },
+  {
+    "title": "The Drumstick Detour",
+    "file": "assets/audio/level-46.wav",
+    "seconds": 49.23,
+    "peak": 0.37,
+    "rms": 0.113
+  },
+  {
+    "title": "Watch Your Step",
+    "file": "assets/audio/level-47.wav",
+    "seconds": 49.23,
+    "peak": 0.376,
+    "rms": 0.125
+  },
+  {
+    "title": "Sherbet Underground",
+    "file": "assets/audio/level-48.wav",
+    "seconds": 49.23,
+    "peak": 0.368,
+    "rms": 0.097
+  },
+  {
+    "title": "Lollipop Lookout",
+    "file": "assets/audio/level-49.wav",
+    "seconds": 49.23,
+    "peak": 0.363,
+    "rms": 0.102
+  },
+  {
+    "title": "The Custard Switchback",
+    "file": "assets/audio/level-50.wav",
+    "seconds": 49.23,
+    "peak": 0.368,
+    "rms": 0.103
   }
 ]

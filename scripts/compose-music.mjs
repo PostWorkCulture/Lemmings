@@ -16,7 +16,7 @@ for(let i=5;i<LEVELS.length;i++){
 }
 const SR=22050,TAU=Math.PI*2;const report=[];
 for(const [scoreIndex,score] of SCORES.entries()){
- if(process.argv.includes('--new')&&scoreIndex<20)continue;
+ if(process.argv.includes('--new')&&scoreIndex<Number(process.env.MUSIC_START||20))continue;
  const beat=60/score.bpm,bars=32,duration=bars*4*beat,length=Math.round(duration*SR),left=new Float32Array(length),right=new Float32Array(length),scale=score.minor?[0,2,3,5,7,8,10]:[0,2,4,5,7,9,11];
  const degree=(d,oct=0)=>score.root+12*oct+12*Math.floor(d/7)+scale[((d%7)+7)%7];
  function note(time,midi,duration,gain,tone,pan=0){

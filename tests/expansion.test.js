@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {LEVELS} from '../src/levels.js';
+import {LEVELS,CAMPAIGN} from '../src/levels.js';
 import {Game} from '../src/engine.js';
 import {mergeProgress} from '../src/player-store.js';
 import {isUnlocked} from '../src/progress.js';
 
 test('25 new campaign maps preserve existing IDs and form five coherent chapters',()=>{
- assert.equal(LEVELS.length,45);
- assert.deepEqual(LEVELS.map(l=>l.id),Array.from({length:45},(_,i)=>i));
+ assert.equal(LEVELS.length,50);
+ assert.deepEqual(LEVELS.map(l=>l.id),Array.from({length:50},(_,i)=>i));
  const signatures=new Set();
  for(let i=20;i<45;i++){
   const l=LEVELS[i];assert.ok(l.expansion);assert.equal(l.total,20);assert.ok(l.target<=20);
@@ -31,6 +31,6 @@ test('all new maps need intervention rather than rescuing themselves',()=>{
 test('new-level stars and current level survive profile and cloud merges',()=>{
  const merged=mergeProgress({best:{0:20},stars:{0:{stars:3}}},{best:{44:20},perfect:{44:{completed:true,saved:20,total:20,lost:0}},stars:{44:{stars:3,bestPerfectTicks:7000}},currentLevel:44});
  assert.equal(merged.currentLevel,44);assert.equal(merged.stars[44].stars,3);assert.equal(merged.best[44],20);assert.equal(merged.best[0],20);
- const completed=Object.fromEntries(Array.from({length:20},(_,i)=>[i,{stars:3}]));
+ const completed=Object.fromEntries(CAMPAIGN.slice(0,5).map(l=>[l.id,{stars:3}]));
  assert.equal(isUnlocked(20,completed),true);assert.equal(isUnlocked(21,completed),true);assert.equal(isUnlocked(22,completed),false);
 });

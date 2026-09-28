@@ -1,12 +1,14 @@
-import {LEVELS} from './levels.js';
+import {LEVELS,CAMPAIGN} from './levels.js';
 export function starCount(record){return Number.isInteger(record?.stars)&&record.stars>=0&&record.stars<=3?record.stars:0;}
-export function totalStars(records,before=LEVELS.length){return LEVELS.slice(0,before).reduce((n,l)=>n+starCount(records[l.id]),0);}
+export function totalStars(records,before=LEVELS.length){return CAMPAIGN.slice(0,before).reduce((n,l)=>n+starCount(records[l.id]),0);}
 export function isUnlocked(index,records){
  if(!Number.isInteger(index)||index<0||index>=LEVELS.length)return false;
- if(index===0)return true;
- const completed=LEVELS.slice(0,index).filter(l=>starCount(records[l.id])>0);
- const frontier=completed.length?completed.at(-1).id:-1;
- return index<=frontier+2&&totalStars(records,index)>=index;
+ if(starCount(records[index])>0)return true;
+ const position=LEVELS[index].campaignIndex;
+ if(position===0)return true;
+ const completed=CAMPAIGN.slice(0,position).filter(l=>starCount(records[l.id])>0);
+ const frontier=completed.length?completed.at(-1).campaignIndex:-1;
+ return position<=frontier+2&&totalStars(records,position)>=position;
 }
 export function earnedStars(level,{completed,saved,lost,ticks}){
  if(!completed||!Number.isInteger(saved)||saved<level.target||saved>level.total)return 0;
@@ -29,6 +31,7 @@ export function recordResult(level,previous,run){
  return result;
 }
 export function unlockHint(index,records){
- const missing=Math.max(0,index-totalStars(records,index));
+ const position=LEVELS[index]?.campaignIndex??0;
+ const missing=Math.max(0,position-totalStars(records,position));
  return missing?`${missing} more star${missing===1?'':'s'} from earlier levels`:'Complete either of the two preceding levels';
 }
