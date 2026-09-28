@@ -79,6 +79,7 @@ function rock(c,x,y,r,t,snow=false) {
 }
 function butterfly(c,x,y,t,color) {const flap=3+Math.abs(Math.sin(t))*5;oval(c,x-flap*.65,y,flap,6,color);oval(c,x+flap*.65,y,flap,6,color);oval(c,x,y,1.4,5,'#455653');}
 export function ambientWorld(c,tick,level) {
+ if(level.connectedStudy!==undefined)return;
  drawWaterfalls(c,tick,level);
  const key=level.theme, height=level.height||470, t=tick;
  if(key==='volcano'){
@@ -132,6 +133,7 @@ export function ambientWorld(c,tick,level) {
 }
 // Large silhouettes give the five finales recognisable architecture at every depth.
 export function finaleLandmarks(c,t,level) {
+ if(level.connectedStudy!==undefined)return;
  c.save();c.globalAlpha=.48;
  for(const p of level.setPieces||[]){
   const {left,right,y,room,form}=p,mid=(left+right)/2,w=right-left;

@@ -1,3 +1,4 @@
+import {connectedBackground,paintConnectedTerrain,connectedDoors} from './connected-art.js';
 import {paintRebootTerrain,sweetDoors,sweetBackdrop} from './sweet-reboot-art.js';
 import {paintSculptedMaterials} from './sculpted-materials.js';
 import {paintSweetTerrain} from './expansion-art.js';
@@ -41,6 +42,7 @@ export function character(c,x,y,state='walk',dir=1,tick=0,scale=1) {
   c.restore();
 }
 export function makeBackground(theme='forest',height=HEIGHT,level=null) {
+  if(level?.connectedStudy!==undefined)return connectedBackground(level);
   if(level?.embeddedDoors)return sweetBackdrop(level);
   const world=worldBackground(theme,height,level);if(world)return world;
   if(theme!=='forest')return themedBackground(theme);
@@ -67,6 +69,7 @@ export function renderTerrain(game,canvas) {
   if(canvas.height!==game.height)canvas.height=game.height;
   const terrainAt=(x,y)=>x<0||x>=WIDTH||y<0||y>=game.height?0:game.terrain[Math.floor(y)*WIDTH+Math.floor(x)];
   const c=canvas.getContext('2d');c.clearRect(0,0,WIDTH,game.height);
+  if(game.level.connectedStudy!==undefined){paintConnectedTerrain(c,game);return;}
   if(game.level.sweetReboot!==undefined){paintRebootTerrain(c,game);return;}
   const theme=THEMES[game.level.theme];const colors={1:theme.earth,2:theme.stone,3:palettes[3]};
   const pixels=c.createImageData(WIDTH,game.height),cache={},snowDepth=new Uint16Array(WIDTH);
@@ -204,6 +207,7 @@ export function magicalEntrance(c,tick,level,spawned=0,lastSpawnTick=null){
  c.restore();
 }
 export function scenery(c,tick,level,spawned=0,lastSpawnTick=null,sceneryTick=tick,game=null) {
+  if(level.connectedStudy!==undefined){connectedDoors(c,tick,level,spawned,lastSpawnTick);return;}
   if(level.embeddedDoors){sweetDoors(c,tick,level,spawned,lastSpawnTick);return;}
   worldScenery(c,sceneryTick,level,game?(x,y)=>game.at(x,y):null);
   if(level.entrances){for(const [i,e] of level.entrances.entries()){const n=level.entrances.length,count=Math.max(0,Math.ceil((spawned-i)/n));magicalEntrance(c,tick,{...level,spawnX:e.x,spawnY:rocketHeight(level,e),rocketScale:i===0?1:.6,total:Math.ceil((level.total-i)/n)},count,count?((count-1)*n+i)*level.interval:null);}}else magicalEntrance(c,tick,{...level,spawnY:level.rocketY||90},spawned,lastSpawnTick);

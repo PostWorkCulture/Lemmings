@@ -418,5 +418,355 @@
     "seconds": 49.23,
     "peak": 0.366,
     "rms": 0.102
+  },
+  {
+    "title": "Pinball Panic",
+    "file": "assets/audio/level-61.wav",
+    "seconds": 49.23,
+    "peak": 0.36,
+    "rms": 0.114
+  },
+  {
+    "title": "Headphone Highway",
+    "file": "assets/audio/level-62.wav",
+    "seconds": 49.23,
+    "peak": 0.397,
+    "rms": 0.121
+  },
+  {
+    "title": "Cassette Canyon",
+    "file": "assets/audio/level-63.wav",
+    "seconds": 49.23,
+    "peak": 0.383,
+    "rms": 0.096
+  },
+  {
+    "title": "Synth Summit",
+    "file": "assets/audio/level-64.wav",
+    "seconds": 49.23,
+    "peak": 0.371,
+    "rms": 0.101
+  },
+  {
+    "title": "Joystick Junction",
+    "file": "assets/audio/level-65.wav",
+    "seconds": 49.23,
+    "peak": 0.345,
+    "rms": 0.102
+  },
+  {
+    "title": "Laser Harp",
+    "file": "assets/audio/level-66.wav",
+    "seconds": 49.23,
+    "peak": 0.361,
+    "rms": 0.113
+  },
+  {
+    "title": "Turntable Terrace",
+    "file": "assets/audio/level-67.wav",
+    "seconds": 49.23,
+    "peak": 0.382,
+    "rms": 0.127
+  },
+  {
+    "title": "Neon Raceway",
+    "file": "assets/audio/level-68.wav",
+    "seconds": 49.23,
+    "peak": 0.362,
+    "rms": 0.097
+  },
+  {
+    "title": "Inside the Cabinet",
+    "file": "assets/audio/level-69.wav",
+    "seconds": 49.23,
+    "peak": 0.359,
+    "rms": 0.101
+  },
+  {
+    "title": "Fibre-optic Crown",
+    "file": "assets/audio/level-70.wav",
+    "seconds": 49.23,
+    "peak": 0.358,
+    "rms": 0.102
+  },
+  {
+    "title": "Slingshot Salvage",
+    "file": "assets/audio/level-71.wav",
+    "seconds": 49.23,
+    "peak": 0.351,
+    "rms": 0.115
+  },
+  {
+    "title": "Comet Corkscrew",
+    "file": "assets/audio/level-72.wav",
+    "seconds": 49.23,
+    "peak": 0.385,
+    "rms": 0.127
+  },
+  {
+    "title": "Lunar Lander",
+    "file": "assets/audio/level-73.wav",
+    "seconds": 49.23,
+    "peak": 0.384,
+    "rms": 0.099
+  },
+  {
+    "title": "Asteroid Foundry",
+    "file": "assets/audio/level-74.wav",
+    "seconds": 49.23,
+    "peak": 0.371,
+    "rms": 0.102
+  },
+  {
+    "title": "Rocket Graveyard",
+    "file": "assets/audio/level-75.wav",
+    "seconds": 49.23,
+    "peak": 0.368,
+    "rms": 0.104
+  },
+  {
+    "title": "Satellite Sling",
+    "file": "assets/audio/level-76.wav",
+    "seconds": 49.23,
+    "peak": 0.357,
+    "rms": 0.115
+  },
+  {
+    "title": "Meteor Mail",
+    "file": "assets/audio/level-77.wav",
+    "seconds": 49.23,
+    "peak": 0.387,
+    "rms": 0.126
+  },
+  {
+    "title": "Frozen Relay",
+    "file": "assets/audio/level-78.wav",
+    "seconds": 49.23,
+    "peak": 0.385,
+    "rms": 0.1
+  },
+  {
+    "title": "Saturn Within",
+    "file": "assets/audio/level-79.wav",
+    "seconds": 49.23,
+    "peak": 0.368,
+    "rms": 0.1
+  },
+  {
+    "title": "Observatory Ascent",
+    "file": "assets/audio/level-80.wav",
+    "seconds": 49.23,
+    "peak": 0.349,
+    "rms": 0.104
+  },
+  {
+    "title": "Takeaway Tangle",
+    "file": "assets/audio/level-81.wav",
+    "seconds": 49.23,
+    "peak": 0.356,
+    "rms": 0.114
+  },
+  {
+    "title": "Breakfast Breakout",
+    "file": "assets/audio/level-82.wav",
+    "seconds": 49.23,
+    "peak": 0.392,
+    "rms": 0.125
+  },
+  {
+    "title": "Sushi Express",
+    "file": "assets/audio/level-83.wav",
+    "seconds": 49.23,
+    "peak": 0.388,
+    "rms": 0.099
+  },
+  {
+    "title": "Taco Gorge",
+    "file": "assets/audio/level-84.wav",
+    "seconds": 49.23,
+    "peak": 0.382,
+    "rms": 0.101
+  },
+  {
+    "title": "Pretzel Pass",
+    "file": "assets/audio/level-85.wav",
+    "seconds": 49.23,
+    "peak": 0.361,
+    "rms": 0.101
+  },
+  {
+    "title": "Noodle Nest",
+    "file": "assets/audio/level-86.wav",
+    "seconds": 49.23,
+    "peak": 0.368,
+    "rms": 0.112
+  },
+  {
+    "title": "Waffle Works",
+    "file": "assets/audio/level-87.wav",
+    "seconds": 49.23,
+    "peak": 0.395,
+    "rms": 0.126
+  },
+  {
+    "title": "Melon Drop",
+    "file": "assets/audio/level-88.wav",
+    "seconds": 49.23,
+    "peak": 0.366,
+    "rms": 0.099
+  },
+  {
+    "title": "Croissant Cavern",
+    "file": "assets/audio/level-89.wav",
+    "seconds": 49.23,
+    "peak": 0.387,
+    "rms": 0.102
+  },
+  {
+    "title": "Cheese Fortress",
+    "file": "assets/audio/level-90.wav",
+    "seconds": 49.23,
+    "peak": 0.366,
+    "rms": 0.105
+  },
+  {
+    "title": "Cup Final",
+    "file": "assets/audio/level-91.wav",
+    "seconds": 49.23,
+    "peak": 0.364,
+    "rms": 0.11
+  },
+  {
+    "title": "Centre Court",
+    "file": "assets/audio/level-92.wav",
+    "seconds": 49.23,
+    "peak": 0.38,
+    "rms": 0.121
+  },
+  {
+    "title": "Skatepark Switchback",
+    "file": "assets/audio/level-93.wav",
+    "seconds": 49.23,
+    "peak": 0.371,
+    "rms": 0.096
+  },
+  {
+    "title": "Cricket Crease",
+    "file": "assets/audio/level-94.wav",
+    "seconds": 49.23,
+    "peak": 0.371,
+    "rms": 0.099
+  },
+  {
+    "title": "Bowling Alley",
+    "file": "assets/audio/level-95.wav",
+    "seconds": 49.23,
+    "peak": 0.369,
+    "rms": 0.1
+  },
+  {
+    "title": "Rugby Run",
+    "file": "assets/audio/level-96.wav",
+    "seconds": 49.23,
+    "peak": 0.364,
+    "rms": 0.112
+  },
+  {
+    "title": "Climbing Club",
+    "file": "assets/audio/level-97.wav",
+    "seconds": 49.23,
+    "peak": 0.385,
+    "rms": 0.122
+  },
+  {
+    "title": "Poolside Plunge",
+    "file": "assets/audio/level-98.wav",
+    "seconds": 49.23,
+    "peak": 0.374,
+    "rms": 0.099
+  },
+  {
+    "title": "Golf Gully",
+    "file": "assets/audio/level-99.wav",
+    "seconds": 49.23,
+    "peak": 0.384,
+    "rms": 0.1
+  },
+  {
+    "title": "Velodrome Vault",
+    "file": "assets/audio/level-100.wav",
+    "seconds": 49.23,
+    "peak": 0.377,
+    "rms": 0.102
+  },
+  {
+    "title": "Backbone Bridge",
+    "file": "assets/audio/level-101.wav",
+    "seconds": 49.23,
+    "peak": 0.351,
+    "rms": 0.113
+  },
+  {
+    "title": "The Eggscape",
+    "file": "assets/audio/level-102.wav",
+    "seconds": 49.23,
+    "peak": 0.397,
+    "rms": 0.126
+  },
+  {
+    "title": "Amber Falls",
+    "file": "assets/audio/level-103.wav",
+    "seconds": 49.23,
+    "peak": 0.363,
+    "rms": 0.097
+  },
+  {
+    "title": "Triceratops Trail",
+    "file": "assets/audio/level-104.wav",
+    "seconds": 49.23,
+    "peak": 0.375,
+    "rms": 0.102
+  },
+  {
+    "title": "Stegosaur Steps",
+    "file": "assets/audio/level-105.wav",
+    "seconds": 49.23,
+    "peak": 0.371,
+    "rms": 0.103
+  },
+  {
+    "title": "Pterosaur Perch",
+    "file": "assets/audio/level-106.wav",
+    "seconds": 49.23,
+    "peak": 0.375,
+    "rms": 0.111
+  },
+  {
+    "title": "Footprint Hollow",
+    "file": "assets/audio/level-107.wav",
+    "seconds": 49.23,
+    "peak": 0.395,
+    "rms": 0.122
+  },
+  {
+    "title": "Root of the Rex",
+    "file": "assets/audio/level-108.wav",
+    "seconds": 49.23,
+    "peak": 0.37,
+    "rms": 0.096
+  },
+  {
+    "title": "Volcanic Nursery",
+    "file": "assets/audio/level-109.wav",
+    "seconds": 49.23,
+    "peak": 0.373,
+    "rms": 0.1
+  },
+  {
+    "title": "Brontosaurus Bend",
+    "file": "assets/audio/level-110.wav",
+    "seconds": 49.23,
+    "peak": 0.36,
+    "rms": 0.1
   }
 ]

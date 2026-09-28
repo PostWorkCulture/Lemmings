@@ -197,3 +197,6 @@ LEVELS.push(...freshSweets);
 CAMPAIGN.splice(30,0,...freshSweets);
 CHAPTERS.splice(3,0,{name:'Sweet Worlds',theme:'candy',difficulty:'Hard'});
 CAMPAIGN.forEach((l,index)=>{l.campaignIndex=index;});
+
+import {connectedLevels,CONNECTED_CHAPTERS} from './connected-levels.js';
+const connectedMaps=connectedLevels();LEVELS.push(...connectedMaps);CAMPAIGN.push(...connectedMaps);CHAPTERS.push(...CONNECTED_CHAPTERS);CAMPAIGN.forEach((l,index)=>{l.campaignIndex=index;});

@@ -29,7 +29,7 @@ begin
  if old_save->>'campaignVersion' is distinct from '2' then old_save:='{}'::jsonb; end if;
  -- Merge within the row lock: simultaneous devices cannot discard better results.
  foreach source in array array[old_save,incoming] loop
-  for n in 0..59 loop
+  for n in 0..109 loop
    k:=n::text;
    value:=source #> array['best',k];
    if value::text ~ '^[0-9]{1,4}$' then
@@ -51,7 +51,7 @@ begin
     result:=jsonb_set(result,array['perfect',k],jsonb_build_object('completed',true,'saved',(value->>'saved')::integer,'total',(value->>'total')::integer,'lost',0,'puzzleId',left(value->>'puzzleId',200)));
    end if;
   end loop;
-  if (source->>'currentLevel') ~ '^[0-9]{1,2}$' and (source->>'currentLevel')::integer<60 then result:=jsonb_set(result,'{currentLevel}',source->'currentLevel'); end if;
+  if (source->>'currentLevel') ~ '^[0-9]{1,3}$' and (source->>'currentLevel')::integer<110 then result:=jsonb_set(result,'{currentLevel}',source->'currentLevel'); end if;
  end loop;
  update public.lemmings_saves set progress=result,updated_at=now() where user_id=auth.uid();
  return result;

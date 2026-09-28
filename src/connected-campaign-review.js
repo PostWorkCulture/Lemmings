@@ -1,3 +1,4 @@
+import {LEVELS} from './levels.js';import {SKILLS} from './skills.js';
 import {CONNECTED_WORLDS} from './connected-world-plans.js';
 const $=s=>document.querySelector(s),nav=$('nav'),grid=$('.grid'),images=new Map();
 let manifest,worldIndex=-1,levelIndex=0,revision=0;
@@ -8,7 +9,7 @@ async function select(wi,li){
  const version=++revision,w=CONNECTED_WORLDS[wi],l=w.levels[li];levelIndex=li;
  history.replaceState(null,'',`#${w.key}/${li+1}`);
  $('main').style.setProperty('--scene',w.color);$('#title').textContent=`${l.id+1}. ${l.name}`;$('#counter').textContent=`${w.name} · ${li+1} / 10 · ${l.structure}`;
- $('#terrain').textContent=l.terrain;$('#puzzle').textContent=l.puzzle;$('#skills').textContent=`Proposed tools: ${l.skills}`;$('#check').textContent=l.check;
+ $('#terrain').textContent=l.terrain;$('#puzzle').textContent=l.puzzle;const playable=LEVELS[l.id+10];$('#skills').textContent=Object.keys(playable.stock).map(k=>SKILLS[k].name).join(' · ');$('#puzzle').textContent=playable.hints.slice(1).join(' ');$('#play').href=`world-playtest.html?level=${playable.id}`;$('#rescue-link').href=`original-worlds.html#${playable.campaignIndex+1}`;$('#check').textContent=l.check;
  $('#previous').disabled=wi===0&&li===0;$('#next').disabled=wi===4&&li===9;
  $('#landscape').setAttribute('aria-label',`${l.name}: ${l.structure}`);
  for(const button of nav.children)button.setAttribute('aria-pressed',String(Number(button.dataset.world)===wi));
