@@ -15,6 +15,7 @@ export function objectInteraction(g,u){
  for(const o of g.level.objects||[]){
   if(o.requires&&!g.disabledObjects.has(o.requires))continue;
   if(isDangerous(o,g.tick,g.disabledObjects)&&u.x>=o.x&&u.x<=o.x+o.w&&u.y>o.y&&u.y-22<o.y+o.h){g.remove(u);return true;}
+  if(o.type==='lavaPool'&&u.x>=o.x&&u.x<o.x+o.w&&u.y>=o.y&&u.y-18<o.y+o.h&&!g.at(u.x,u.y-1)){g.remove(u);return true;}
   if(u.state!=='walk')continue;
   if(o.type==='portal'&&!o.arrivalOnly&&Math.abs(u.x-o.x)<4&&Math.abs(u.y-o.y)<4&&(u.portalUntil||0)<=g.tick){
    const destination=g.level.objects.find(p=>p.type==='portal'&&p.id===o.target);

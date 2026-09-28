@@ -108,13 +108,13 @@ export function renderTerrain(game,canvas) {
         if(rim)color=type===1?'#f4d875':'#d5bd75';
         if(surface)color=type===1?'#ffea9a':'#ebd59a';
       }else if(material==='volcano'){
-        color=type===1?'#76574d':'#49505b';
-        if(type===1&&grain%11===0)color='#826154';
-        if(type===1&&(y+Math.floor(Math.sin(x*.035)*9))%53===0)color='#a36d4e';
+        color=type===1?'#252127':'#49505b';
+        if(type===1&&grain%11===0)color='#302930';
+        if(type===1&&(y+Math.floor(Math.sin(x*.035)*9))%53===0)color='#493038';
         if(type===2&&(y%36===0||(x+(Math.floor(y/36)%2)*30)%60===0))color='#303741';
-        if(edge)color=type===1?'#4a3537':'#292e38';
-        if(rim)color=type===1?'#bf8c65':'#9299a3';
-        if(surface)color=type===1?'#e1ac7c':'#b5bdc6';
+        if(edge)color=type===1?'#151319':'#292e38';
+        if(rim)color=type===1?'#74616b':'#9299a3';
+        if(surface)color=type===1?'#a18b94':'#b5bdc6';
       }else if(material==='alpine'){
         const capped=snowDepth[x]<26+Math.round(Math.sin(x*.065)*7);
         color=type===1?(capped?'#e0ecef':'#738895'):'#b9ced6';

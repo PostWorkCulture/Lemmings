@@ -172,3 +172,13 @@ CAMPAIGN.slice(40).forEach((level,i)=>{
  level.theme='volcano';level.hazard='lava';level.name=lavaNames[i];level.circusProps=[];level.setPieces=[];level.sceneryShelves=[];
  level.hints=level.hints.map(h=>h.replaceAll('circus stages','volcanic terraces').replaceAll('circus','volcanic').replaceAll('rings','craters').replaceAll('performer','lemming').replaceAll('backstage passage','lower cavern').replaceAll('stage blocks','basalt blocks').replaceAll('stages','terraces').replaceAll('stage','ledge').replaceAll('curtain','gate').replaceAll('audience','crowd').replaceAll('rigging','rock faces').replaceAll('wings','outer cavern').replaceAll('encore','final ascent'));
 });
+
+// Recessed lava basins replace selected crevasses, below the intended bridge route.
+for(const [id,x,y,w] of [[35,300,260,150],[36,500,270,65],[37,580,380,60],[38,365,740,65]]){
+ const l=LEVELS[id],h=48;
+ l.shapes.push({type:2,points:[[x-5,y+h],[x+w+5,y+h],[x+w+5,y+120],[x-5,y+120]]});
+ l.shapes.push({type:2,points:[[x-5,y-8],[x,y-8],[x,y+h],[x-5,y+h]]});
+ l.shapes.push({type:2,points:[[x+w,y-8],[x+w+5,y-8],[x+w+5,y+h],[x+w,y+h]]});
+ l.objects.push({type:'lavaPool',x,y,w,h});
+ l.hints.push('The recessed lava is lethal. Prepare the crossing before releasing the crowd.');
+}

@@ -12,7 +12,14 @@ export function drawObjects(c,g){
  const badge=(id,x,y)=>{const i=controls.indexOf(id);if(i<0)return;c.save();c.globalAlpha=1;c.fillStyle=['#79e66d','#ff7777','#ffe15a','#ff9cdd'][i%4];c.beginPath();c.arc(x,y,10,0,Math.PI*2);c.fill();c.strokeStyle='#162323';c.lineWidth=3;c.stroke();c.strokeStyle='#fff3dc';c.lineWidth=1;c.stroke();c.fillStyle='#101b1d';c.font='900 13px Arial, sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(String.fromCharCode(65+i),x,y+.5);c.restore();};
  for(const z of g.level.oneWay||[]){c.fillStyle='#e4c787';for(let x=z.x+12;x<z.x+z.w-5;x+=20)for(let y=z.y+15;y<z.y+z.h-10;y+=26){if(g.at(x,y)!==1)continue;c.beginPath();c.moveTo(x+z.dir*5,y);c.lineTo(x-z.dir*4,y-4);c.lineTo(x-z.dir*4,y+4);c.closePath();c.fill();}}
  for(const o of g.level.objects||[]){const p=objectPosition(o,g.tick);c.save();if(o.requires&&!g.disabledObjects.has(o.requires))c.globalAlpha=.35;
-  if(o.type==='portal'){
+  if(o.type==='lavaPool'){
+   // Clip to empty pixels: molten rock never paints over its basin or player-built steps.
+   c.beginPath();
+   for(let yy=o.y;yy<o.y+o.h;yy++){let start=null;for(let xx=o.x;xx<=o.x+o.w;xx++){const empty=xx<o.x+o.w&&!g.at(xx,yy);if(empty&&start===null)start=xx;if(!empty&&start!==null){c.rect(start,yy,xx-start,1);start=null;}}}
+   c.clip();const molten=c.createLinearGradient(0,o.y,0,o.y+o.h);molten.addColorStop(0,'#ffb447');molten.addColorStop(.18,'#e85b20');molten.addColorStop(1,'#8d241d');c.fillStyle=molten;c.fillRect(o.x,o.y,o.w,o.h);
+   c.strokeStyle='#ffdb73';c.lineWidth=2;c.beginPath();for(let xx=0;xx<=o.w;xx+=2){const yy=o.y+3+Math.sin(xx*.13+g.tick*.055)*1.5;xx?c.lineTo(o.x+xx,yy):c.moveTo(o.x+xx,yy);}c.stroke();
+   for(let i=0;i<Math.ceil(o.w/20);i++){const phase=(g.tick+i*43)%110,x=o.x+9+(i*29)%(o.w-16),y=o.y+o.h-5-phase/110*(o.h-10);c.strokeStyle='#ffc15b';c.lineWidth=1;c.beginPath();c.arc(x,y,1+Math.sin(phase/110*Math.PI)*2,0,Math.PI*2);c.stroke();}
+  }else if(o.type==='portal'){
    c.translate(o.x,o.y);c.fillStyle='#282542';c.fillRect(-20,-48,40,48);c.strokeStyle=o.color;c.lineWidth=4;c.strokeRect(-18,-46,36,44);
    const glow=c.createRadialGradient(0,-23,2,0,-23,25);glow.addColorStop(0,'#fff2ff');glow.addColorStop(.35,o.color);glow.addColorStop(1,'#24233f');c.fillStyle=glow;c.fillRect(-14,-42,28,38);
    c.strokeStyle='#ffffff9a';c.lineWidth=1.5;for(let n=0;n<3;n++){c.beginPath();c.ellipse(0,-23,4+n*4,7+n*5,g.tick*.025+n,0,Math.PI*1.5);c.stroke();}
