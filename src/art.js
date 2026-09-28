@@ -1,3 +1,4 @@
+import {paintSculptedMaterials} from './sculpted-materials.js';
 import {paintSweetTerrain} from './expansion-art.js';
 import {CLASSIC_ENTRANCE} from './classic-entrance.js';
 import {rocketHeight} from './levels.js';
@@ -142,6 +143,7 @@ export function renderTerrain(game,canvas) {
     const rgb=cache[color],i=(y*WIDTH+x)*4;pixels.data[i]=rgb[0];pixels.data[i+1]=rgb[1];pixels.data[i+2]=rgb[2];pixels.data[i+3]=255;
   }
   c.putImageData(pixels,0,0); if((game.level.sweetPieces||game.level.bonusSweet!==undefined))paintSweetTerrain(c,game);
+  paintSculptedMaterials(c,game);
   // Grass follows the editable surface, including the rim of dug tunnels.
   if(['forest','woodland','treehouse','highland'].includes(game.level.theme))for(let x=46;x<960;x+=7)for(const y of [...new Set(game.level.terrain.filter(r=>r[4]===1).map(r=>r[1]))])if(terrainAt(x,y)===1&&!terrainAt(x,y-1)){
     const h=hash(x,y)%5;c.fillStyle=theme.grass[1];c.fillRect(x,y-3-h,2,3+h);c.fillStyle=theme.grass[0];c.fillRect(x+2,y-2,2,2);

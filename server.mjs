@@ -16,4 +16,4 @@ http.createServer(async (req,res) => {
       res.writeHead(206,{...headers,'Content-Range':`bytes ${start}-${end}/${body.length}`,'Content-Length':end-start+1}).end(req.method==='HEAD'?undefined:body.subarray(start,end+1));
     }else res.writeHead(200,{...headers,'Content-Length':body.length}).end(req.method==='HEAD'?undefined:body);
   } catch { res.writeHead(404).end('Not found'); }
-}).listen(4173, '127.0.0.1', () => console.log('Lemmings ready at http://127.0.0.1:4173'));
+}).listen(Number(process.env.PORT||4173), '127.0.0.1', () => console.log('Lemmings ready at http://127.0.0.1:'+(process.env.PORT||4173)));
