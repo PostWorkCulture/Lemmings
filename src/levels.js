@@ -160,8 +160,15 @@ CHAPTERS.splice(0,CHAPTERS.length,
  {name:'Dunes',theme:'beach',difficulty:'Medium'},
  {name:'Mountain Rescue',theme:'alpine',difficulty:'Medium'},
  {name:'Pick ’n’ Mix',theme:'candy',difficulty:'Hard'},
- {name:'What a Circus!',theme:'circus',difficulty:'Extreme'});
+ {name:'Lava Land',theme:'volcano',difficulty:'Extreme'});
 const groups=[[0,1,2,3,4,20,21,22,23,24],[5,6,7,8,9,25,26,27,28,29],[10,11,12,13,14,30,31,32,33,34],[45,46,47,48,49,40,41,42,43,44],[15,16,17,18,19,35,36,37,38,39]];
 export const CAMPAIGN=groups.flat().map(id=>LEVELS[id]);
 CAMPAIGN.forEach((level,index)=>{const c=CHAPTERS[Math.floor(index/10)];level.campaignIndex=index;level.chapter=c.name;level.world=c.name;level.difficulty=c.difficulty;});
 export const nextLevelId=id=>CAMPAIGN[LEVELS[id]?.campaignIndex+1]?.id;
+
+// Preserve map identities and routes while replacing the final chapter's material and hazard.
+const lavaNames=['Into the Caldera','Basalt Rendezvous','The Magma Circuit','Three Crater Crossing','Last Lemming from the Furnace','The Cinder Crossing','Obsidian Labyrinth','The Ashfall Chute','Up the Chimney','Escape from Emberjaw'];
+CAMPAIGN.slice(40).forEach((level,i)=>{
+ level.theme='volcano';level.hazard='lava';level.name=lavaNames[i];level.circusProps=[];level.setPieces=[];level.sceneryShelves=[];
+ level.hints=level.hints.map(h=>h.replaceAll('circus stages','volcanic terraces').replaceAll('circus','volcanic').replaceAll('rings','craters').replaceAll('performer','lemming').replaceAll('backstage passage','lower cavern').replaceAll('stage blocks','basalt blocks').replaceAll('stages','terraces').replaceAll('stage','ledge').replaceAll('curtain','gate').replaceAll('audience','crowd').replaceAll('rigging','rock faces').replaceAll('wings','outer cavern').replaceAll('encore','final ascent'));
+});

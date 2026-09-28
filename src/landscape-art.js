@@ -11,6 +11,13 @@ function crystal(c,x,y,h,color){poly(c,[[x-13,y],[x-17,y-h*.7],[x,y-h],[x+16,y-h
 export function worldBackground(key,height=470,level=null){
  const w=WORLDS.find(w=>w.key===key);if(!w)return null;
  const canvas=document.createElement('canvas');canvas.width=1000;canvas.height=height;const c=canvas.getContext('2d');
+ if(key==='volcano'){
+  const sky=c.createLinearGradient(0,0,0,height);sky.addColorStop(0,'#18151c');sky.addColorStop(1,'#482328');c.fillStyle=sky;c.fillRect(0,0,1000,height);
+  // Two faint distant caldera walls keep the playable route dominant.
+  poly(c,[[0,height],[0,height*.48],[150,height*.64],[245,height]],'#32232b');
+  poly(c,[[1000,height],[1000,height*.4],[825,height*.66],[735,height]],'#34232a');
+  return canvas;
+ }
  if(key==='candy'&&level?.quietScenery){c.fillStyle='#292035';c.fillRect(0,0,1000,height);return canvas;}
  if(['circus','beach'].includes(key)){chapterBackdrop(c,key,height,level);return canvas;}
  // The active chapters keep their background deliberately quieter than the route.

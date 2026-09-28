@@ -6,7 +6,7 @@ The campaign is displayed as five chapters of ten maps:
 - Levels 11–20: Dunes — Medium
 - Levels 21–30: Mountain Rescue — Medium
 - Levels 31–40: Pick ’n’ Mix — Hard
-- Levels 41–50: What a Circus! — Extreme
+- Levels 41–50: Lava Land — Extreme
 
 The five previously separate sweet adventures now participate in the campaign, with stars, target times, individual music and saved results. An attractor holds the crowd while a scout prepares the route.
 

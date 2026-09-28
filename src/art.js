@@ -95,7 +95,7 @@ export function renderTerrain(game,canvas) {
     // Quiet, larger material marks leave the route silhouette and tools in charge.
     // Hard blocks stay regular; excavatable terrain has sparse organic strata.
     const material=game.level.theme;
-    if((type===1||type===2)&&['beach','alpine','circus'].includes(material)){
+    if((type===1||type===2)&&['beach','alpine','circus','volcano'].includes(material)){
       const surface=!terrainAt(x,y-1),rim=!terrainAt(x,y-3),edge=!terrainAt(x-1,y)||!terrainAt(x+1,y)||!terrainAt(x,y+1);
       const grain=hash(Math.floor(x/18),Math.floor(y/12));
       if(material==='beach'){
@@ -105,6 +105,14 @@ export function renderTerrain(game,canvas) {
         if(edge)color=type===1?'#967443':'#64583e';
         if(rim)color=type===1?'#e6cc8b':'#bdaa78';
         if(surface)color=type===1?'#f3dc9d':'#d4c695';
+      }else if(material==='volcano'){
+        color=type===1?'#76574d':'#49505b';
+        if(type===1&&grain%11===0)color='#826154';
+        if(type===1&&(y+Math.floor(Math.sin(x*.035)*9))%53===0)color='#a36d4e';
+        if(type===2&&(y%36===0||(x+(Math.floor(y/36)%2)*30)%60===0))color='#303741';
+        if(edge)color=type===1?'#4a3537':'#292e38';
+        if(rim)color=type===1?'#bf8c65':'#9299a3';
+        if(surface)color=type===1?'#e1ac7c':'#b5bdc6';
       }else if(material==='alpine'){
         color=type===1?'#e0ecef':'#b9ced6';
         if(type===1&&((y+Math.floor(Math.sin(x*.025)*5))%43===0))color='#c9dde3';

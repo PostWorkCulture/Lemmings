@@ -81,6 +81,17 @@ function butterfly(c,x,y,t,color) {const flap=3+Math.abs(Math.sin(t))*5;oval(c,x
 export function ambientWorld(c,tick,level) {
  drawWaterfalls(c,tick,level);
  const key=level.theme, height=level.height||470, t=tick;
+ if(key==='volcano'){
+  // Heat and sparks originate at the lava floor, never in a random section of sky.
+  const floor=height-28;c.save();
+  for(let i=0;i<9;i++){
+   const x=50+i*113,phase=tick*.045+i*2,h=12+(Math.sin(phase)+1)*8;
+   c.fillStyle='#ed6428';c.beginPath();c.moveTo(x-8,floor+20);c.quadraticCurveTo(x-12,floor+8,x+Math.sin(phase)*5,floor+18-h);c.quadraticCurveTo(x+2,floor+12,x+8,floor+20);c.fill();
+   c.fillStyle='#ffd47b';c.beginPath();c.ellipse(x,floor+17,3,5,0,0,Math.PI*2);c.fill();
+   const rise=(tick*.32+i*19)%95;c.globalAlpha=(1-rise/95)*.65;c.fillStyle='#ffc373';c.fillRect(x+Math.sin(rise*.06+i)*12,floor-rise,2,2);c.globalAlpha=1;
+  }
+  c.restore();return;
+ }
  if(key==='beach')driftingClouds(c,tick);
  c.save();c.globalAlpha=.8;
  // Ambient life belongs to the skyline; lower routes stay visually quiet.
@@ -95,7 +106,7 @@ export function ambientWorld(c,tick,level) {
   }
   if(key==='highland'){const shelves=level.terrain.filter(r=>r[4]===1&&r[2]>160&&r[1]>row+140&&r[1]<row+330&&r[1]<height-30);const shelf=shelves.find(r=>r[0]<785&&r[0]+r[2]>785)||shelves[0];if(shelf){const x=Math.min(shelf[0]+shelf[2]-45,Math.max(shelf[0]+45,785));windmill(c,x,shelf[1]-83,t+seed);}}
   if(key==='factory') {for(const g of factoryGears(level,row))factoryGear(c,g,t);for(let i=0;i<6;i++){const p=wrap(t*.4+i*22,150);oval(c,500+Math.sin(p*.025)*18,row+190-p,9+p*.1,7+p*.07,'#aab7ae25');}}
-  if(['volcano','prehistoric'].includes(key)) {
+  if(key==='prehistoric') {
    // Distant debris falls behind every playable shelf: scenery, not a new trap.
    for(let i=0;i<4;i++){const p=wrap(t*(.7+i*.12)+i*91,335);rock(c,110+i*238+Math.sin(p*.02)*12,row-30+p,8+i%2*4,t*.035+i);}
    if(key==='volcano')for(let i=0;i<13;i++){const p=wrap(t*.65+i*33,270);oval(c,70+i*77+Math.sin(p*.04)*12,row+300-p,2,3,'#eeb879');}
