@@ -1,3 +1,4 @@
+import {softenTerrainCorners} from './terrain-finish.js';
 import {connectedBackground,paintConnectedTerrain,connectedDoors} from './connected-art.js';
 import {paintRebootTerrain,sweetDoors,sweetBackdrop} from './sweet-reboot-art.js';
 import {paintSculptedMaterials} from './sculpted-materials.js';
@@ -66,6 +67,10 @@ export function makeBackground(theme='forest',height=HEIGHT,level=null) {
   return canvas;
 }
 export function renderTerrain(game,canvas) {
+  paintTerrain(game,canvas);
+  softenTerrainCorners(canvas.getContext('2d'),game);
+}
+function paintTerrain(game,canvas) {
   if(canvas.height!==game.height)canvas.height=game.height;
   const terrainAt=(x,y)=>x<0||x>=WIDTH||y<0||y>=game.height?0:game.terrain[Math.floor(y)*WIDTH+Math.floor(x)];
   const c=canvas.getContext('2d');c.clearRect(0,0,WIDTH,game.height);

@@ -8,7 +8,7 @@ function texture(level){let tex=paints.get(level.id);if(tex)return tex;const s=S
 export function paintRebootTerrain(c,g){const source=sweetSourceMask(g.level.id),tex=texture(g.level),im=c.createImageData(1000,g.height),d=im.data,pair=palettes[g.level.sweetReboot];const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),base=rgb(pair[0]),light=rgb(pair[1]);
  for(let i=0;i<g.terrain.length;i++){const kind=g.terrain[i];if(!kind)continue;const p=i*4,x=i%1000,y=Math.floor(i/1000);let col;
   if(kind===3)col=y%2?[196,154,41]:[239,210,91];
-  else{col=[tex.data[p],tex.data[p+1],tex.data[p+2]];if(!source?.[i]&&Math.max(...col)<44){const grain=((Math.sin(x*12.9898+y*78.233)*43758.5453)%1)*.07;const n=Math.sin(x*.17+y*.23)*.035+Math.sin(y*.15)*.035+grain;col=base.map(v=>v*(1+n));if(g.level.sweetReboot>=8){const seam=y%6===0,crumb=Math.sin(x*3.7+y*8.9)>.93;col=col.map((v,k)=>seam?v*.77:crumb?v*.68:v*.86+light[k]*.14);}}const above=y&&g.terrain[i-1000],below=y<g.height-1&&g.terrain[i+1000];if(!above)col=col.map((v,k)=>v*.55+light[k]*.45);else if(!below)col=col.map(v=>v*.7);}
+  else{col=[tex.data[p],tex.data[p+1],tex.data[p+2]];if(tex.data[p+3]<80||(!source?.[i]&&Math.max(...col)<44)){const grain=((Math.sin(x*12.9898+y*78.233)*43758.5453)%1)*.07;const n=Math.sin(x*.17+y*.23)*.035+Math.sin(y*.15)*.035+grain;col=base.map(v=>v*(1+n));if(g.level.sweetReboot>=8){const seam=y%6===0,crumb=Math.sin(x*3.7+y*8.9)>.93;col=col.map((v,k)=>seam?v*.77:crumb?v*.68:v*.86+light[k]*.14);}}const above=y&&g.terrain[i-1000],below=y<g.height-1&&g.terrain[i+1000];if(!above)col=col.map((v,k)=>v*.55+light[k]*.45);else if(!below)col=col.map(v=>v*.7);}
   d[p]=col[0];d[p+1]=col[1];d[p+2]=col[2];d[p+3]=255;
  }c.putImageData(im,0,0);
 }
