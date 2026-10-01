@@ -10,7 +10,7 @@ test('25 new campaign maps preserve existing IDs and form five coherent chapters
  assert.deepEqual(LEVELS.map(l=>l.id),Array.from({length:110},(_,i)=>i));
  const signatures=new Set();
  for(let i=20;i<45;i++){
-  const l=LEVELS[i];if(l.creature!==undefined){assert.equal(l.chapter,'Creature Comfort');signatures.add(JSON.stringify([...new Game(i).terrain]));continue;}assert.ok(l.expansion);assert.equal(l.total,20);assert.ok(l.target<=20);
+  const l=LEVELS[i];if(l.creature!==undefined){assert.equal(l.chapter,'Creature Comfort');signatures.add(JSON.stringify([...new Game(i).terrain]));continue;}assert.ok(l.expansion);assert.equal(l.total,CAMPAIGN.includes(l)?10:20);assert.ok(l.target<=l.total);
   assert.ok(l.height>700);assert.ok(l.hints.length>0);
   signatures.add(JSON.stringify([l.terrain,l.shapes,l.objects]));
   const required=new Set(l.expansionRoutes.map(r=>r[2]));required.add(l.stock.attract?'attract':'block');
@@ -30,8 +30,8 @@ test('all new maps need intervention rather than rescuing themselves',()=>{
  for(let id=20;id<45;id++){const g=new Game(id);for(let t=0;t<18000&&!g.result;t++)g.step();assert.notEqual(g.result,'win',g.level.name);}
 });
 test('new-level stars and current level survive profile and cloud merges',()=>{
- const merged=mergeProgress({best:{0:20},stars:{0:{stars:3}}},{best:{44:20},perfect:{44:{completed:true,saved:20,total:20,lost:0}},stars:{44:{stars:3,bestPerfectTicks:7000}},currentLevel:44});
- assert.equal(merged.currentLevel,44);assert.equal(merged.stars[44].stars,3);assert.equal(merged.best[44],20);assert.equal(merged.best[0],20);
+ const merged=mergeProgress({best:{0:LEVELS[0].total},stars:{0:{stars:3}}},{best:{44:20},perfect:{44:{completed:true,saved:20,total:20,lost:0}},stars:{44:{stars:3,bestPerfectTicks:7000}},currentLevel:44});
+ assert.equal(merged.currentLevel,44);assert.equal(merged.stars[44].stars,3);assert.equal(merged.best[44],20);assert.equal(merged.best[0],LEVELS[0].total);
  const completed=Object.fromEntries(CAMPAIGN.slice(0,5).map(l=>[l.id,{stars:3}]));
  assert.equal(isUnlocked(20,completed),true);assert.equal(isUnlocked(21,completed),true);assert.equal(isUnlocked(22,completed),false);
 });

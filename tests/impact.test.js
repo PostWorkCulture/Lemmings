@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {Game} from '../src/engine.js';
-function land(startY,float=false){const g=new Game();g.spawned=20;g.units=[{id:0,x:800,y:startY,fallStart:startY,state:'fall',vy:0,dir:1,abilities:{float}}];g.rect(790,220,20,130,0);g.rect(790,350,20,10,1);for(let i=0;i<500&&g.units[0]?.state==='fall';i++)g.step();return g;}
+function land(startY,float=false){const g=new Game();g.spawned=g.level.total;g.units=[{id:0,x:800,y:startY,fallStart:startY,state:'fall',vy:0,dir:1,abilities:{float}}];g.rect(790,220,20,130,0);g.rect(790,350,20,10,1);for(let i=0;i<500&&g.units[0]?.state==='fall';i++)g.step();return g;}
 test('fatal ground impact records one splat exactly on the landing floor',()=>{const g=land(150);assert.equal(g.lost,1);assert.equal(g.effects.length,1);assert.equal(g.effects[0].type,'splat');assert.equal(g.effects[0].y,350);g.step();assert.equal(g.effects.length,1);g.reset();assert.equal(g.effects.length,0);});
 test('safe drops and parachute landings have no blood or impact event',()=>{for(const g of [land(280),land(150,true)]){assert.equal(g.lost,0);assert.equal(g.effects.length,0);}});
 
@@ -31,7 +31,7 @@ test('successful rescues never trigger the kill effect',()=>{
 });
 
 test('drowning delays the loss and level result, and cannot receive skills',()=>{
- const g=new Game();g.spawned=20;g.saved=19;g.level={...g.level,hazard:'water',objects:[]};
+ const g=new Game();g.spawned=20;g.saved=g.level.total-1;g.level={...g.level,hazard:'water',objects:[]};
  const u={id:0,x:500,y:g.hazardY+2,state:'fall',dir:1,vy:0};g.units=[u];g.step();
  assert.equal(u.state,'drown');assert.equal(u.shark,true);assert.equal(g.lost,0);assert.equal(g.result,null);
  assert.equal(g.assign(0,'float').ok,false);

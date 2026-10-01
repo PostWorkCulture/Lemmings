@@ -24,11 +24,11 @@ test('rescue pole stays locked until the lower switch is reached',()=>{
  const s=g.level.objects.find(o=>o.type==='switch');objectInteraction(g,{state:'walk',x:s.x,y:s.y});
  objectInteraction(g,u);assert.equal(u.state,'pole');
 });
-test('multiple entrances distribute exactly twenty lemmings in a repeatable sequence',()=>{
- for(const id of [16,18]){const g=new Game(id);for(let n=0;n<20;n++){const e=g.level.entrances[n%g.level.entrances.length],u=g.spawn();assert.equal(u.x,e.x);assert.equal(u.y,rocketHeight(g.level,e));assert.equal(u.arrival.y,e.y);assert.equal(u.dir,e.dir);}}
+test('multiple entrances distribute the whole smaller group in a repeatable sequence',()=>{
+ for(const id of [16,18]){const g=new Game(id);for(let n=0;n<g.level.total;n++){const e=g.level.entrances[n%g.level.entrances.length],u=g.spawn();assert.equal(u.x,e.x);assert.equal(u.y,rocketHeight(g.level,e));assert.equal(u.arrival.y,e.y);assert.equal(u.dir,e.dir);}}
 });
 test('one-way masonry resists excavation from the wrong side',()=>{
- for(const dir of [-1,1]){const g=new Game(6);g.level={...g.level,slipperySlopes:[],oneWay:[{x:360,y:220,w:80,h:120,dir:-1}]};g.terrain.fill(0);g.rect(40,340,920,24,2);g.rect(360,220,80,120,1);g.stock.bash=1;g.spawned=20;
+ for(const dir of [-1,1]){const g=new Game(6);g.level={...g.level,slipperySlopes:[],oneWay:[{x:360,y:220,w:80,h:120,dir:-1}]};g.terrain.fill(0);g.rect(40,340,920,24,2);g.rect(360,220,80,120,1);g.stock.bash=1;g.spawned=g.level.total;
   const u={id:0,x:dir===1?351:449,y:340,state:'walk',dir,vy:0,jobTick:0};g.units=[u];g.assign(0,'bash');
   for(let n=0;n<300;n++)g.step();
   assert.equal(g.at(400,325),dir===1?1:0);

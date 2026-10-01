@@ -14,8 +14,8 @@ function solve() {
   }
   return g;
 }
-test('the first level can rescue all 20 with one of each skill',()=>{
-  const g=solve();assert.equal(g.result,'win');assert.equal(g.saved,20);assert.equal(g.lost,0);
+test('the first level can rescue all 10 with one of each skill',()=>{
+  const g=solve();assert.equal(g.result,'win');assert.equal(g.saved,LEVEL.total);assert.equal(g.lost,0);
   assert.deepEqual(g.stock,{block:2,build:3,dig:2});assert.equal(g.units.length,0);
 });
 test('a recorded solution replays deterministically',()=>{
@@ -25,7 +25,7 @@ test('a recorded solution replays deterministically',()=>{
 });
 test('doing nothing loses the level rather than walking across the gap',()=>{
   const g=new Game();for(let i=0;i<10000&&!g.result;i++)g.step();
-  assert.equal(g.result,'lose');assert.equal(g.lost,20);assert.equal(g.saved,0);
+  assert.equal(g.result,'lose');assert.equal(g.lost,LEVEL.total);assert.equal(g.saved,0);
 });
 test('invalid assignments do not consume inventory',()=>{
   const g=new Game();g.step();const stock={...g.stock};assert.equal(g.assign(0,'build').ok,false);assert.equal(g.assign(999,'dig').ok,false);assert.deepEqual(g.stock,stock);

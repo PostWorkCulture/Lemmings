@@ -20,7 +20,7 @@ export function solvePuzzle(id,variant='perfect',omit=null){
   if(id===12){if(variant==='demolition'){at('blast',0,'explode',444,320);at('bridge',1,'build',584,320);}else{at('bash',0,'bash',441,320);at('bridge',0,'build',584,320);}}
   if(id===13){at('swim',0,'swim',150,300);at('hold',1,'attract',105,300);at('bash',0,'bash',751,300);at('bridge',0,'build',820,300);if(done.has('bridge')&&g.tick>5000)act('release',1,'walk',()=>true);}
   if(id===18){at('bridge',0,'build',324,190);at('bash2',1,'bash',732,340,-1);at('bash3',2,'bash',241,500);}
-  if(id===19){at('hold',1,'attract',105,160);at('bridge',0,'build',314,160);at('float',0,'float',430,160);at('shaft',0,'dig',470,160);at('wait',0,'block',600,400);if(done.has('wait')&&g.tick>4500)act('release',1,'walk',()=>true);if(done.has('release'))at('repair',1,'platform',448,160);if(g.saved===19){act('last',0,'walk',()=>true);at('return',0,'turn',600,400);}}
+  if(id===19){at('hold',1,'attract',105,160);at('bridge',0,'build',314,160);at('float',0,'float',430,160);at('shaft',0,'dig',470,160);at('wait',0,'block',600,400);if(done.has('wait')&&g.tick>4500)act('release',1,'walk',()=>true);if(done.has('release'))at('repair',1,'platform',448,160);if(g.saved===g.level.total-1){act('last',0,'walk',()=>true);at('return',0,'turn',600,400);}}
   g.step();
  }
  return {g,done:[...done]};

@@ -1,3 +1,4 @@
+import {POPULATION_VERSION,migratePopulationProgress} from './population-balance.js';
 import {LEVELS} from './levels.js';
 import {migrateStars,isPerfect} from './progress.js';
 export const SAVE_VERSION=2;
@@ -25,6 +26,16 @@ export class PlayerStore{
    // The new campaign starts at zero; pre-release storage is intentionally not imported.
    storage.setItem(REGISTRY,JSON.stringify(registry));
   }
+  // Migrate each local player once, before the game reads the four save fields.
+  for(const player of registry.players){
+   const marker=this.key(player.id,'lemmings-population-version');
+   if(Number(storage.getItem(marker))===POPULATION_VERSION)continue;
+   const read=key=>{try{return JSON.parse(storage.getItem(this.key(player.id,key)));}catch{return null;}};
+   const progress=migratePopulationProgress({best:read(SAVE_KEYS[0]),perfect:read(SAVE_KEYS[1]),stars:read(SAVE_KEYS[2]),currentLevel:read(SAVE_KEYS[3])},LEVELS);
+   const normalized=mergeProgress({},progress);
+   for(const [i,field] of ['best','perfect','stars','currentLevel'].entries())storage.setItem(this.key(player.id,SAVE_KEYS[i]),JSON.stringify(normalized[field]));
+   storage.setItem(marker,String(POPULATION_VERSION));
+  }
   this.registry=registry;this.activeId=registry.players.some(p=>p.id===registry.active)?registry.active:registry.players[0].id;
  }
  key(id,key){return `lemmings-player:v${SAVE_VERSION}:${id}:${key}`;}
@@ -35,6 +46,6 @@ export class PlayerStore{
  add(name){name=name.trim().slice(0,24);if(!name)throw Error('Enter a player name.');const p={id:this.id(),name};this.registry.players.push(p);this.saveRegistry();return p;}
  select(id){if(!this.registry.players.some(p=>p.id===id))throw Error('Player not found.');this.registry.active=id;this.saveRegistry();}
  link(userId){if(this.player.cloudId&&this.player.cloudId!==userId)throw Error('This player is linked to a different account. Select or create another player.');if(this.registry.players.some(p=>p.id!==this.activeId&&p.cloudId===userId))throw Error('This account is already linked to another player on this device.');this.player.cloudId=userId;this.saveRegistry();}
- snapshot(){const read=key=>{try{return JSON.parse(this.getItem(key));}catch{return null;}};return {...mergeProgress({}, {best:read(SAVE_KEYS[0]),perfect:read(SAVE_KEYS[1]),stars:read(SAVE_KEYS[2]),currentLevel:read(SAVE_KEYS[3])}),campaignVersion:SAVE_VERSION};}
- merge(remote){if(remote?.campaignVersion!==SAVE_VERSION)return this.snapshot();const local=this.snapshot(),merged=mergeProgress(remote,local);if(!Object.keys(local.stars).length&&local.currentLevel===0&&Number.isInteger(remote?.currentLevel))merged.currentLevel=remote.currentLevel;for(const [i,field] of ['best','perfect','stars','currentLevel'].entries())this.storage.setItem(this.key(this.activeId,SAVE_KEYS[i]),JSON.stringify(merged[field]));return {...merged,campaignVersion:SAVE_VERSION};}
+ snapshot(){const read=key=>{try{return JSON.parse(this.getItem(key));}catch{return null;}};return {...mergeProgress({}, {best:read(SAVE_KEYS[0]),perfect:read(SAVE_KEYS[1]),stars:read(SAVE_KEYS[2]),currentLevel:read(SAVE_KEYS[3])}),campaignVersion:SAVE_VERSION,populationVersion:POPULATION_VERSION};}
+ merge(remote){if(remote?.campaignVersion!==SAVE_VERSION)return this.snapshot();remote=migratePopulationProgress(remote,LEVELS);const local=this.snapshot(),merged=mergeProgress(remote,local);if(!Object.keys(local.stars).length&&local.currentLevel===0&&Number.isInteger(remote?.currentLevel))merged.currentLevel=remote.currentLevel;for(const [i,field] of ['best','perfect','stars','currentLevel'].entries())this.storage.setItem(this.key(this.activeId,SAVE_KEYS[i]),JSON.stringify(merged[field]));return {...merged,campaignVersion:SAVE_VERSION,populationVersion:POPULATION_VERSION};}
 }

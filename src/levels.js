@@ -208,3 +208,6 @@ CHAPTERS[1]={name:'Creature Comfort',theme:'creature',difficulty:'Medium'};
 // Historical fixtures keep the retired mechanics regression-testable; never in the menu.
 export const LEGACY_DUNES=Object.fromEntries(CAMPAIGN.slice(10,20).map(l=>[l.id,l]));
 for(const fresh of creatureLevels()){const index=CAMPAIGN.findIndex(l=>l.id===fresh.id);fresh.campaignIndex=index;LEVELS[fresh.id]=fresh;CAMPAIGN[index]=fresh;}
+import {rebalancePopulations} from './population-balance.js';
+import {POPULATION_TARGET_TIMES} from './population-times.js';
+rebalancePopulations(CAMPAIGN,POPULATION_TARGET_TIMES);

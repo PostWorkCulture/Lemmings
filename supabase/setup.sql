@@ -18,7 +18,9 @@ create policy "Update own save" on public.lemmings_saves for update to authentic
 create or replace function public.sync_lemmings_progress(incoming jsonb)
 returns jsonb language plpgsql security invoker set search_path = '' as $$
 declare
- old_save jsonb; result jsonb := '{"campaignVersion":2,"best":{},"perfect":{},"stars":{},"currentLevel":0}';
+ old_save jsonb; result jsonb := '{"campaignVersion":2,"populationVersion":1,"best":{},"perfect":{},"stars":{},"currentLevel":0}';
+ old_totals integer[] := array[20,20,20,20,20,15,10,12,15,10,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,5,12,10,10,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,12,10,10,15,12,10,12,10,15,10,10,15,12,10,5,15,10,12,10,20,10,15,12,10,5,15,10,12,10,20,10,15,12,10,5,15,10,12,10,20,10,15,12,10,5,15,10,12,10,20,10,15,12,10,5,15,10,12,10,20];
+ new_totals integer[] := array[10,10,10,10,10,8,5,6,8,5,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,5,6,5,5,10,10,10,10,10,10,10,10,10,10,10,20,20,20,20,20,20,20,20,20,20,6,5,5,8,6,5,6,5,8,5,5,8,6,5,5,8,5,6,5,10,5,8,6,5,5,8,5,6,5,10,5,8,6,5,5,8,5,6,5,10,5,8,6,5,5,8,5,6,5,10,5,8,6,5,5,8,5,6,5,10];
  n integer; k text; source jsonb; value jsonb; stars integer; saved integer; ticks bigint; old_ticks bigint;
 begin
  if auth.uid() is null then raise exception 'Sign in required'; end if;
@@ -34,6 +36,7 @@ begin
    value:=source #> array['best',k];
    if value::text ~ '^[0-9]{1,4}$' then
     saved:=(value::text)::integer;
+    if source->>'populationVersion' is distinct from '1' and saved<=old_totals[n+1] then saved:=floor(saved::numeric*new_totals[n+1]/old_totals[n+1])::integer; end if;
     if saved<=9999 then result:=jsonb_set(result,array['best',k],to_jsonb(greatest(coalesce((result #>> array['best',k])::integer,0),saved))); end if;
    end if;
    value:=source #> array['stars',k];
@@ -47,6 +50,9 @@ begin
     if ticks is not null then result:=jsonb_set(result,array['stars',k,'bestPerfectTicks'],to_jsonb(ticks)); end if;
    end if;
    value:=source #> array['perfect',k];
+   if source->>'populationVersion' is distinct from '1' and value->>'total'=old_totals[n+1]::text and value->>'saved'=value->>'total' then
+    value:=jsonb_set(jsonb_set(value,'{saved}',to_jsonb(new_totals[n+1])),'{total}',to_jsonb(new_totals[n+1]));
+   end if;
    if value->>'completed'='true' and (value->>'total') ~ '^[1-9][0-9]{0,3}$' and value->>'saved'=value->>'total' and value->>'lost'='0' then
     result:=jsonb_set(result,array['perfect',k],jsonb_build_object('completed',true,'saved',(value->>'saved')::integer,'total',(value->>'total')::integer,'lost',0,'puzzleId',left(value->>'puzzleId',200)));
    end if;
