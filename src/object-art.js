@@ -54,6 +54,7 @@ export function drawObjects(c,g){
  }
 }
 export function skillEquipment(c,u,tick){
+ if(u.state==='stranded')return;
  c.save();c.translate(u.x,u.y);c.scale(.75,.75);const state=u.state;
  if(u.arrival||(u.abilities?.float&&state==='fall')){
   c.strokeStyle='#d0d5c5';c.lineWidth=1;c.beginPath();c.moveTo(-15,-45);c.lineTo(-4,-12);c.moveTo(15,-45);c.lineTo(4,-12);apparatusStroke(c,'#fff4d6',1);c.fillStyle='#bd8f9c';c.beginPath();c.arc(0,-43,17,Math.PI,0);c.closePath();c.fill();c.strokeStyle='#e1c4be';c.beginPath();c.arc(0,-43,9,Math.PI,0);c.stroke();

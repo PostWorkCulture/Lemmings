@@ -1,3 +1,4 @@
+import {drawSplats} from './impact-effects.js';
 import {CAMPAIGN,CHAPTERS} from './levels.js';
 import {Game} from './engine.js';
 import {terrainIdentity} from './original-terrain.js';
@@ -19,7 +20,8 @@ function draw(t){const delta=Math.min(100,t-last);last=t;if(demonstrating){accum
  c.drawImage(bg,0,0);if(!g.level.embeddedDoors)hazards(c,t*.06,g.level.theme,g.height);ambientWorld(c,t*.06,g.level);finaleLandmarks(c,t*.06,g.level);
  if(revision!==g.revision){const renderStart=performance.now();renderTerrain(g,terrain);canvas.dataset.renderMilliseconds=String(Math.round(performance.now()-renderStart));if(solid){const tc=terrain.getContext('2d'),im=tc.createImageData(1000,g.height);for(let p=0;p<g.terrain.length;p++)if(g.terrain[p]){const rgb=g.terrain[p]===1?[91,193,155]:g.terrain[p]===2?[185,191,201]:[255,214,90];im.data.set([...rgb,255],p*4);}tc.putImageData(im,0,0);}revision=g.revision;}
  c.drawImage(terrain,0,0);drawObjects(c,g);scenery(c,g.tick,g.level,g.spawned,g.lastSpawnTick,t*.06,g);exitPortal(c,g.level,g.tick,g.units.some(u=>u.state==='exit'));
- for(const u of g.units){if(['saved','lost'].includes(u.state))continue;if(u.state==='exit')enteringLemming(c,u,g.level,g.tick);else{character(c,u.x,u.y,u.state,u.dir,g.tick);skillEquipment(c,u,g.tick);}}
+ drawSplats(c,g.effects,g.tick);
+ for(const u of g.units){if(['saved','lost'].includes(u.state))continue;if(u.state==='exit')enteringLemming(c,u,g.level,g.tick);else{character(c,u.x,u.y,u.state,u.dir,u.state==='stranded'?g.tick-u.strandedTick:g.tick);skillEquipment(c,u,g.tick);}}
  requestAnimationFrame(draw);
 }
 window.addEventListener('hashchange',()=>{const wanted=(Number(location.hash.slice(1))||1)-1;if(wanted!==index)select(wanted);});

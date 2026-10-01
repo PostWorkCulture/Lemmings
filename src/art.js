@@ -1,3 +1,4 @@
+import {STRANDED_TURN} from './stranded.js';
 import {softenTerrainCorners} from './terrain-finish.js';
 import {connectedBackground,paintConnectedTerrain,connectedDoors} from './connected-art.js';
 import {paintRebootTerrain,sweetDoors,sweetBackdrop} from './sweet-reboot-art.js';
@@ -12,6 +13,7 @@ import { WIDTH,HEIGHT } from './engine.js';
 const palettes={1:['#624734','#6c5038','#73583d','#594330','#806243'],2:['#455c59','#4a625d','#526d64','#3d534f'],3:['#b48c56','#c59a61','#d3ac72']};
 function hash(x,y){let a=Math.imul(x+773,y+179)^Math.imul(x,7919);return (a^a>>>11)>>>0;}
 export function character(c,x,y,state='walk',dir=1,tick=0,scale=1) {
+  if(state==='stranded') { drawStrandedFace(c,x,y,dir,tick,scale);return; }
   c.save();c.translate(Math.round(x),Math.round(y));c.scale(dir*scale*.75,scale*.75);
   const phase=Math.floor(tick/7)%4,bob=state==='walk'&&phase%2?1:0;
   const r=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(x,y-bob,w,h);};
@@ -401,4 +403,19 @@ export function hazards(c,tick,theme,height=HEIGHT){
   }
 
   c.restore();
+}
+
+export function drawStrandedFace(c,x,y,dir,age,scale=1) {
+ if(age>=STRANDED_TURN)return;
+ // Compress the profile briefly, then open into a front-facing, worried expression.
+ if(age<8){c.save();c.translate(x,y);c.scale(1-age/12,1);character(c,0,0,'block',dir,0,scale);c.restore();return;}
+ c.save();c.translate(Math.round(x),Math.round(y));c.scale(scale*.75*Math.min(1,(age-6)/6),scale*.75);
+ const r=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(x,y,w,h);};
+ r(-7,-23,14,11,'#162e29');r(-6,-21,12,10,'#f5cda5');
+ r(-8,-24,16,5,'#75c94c');r(-5,-26,10,3,'#a4e671');r(-9,-21,4,8,'#56a842');r(5,-21,4,8,'#56a842');
+ r(-5,-20,4,5,'#fff5de');r(1,-20,4,5,'#fff5de');r(-3,-18,2,3,'#26352c');r(2,-18,2,3,'#26352c');
+ r(-2,-14,4,2,'#d7a17d');r(-1,-12,2,1,'#6a3c40');
+ r(-6,-11,12,10,'#3447a0');r(-5,-11,10,8,'#526fd7');r(-4,-10,3,6,'#7d94ee');
+ r(-9,-10,3,6,'#f5cda5');r(6,-10,3,6,'#f5cda5');r(-6,-1,5,2,'#f9dcba');r(1,-1,5,2,'#f9dcba');
+ c.restore();
 }

@@ -8,7 +8,7 @@ export function updateObjects(g){
  for(const u of g.units)u.riding=false;
  for(const o of g.level.objects||[])if(o.type==='lift'){
   const before=objectPosition(o,g.tick),after=objectPosition(o,g.tick+1);
-  for(const u of g.units)if(!g.terrain[Math.floor(u.y)*1000+Math.floor(u.x)]&&!['fall','jump','exit','ladder','pole','climb'].includes(u.state)&&u.x>=before.x-1&&u.x<=before.x+o.w+1&&Math.abs(u.y-before.y)<2){u.x=after.x+Math.max(2,Math.min(o.w-2,u.x-before.x));u.y+=after.y-before.y;u.riding=Math.abs(after.x-before.x)+Math.abs(after.y-before.y)>.001||(u.dir===1?after.x<o.toX-.1:after.x>o.x+.1);}
+  for(const u of g.units)if(!g.terrain[Math.floor(u.y)*1000+Math.floor(u.x)]&&!['fall','jump','exit','ladder','pole','climb','stranded'].includes(u.state)&&u.x>=before.x-1&&u.x<=before.x+o.w+1&&Math.abs(u.y-before.y)<2){u.x=after.x+Math.max(2,Math.min(o.w-2,u.x-before.x));u.y+=after.y-before.y;u.riding=Math.abs(after.x-before.x)+Math.abs(after.y-before.y)>.001||(u.dir===1?after.x<o.toX-.1:after.x>o.x+.1);}
  }
 }
 export function objectInteraction(g,u){

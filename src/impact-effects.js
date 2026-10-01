@@ -1,5 +1,5 @@
 export function drawSplats(c,effects,tick){
- for(const e of effects){const age=tick-e.tick;if(age<0||age>150)continue;c.save();c.translate(e.x,e.y);c.globalAlpha=Math.min(1,(150-age)/45);
+ for(const e of effects){if(e.type==='burst'){drawBurst(c,e,tick);continue;}const age=tick-e.tick;if(age<0||age>150)continue;c.save();c.translate(e.x,e.y);c.globalAlpha=Math.min(1,(150-age)/45);
   // Small arcade-style splash and flattened green hair/blue tunic.
   c.fillStyle='#9e2536';c.beginPath();c.ellipse(0,-1,13,2.5,0,0,Math.PI*2);c.fill();
   if(age<45){c.fillStyle='#435bba';c.fillRect(-8,-3,14,3);c.fillStyle='#71c845';c.fillRect(-5,-5,10,2);c.fillStyle='#e5c3a1';c.fillRect(6,-3,5,2);}
@@ -61,5 +61,16 @@ export function drawDrowning(c,u,tick,character,height){
   c.restore();
   if(age>=bite&&age<bite+28){c.globalAlpha=1-(age-bite)/28;c.fillStyle='#b63643';for(let i=0;i<8;i++)c.fillRect(u.x+Math.sin(i*2.3)*(age-bite)*.6,surface+8+Math.cos(i)*4,2,2);}
  }
+ c.restore();
+}
+
+export function drawBurst(c,e,tick){
+ const age=tick-e.tick;if(age<0||age>65)return;
+ c.save();c.translate(e.x,e.y);c.globalAlpha=Math.min(1,(65-age)/20);
+ if(age<10){c.fillStyle=age<4?'#fff5ce':'#f3c77b';c.beginPath();c.arc(0,0,2+age*.85,0,Math.PI*2);c.fill();}
+ // Tiny arcade fragments of hair, blue tunic and a few red flecks.
+ const colors=['#83ce59','#526fd7','#f5cda5','#b63643','#35499f','#a4e671'];
+ for(let i=0;i<22;i++){const angle=i*2.39996,speed=.55+(i%5)*.19,x=Math.cos(angle)*speed*age,y=Math.sin(angle)*speed*age-.75*age+.025*age*age;
+  c.save();c.translate(x,y);c.rotate(i+age*(i%2?.12:-.1));c.fillStyle=colors[i%colors.length];const size=i%4===0?3:2;c.fillRect(-size/2,-size/2,size,size);c.restore();}
  c.restore();
 }

@@ -1,3 +1,4 @@
+import {updateStranded,stepStranded} from './stranded.js';
 import {polishOriginalSilhouette} from './first30-polish.js';
 import {shapeConnected} from './connected-terrain.js';
 import {shapeSweetReboot} from './sweet-reboot-terrain.js';
@@ -20,7 +21,7 @@ export class Game {
     if(this.level.hazard==='toys')this.rect(0,this.hazardY,WIDTH,28,2);
     sculptOriginalTerrain(this);polishOriginalSilhouette(this);
     shapeSweetReboot(this);shapeConnected(this);
-    this.units=[];this.effects=[];this.soundEvents=[]; this.lastSpawnTick=null; this.spawned=0; this.saved=0; this.lost=0; this.tick=0;
+    this.units=[];this.effects=[];this.soundEvents=[]; this.lastSpawnTick=null; this.spawned=0; this.saved=0; this.lost=0; this.tick=0;this.lastRescueTick=null;this.strandedCheck=null;
     this.disabledObjects=new Set();this.stock={...this.level.stock}; this.result=null; this.events=[]; this.revision=(this.revision||0)+1;
   }
   rect(x,y,w,h,type) {
@@ -38,7 +39,7 @@ export class Game {
   at(x,y) { x=Math.floor(x);y=Math.floor(y);if(x<0||x>=WIDTH||y<0||y>=this.height)return 0;for(const o of this.level.objects||[]){if(((o.type==='gate'&&!this.disabledObjects.has(o.id))||(o.type==='bridge'&&this.disabledObjects.has(o.id)))&&x>=o.x&&x<o.x+o.w&&y>=o.y&&y<o.y+o.h)return 2;}for(const o of this.level.objects||[])if(o.type==='lift'){const p=objectPosition(o,this.tick);if(x>=p.x&&x<=p.x+o.w&&y>=Math.floor(p.y)&&y<Math.floor(p.y)+5)return 2;}return this.terrain[y*WIDTH+x]; }
   spawn() { this.lastSpawnTick=this.tick;const entrance=this.level.entrances?.[this.spawned%this.level.entrances.length]||{x:this.level.spawnX,y:this.level.spawnY,dir:this.level.dir};const u={id:this.spawned++,x:entrance.x,y:entrance.y,dir:entrance.dir,state:'fall',vy:0,fallStart:entrance.y,jobTick:0,steps:0};u.arrival={x:entrance.x,y:entrance.y,startY:rocketHeight(this.level,entrance),age:0,duration:Math.max(1,Math.abs(entrance.y-(rocketHeight(this.level,entrance)))/1.5)};u.x=entrance.x;u.y=rocketHeight(this.level,entrance);this.units.push(u);return u; }
   canAssign(u,skill) {
-    if(!u||!this.units.includes(u)||this.result||['exit','drown','saved','lost'].includes(u.state))return 'Choose a lemming first.';
+    if(!u||!this.units.includes(u)||this.result||['exit','drown','stranded','saved','lost'].includes(u.state))return 'Choose a lemming first.';
     if(!SKILLS[skill])return 'Unknown skill.';
     if(['block','attract'].includes(skill)&&u.state===skill)return '';
     if(skill==='walk')return ['walk','fall','jump','ladder','pole','climb','swim','slide'].includes(u.state)?'Choose a lemming doing a job.':'';
@@ -63,13 +64,14 @@ export class Game {
     this.events.push({tick:this.tick,id,skill});return {ok:true};
   }
   fall(u) { u.state='fall';u.vy=0;u.fallStart=u.y; }
-  remove(u,saved=false) { if(['saved','lost'].includes(u.state))return;if(!saved)this.effects.push({type:'splat',x:Math.max(13,Math.min(WIDTH-13,u.x)),y:Math.min(this.height-5,u.y),tick:this.tick});u.state=saved?'saved':'lost';saved?this.saved++:this.lost++; }
+  remove(u,saved=false,effect=true) { if(['saved','lost'].includes(u.state))return;if(saved)this.lastRescueTick=this.tick;if(!saved&&effect)this.effects.push({type:'splat',x:Math.max(13,Math.min(WIDTH-13,u.x)),y:Math.min(this.height-5,u.y),tick:this.tick});u.state=saved?'saved':'lost';saved?this.saved++:this.lost++; }
   step() {
     if(this.result)return;
     if(this.spawned<this.level.total && this.tick%this.level.interval===0)this.spawn();
     updateObjects(this);this.tick++;this.effects=this.effects.filter(e=>this.tick-e.tick<=150);this.soundEvents=this.soundEvents.filter(e=>this.tick-e.tick<=150);
     for(const u of this.units) {
       if(u.state==='saved'||u.state==='lost')continue;
+      if(stepStranded(this,u))continue;
       if(u.arrival){
         const a=u.arrival,p=Math.min(1,++a.age/a.duration);
         u.x=a.x;u.y=a.startY+(a.y-a.startY)*p;
@@ -178,6 +180,7 @@ export class Game {
       if(surface!==null)u.y=surface;else this.fall(u);
     }
     this.units=this.units.filter(u=>u.state!=='saved'&&u.state!=='lost');
+    updateStranded(this);
     if(this.saved+this.lost===this.level.total)this.result=this.saved>=this.level.target?'win':'lose';
 
   }
