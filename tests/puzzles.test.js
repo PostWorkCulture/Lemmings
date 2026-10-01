@@ -1,14 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {Game} from '../src/engine.js';
+import {LegacyDunesGame as Game} from './legacy-dunes-fixture.js';
 import {LEVELS,rocketHeight} from '../src/levels.js';
 import {objectInteraction} from '../src/objects.js';
 import {solvePuzzle} from './puzzle-solutions.js';
 
-test('ten bespoke puzzles have distinct inventories and puzzle identities',()=>{
- const maps=LEVELS.filter(l=>l.id<50&&l.puzzleId);
- assert.equal(maps.length,10);assert.equal(new Set(maps.map(l=>l.puzzleId)).size,10);
- assert.equal(new Set(maps.map(l=>JSON.stringify(l.stock))).size,10);
+test('six retained bespoke puzzles have distinct inventories and puzzle identities',()=>{
+ const maps=LEVELS.filter(l=>l.id<50&&l.puzzleId&&l.creature===undefined);
+ assert.equal(maps.length,6);assert.equal(new Set(maps.map(l=>l.puzzleId)).size,6);
+ assert.equal(new Set(maps.map(l=>JSON.stringify(l.stock))).size,6);
 });
 test('switches change actual gate and bridge collision, and restart restores both',()=>{
  for(const [id,type]of [[5,'gate'],[8,'bridge']]){

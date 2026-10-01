@@ -1,3 +1,4 @@
+import {polishOriginalSilhouette} from './first30-polish.js';
 import {shapeConnected} from './connected-terrain.js';
 import {shapeSweetReboot} from './sweet-reboot-terrain.js';
 import {sculptOriginalTerrain} from './original-terrain.js';
@@ -17,7 +18,7 @@ export class Game {
     for(const rect of this.level.terrain)this.rect(...rect);
     for(const shape of this.level.shapes||[])this.polygon(shape.points,shape.type);
     if(this.level.hazard==='toys')this.rect(0,this.hazardY,WIDTH,28,2);
-    sculptOriginalTerrain(this);
+    sculptOriginalTerrain(this);polishOriginalSilhouette(this);
     shapeSweetReboot(this);shapeConnected(this);
     this.units=[];this.effects=[];this.soundEvents=[]; this.lastSpawnTick=null; this.spawned=0; this.saved=0; this.lost=0; this.tick=0;
     this.disabledObjects=new Set();this.stock={...this.level.stock}; this.result=null; this.events=[]; this.revision=(this.revision||0)+1;

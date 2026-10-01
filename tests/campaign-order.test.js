@@ -6,7 +6,7 @@ import {PlayerStore} from '../src/player-store.js';
 
 test('100 active saved identities form ten ten-level chapters',()=>{
  assert.equal(CAMPAIGN.length,100);assert.equal(new Set(CAMPAIGN.map(l=>l.id)).size,100);
- assert.deepEqual(CHAPTERS.map(c=>[c.theme,c.difficulty]),[['woodland','Easy'],['beach','Medium'],['alpine','Medium'],['candy','Hard'],['volcano','Extreme'],['station','Hard'],['space','Hard'],['candy','Medium'],['sports','Hard'],['prehistoric','Extreme']]);
+ assert.deepEqual(CHAPTERS.map(c=>[c.theme,c.difficulty]),[['woodland','Easy'],['creature','Medium'],['alpine','Medium'],['candy','Hard'],['volcano','Extreme'],['station','Hard'],['space','Hard'],['candy','Medium'],['sports','Hard'],['prehistoric','Extreme']]);
  for(const [i,l]of CAMPAIGN.entries()){assert.equal(l.campaignIndex,i);assert.equal(LEVELS[l.id],l);assert.equal(l.theme,CHAPTERS[Math.floor(i/10)].theme);assert.equal(nextLevelId(l.id),CAMPAIGN[i+1]?.id);}
 });
 test('chapter boundaries unlock the next two displayed maps, not the next save IDs',()=>{

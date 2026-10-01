@@ -1,5 +1,6 @@
 import {cautionStripes} from './hazard-art.js';
 import {objectPosition,isDangerous} from './objects.js';
+export const liftRails=o=>[9,o.w-9].map(axle=>({axle,from:[o.x+axle,o.y+12],to:[o.toX+axle,o.toY+12]}));
 // Paired dark and light edges remain legible on sand, snow, foliage and purple stages.
 function apparatusStroke(c,color,width=2){
  c.save();c.lineJoin='round';c.lineCap='round';
@@ -36,7 +37,7 @@ export function drawObjects(c,g){
   }else if(o.type==='trampoline'){
    c.fillStyle='#ba8399';c.fillRect(o.x,o.y-4,o.w,4);c.strokeStyle='#b5c8c7';c.lineWidth=2;for(let x=o.x+3;x<o.x+o.w;x+=8){c.beginPath();c.moveTo(x,o.y);c.lineTo(x+3,o.y+4);c.lineTo(x,o.y+8);apparatusStroke(c,'#738995',2);}c.fillStyle='#697c83';c.fillRect(o.x-2,o.y+8,o.w+4,3);c.strokeStyle='#17202b';c.lineWidth=2;c.strokeRect(o.x,o.y-4,o.w,4);c.strokeStyle='#fff4d6';c.lineWidth=1;c.strokeRect(o.x-2,o.y+8,o.w+4,3);
   }else if(o.type==='lift'){
-   c.strokeStyle='#a8bbb348';c.setLineDash([3,4]);c.beginPath();c.moveTo(o.x,o.y+12);c.lineTo(o.toX+o.w,o.toY+12);apparatusStroke(c,'#738995',1);c.setLineDash([]);c.fillStyle='#657f87';c.fillRect(p.x,p.y,o.w,8);c.fillStyle='#d2c387';c.fillRect(p.x,p.y,o.w,2);for(const wheelX of [p.x+9,p.x+o.w-9]){c.fillStyle='#263d4b';c.beginPath();c.arc(wheelX,p.y+9,3,0,Math.PI*2);c.fill();c.strokeStyle='#a7b5b7';c.lineWidth=1;c.stroke();}c.strokeStyle='#17202b';c.lineWidth=2;c.strokeRect(p.x,p.y,o.w,8);c.strokeStyle='#fff4d6';c.lineWidth=1;c.strokeRect(p.x+1,p.y+1,o.w-2,6);
+   c.strokeStyle='#a8bbb348';c.setLineDash([3,4]);c.beginPath();for(const rail of liftRails(o)){c.moveTo(...rail.from);c.lineTo(...rail.to);}apparatusStroke(c,'#738995',1);c.setLineDash([]);c.fillStyle='#657f87';c.fillRect(p.x,p.y,o.w,8);c.fillStyle='#d2c387';c.fillRect(p.x,p.y,o.w,2);for(const wheelX of [p.x+9,p.x+o.w-9]){c.fillStyle='#263d4b';c.beginPath();c.arc(wheelX,p.y+9,3,0,Math.PI*2);c.fill();c.strokeStyle='#a7b5b7';c.lineWidth=1;c.stroke();}c.strokeStyle='#17202b';c.lineWidth=2;c.strokeRect(p.x,p.y,o.w,8);c.strokeStyle='#fff4d6';c.lineWidth=1;c.strokeRect(p.x+1,p.y+1,o.w-2,6);
   }else if(o.type==='bridge'){const open=g.disabledObjects.has(o.id);c.strokeStyle=open?'#c5b587':'#a6a69666';c.lineWidth=3;c.setLineDash(open?[]:[5,5]);c.beginPath();c.moveTo(o.x,o.y);c.lineTo(o.x+o.w,o.y);apparatusStroke(c,open?'#ae6b30':'#738995',3);c.setLineDash([]);if(open){c.fillStyle='#897b69';c.fillRect(o.x,o.y,o.w,o.h);c.fillStyle='#ccbe91';c.fillRect(o.x,o.y,o.w,2);}else{c.fillStyle='#a39178';c.fillRect(o.x,o.y-38,7,38);c.fillRect(o.x+o.w-7,o.y-38,7,38);}
   }else if(o.type==='gate'){const open=g.disabledObjects.has(o.id);c.fillStyle=open?'#658b7860':'#748593';c.fillRect(o.x,o.y,o.w,open?6:o.h);c.strokeStyle='#17202b';c.lineWidth=2;c.strokeRect(o.x,o.y,o.w,open?6:o.h);c.strokeStyle='#fff4d6';c.lineWidth=1;c.strokeRect(o.x+1,o.y+1,o.w-2,(open?6:o.h)-2);if(!open){c.strokeStyle='#d1c38b';c.lineWidth=2;for(let y=o.y+8;y<o.y+o.h;y+=12){c.beginPath();c.moveTo(o.x+2,y);c.lineTo(o.x+o.w-2,y+6);c.stroke();}}c.fillStyle=open?'#a5d985':'#e3a073';c.fillRect(o.x+o.w/2-2,o.y+1,4,4);
   }else if(o.type==='switch'){

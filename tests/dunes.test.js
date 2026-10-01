@@ -1,4 +1,4 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {Game} from '../src/engine.js';import {clearSky} from '../src/ambient-art.js';
+import test from 'node:test';import assert from 'node:assert/strict';import {LegacyDunesGame as Game} from './legacy-dunes-fixture.js';import {clearSky} from '../src/ambient-art.js';
 test('steep dunes allow a 75 percent ascent then slide facing downhill',()=>{
  for(const climb of [false,true]){const g=new Game(6);g.spawned=20;
  const u={id:0,x:412,y:335,state:'walk',dir:1,abilities:{climb}};g.units=[u];

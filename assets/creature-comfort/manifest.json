@@ -1,0 +1,92 @@
+[
+  {
+    "file": "assets/creature-comfort/01-ant-and-snail.png",
+    "source": [
+      0,
+      0,
+      1254,
+      580
+    ]
+  },
+  {
+    "file": "assets/creature-comfort/01-ant-and-snail.png",
+    "source": [
+      0,
+      591,
+      1254,
+      645
+    ]
+  },
+  {
+    "file": "assets/creature-comfort/02-hive-and-nest.png",
+    "source": [
+      0,
+      15,
+      1254,
+      590
+    ]
+  },
+  {
+    "file": "assets/creature-comfort/02-hive-and-nest.png",
+    "source": [
+      0,
+      620,
+      1254,
+      610
+    ]
+  },
+  {
+    "file": "assets/creature-comfort/03-mouse-and-mole.png",
+    "source": [
+      0,
+      0,
+      1254,
+      580
+    ]
+  },
+  {
+    "file": "assets/creature-comfort/03-mouse-and-mole.png",
+    "source": [
+      0,
+      590,
+      1254,
+      635
+    ]
+  },
+  {
+    "file": "assets/creature-comfort/04-silk-and-butterfly.png",
+    "source": [
+      0,
+      0,
+      1254,
+      625
+    ]
+  },
+  {
+    "file": "assets/creature-comfort/04-silk-and-butterfly.png",
+    "source": [
+      0,
+      656,
+      1254,
+      562
+    ]
+  },
+  {
+    "file": "assets/creature-comfort/05-beetle-and-hedgehog.png",
+    "source": [
+      0,
+      0,
+      1254,
+      520
+    ]
+  },
+  {
+    "file": "assets/creature-comfort/05-beetle-and-hedgehog.png",
+    "source": [
+      0,
+      520,
+      1254,
+      645
+    ]
+  }
+]

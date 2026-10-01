@@ -200,3 +200,11 @@ CAMPAIGN.forEach((l,index)=>{l.campaignIndex=index;});
 
 import {connectedLevels,CONNECTED_CHAPTERS} from './connected-levels.js';
 const connectedMaps=connectedLevels();LEVELS.push(...connectedMaps);CAMPAIGN.push(...connectedMaps);CHAPTERS.push(...CONNECTED_CHAPTERS);CAMPAIGN.forEach((l,index)=>{l.campaignIndex=index;});
+
+// Replace the ten Dunes journeys in place: stable campaign slots and save identities.
+import {creatureLevels} from './connected-levels.js';
+THEMES.creature={...THEMES.woodland,name:'Creature Comfort',hazard:'void'};
+CHAPTERS[1]={name:'Creature Comfort',theme:'creature',difficulty:'Medium'};
+// Historical fixtures keep the retired mechanics regression-testable; never in the menu.
+export const LEGACY_DUNES=Object.fromEntries(CAMPAIGN.slice(10,20).map(l=>[l.id,l]));
+for(const fresh of creatureLevels()){const index=CAMPAIGN.findIndex(l=>l.id===fresh.id);fresh.campaignIndex=index;LEVELS[fresh.id]=fresh;CAMPAIGN[index]=fresh;}

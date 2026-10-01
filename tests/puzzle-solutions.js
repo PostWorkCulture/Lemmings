@@ -1,4 +1,4 @@
-import {Game} from '../src/engine.js';
+import {LegacyDunesGame as Game} from './legacy-dunes-fixture.js';
 export function solvePuzzle(id,variant='perfect',omit=null){
  const g=new Game(id),done=new Set();id=g.level.solutionId??id;if(omit)g.stock[omit]=0;
  const act=(key,uid,skill,condition)=>{if(done.has(key))return;const u=g.units.find(u=>u.id===uid);if(u&&condition(u,g)&&!g.canAssign(u,skill)){g.assign(uid,skill);done.add(key);}};

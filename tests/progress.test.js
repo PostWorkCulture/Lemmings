@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {LEVELS} from '../src/levels.js';
 import {Game} from '../src/engine.js';
 import {isUnlocked,isPerfect,earnedStars,migrateStars,recordResult} from '../src/progress.js';
 test('stars open at most the next two levels and only earlier stars count',()=>{
@@ -34,8 +35,8 @@ test('missing the target does not interrupt remaining lemmings',()=>{
 });
 
 test('redesigned puzzles require a fresh perfect rescue while earlier unlocks remain',()=>{
- const r={completed:true,saved:20,total:20,lost:0};assert.equal(isPerfect(5,{5:r}),false);
- assert.equal(isPerfect(5,{5:{...r,puzzleId:'stack-access'}}),true);
+ const r={completed:true,saved:LEVELS[5].total,total:LEVELS[5].total,lost:0};assert.equal(isPerfect(5,{5:r}),false);
+ assert.equal(isPerfect(5,{5:{...r,puzzleId:LEVELS[5].puzzleId}}),true);
 });
 
 test('micro levels award full stars for their own total, with the same time rule',()=>{

@@ -10,7 +10,7 @@ test('25 new campaign maps preserve existing IDs and form five coherent chapters
  assert.deepEqual(LEVELS.map(l=>l.id),Array.from({length:110},(_,i)=>i));
  const signatures=new Set();
  for(let i=20;i<45;i++){
-  const l=LEVELS[i];assert.ok(l.expansion);assert.equal(l.total,20);assert.ok(l.target<=20);
+  const l=LEVELS[i];if(l.creature!==undefined){assert.equal(l.chapter,'Creature Comfort');signatures.add(JSON.stringify([...new Game(i).terrain]));continue;}assert.ok(l.expansion);assert.equal(l.total,20);assert.ok(l.target<=20);
   assert.ok(l.height>700);assert.ok(l.hints.length>0);
   signatures.add(JSON.stringify([l.terrain,l.shapes,l.objects]));
   const required=new Set(l.expansionRoutes.map(r=>r[2]));required.add(l.stock.attract?'attract':'block');

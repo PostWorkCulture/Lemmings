@@ -20,5 +20,6 @@ test('winning campaign routes use every available command, including the optiona
  const used=new Set();for(const level of LEVELS)for(const event of solveLevel(level.id).events)used.add(event.skill);
  const alternative=solvePuzzle(12,'demolition').g;assert.equal(alternative.result,'win');assert.equal(alternative.saved,19);assert.equal(alternative.lost,1);
  for(const event of alternative.events)used.add(event.skill);
- assert.deepEqual([...used].sort(),['walk','block','build','dig','bash','mine','platform','climb','float','jump','swim','run','stack','turn','attract','explode'].sort());
+ const offered=new Set(['walk',...LEVELS.flatMap(l=>Object.entries(l.stock).filter(([,n])=>n>0).map(([key])=>key))]);assert.deepEqual([...used].sort(),[...offered].sort());
+ const retiredWater=solvePuzzle(8).g;assert.equal(retiredWater.saved,retiredWater.level.total);assert.ok(retiredWater.events.some(e=>e.skill==='swim'));
 });

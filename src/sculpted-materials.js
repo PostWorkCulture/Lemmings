@@ -15,7 +15,7 @@ function baseTexture(level,height){
  base=new Uint8ClampedArray(1000*height*3);const key=level.theme,v=level.campaignIndex%10;
  const wood=key==='woodland',sand=key==='beach',snow=key==='alpine',lava=key==='volcano';
  for(let y=0;y<height;y++)for(let x=0;x<1000;x++){
-  const grit=(noise(x,y)-.5)*5,n=noise(Math.floor(x/36),Math.floor(y/28));let rgb;
+  const grit=(noise(x,y)-.5)*3,n=noise(Math.floor(x/36),Math.floor(y/28));let rgb;
   if(wood){
    const grain=Math.sin(x*.063+Math.sin(y*.011+v)*1.8+Math.sin(y*.039)*.28),wide=Math.sin(x*.012+y*.003+v);
    rgb=mix([77,43,27],[143,89,46],.44+wide*.16+grain*.21);
@@ -47,7 +47,7 @@ function baseTexture(level,height){
   const quadrant={woodland:[0,0],beach:[1,0],alpine:[0,1],volcano:[1,1]}[key];
   if(quadrant){const half=atlas.width/2;c.save();if(v%2){c.translate(1000,0);c.scale(-1,1);}c.drawImage(atlas,quadrant[0]*half,quadrant[1]*half,half,half,0,0,1000,height);c.restore();
    const painted=c.getImageData(0,0,1000,height).data;
-   for(let i=0;i<1000*height;i++)for(let channel=0;channel<3;channel++){const adjustment=key==='volcano'?.68:key==='beach'?1.1:1;const value=painted[i*4+channel]*adjustment;base[i*3+channel]=base[i*3+channel]*.18+value*.82;}
+   for(let i=0;i<1000*height;i++)for(let channel=0;channel<3;channel++){const adjustment=key==='volcano'?.68:key==='beach'?1.1:1;const value=painted[i*4+channel]*adjustment,grainWeight=key==='woodland'?.28:.18;base[i*3+channel]=base[i*3+channel]*grainWeight+value*(1-grainWeight);}
   }
  }
  bases.set(level,base);return base;
@@ -81,6 +81,8 @@ export function paintSculptedMaterials(c,game){
    const light=clamp((slopeX*.35+slopeY*.6),-1,1)*(1-edge/16);
    rgb=light>0?mix(rgb,key==='volcano'?[159,131,153]:[255,242,208],light*(candy?.16:.24)):mix(rgb,[8,16,25],-light*(candy?.22:.38));
   }
+  if(key==='alpine'&&up>38){const seam=Math.sin(x*.012+y*.022+game.level.id*.7);if(seam>.97)rgb=mix(rgb,[195,231,237],.17);}
+  if(key==='woodland'&&up>16){const sheen=Math.sin(x*.023+y*.008+game.level.id);if(sheen>.6)rgb=mix(rgb,[202,140,73],(sheen-.6)*.15);}
   if(edge===1&&(bottom||left))rgb=mix(rgb,[15,18,24],candy?.28:.5);
   d[i]=rgb[0];d[i+1]=rgb[1];d[i+2]=rgb[2];
  }

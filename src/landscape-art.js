@@ -91,6 +91,7 @@ export function scenerySupported(level,x,y,terrainAt=null,halfWidth=0,height=40)
   if(level.terrain.some(([tx,ty,w,h])=>px>=tx&&px<tx+w&&py>=ty&&py<ty+h))return true;
   return (level.shapes||[]).some(({points})=>{let inside=false;for(let i=0,j=points.length-1;i<points.length;j=i++){const [ax,ay]=points[i],[bx,by]=points[j];if((ay>py)!==(by>py)&&px<(bx-ax)*(py-ay)/(by-ay)+ax)inside=!inside;}return inside;});
  });
+ if(halfWidth&&Array.from({length:9},(_,i)=>solid(x-halfWidth+i*halfWidth/4,y)).filter(Boolean).length<8)return false;
  if(!solid(x,y)||[1,12,24,40].some(d=>solid(x,y-d)))return false;
  // Check the whole silhouette, not just its trunk: canopies must clear nearby walls.
  if(halfWidth)for(let dx=-halfWidth;dx<=halfWidth;dx+=4)for(let dy=4;dy<=height;dy+=4)if(solid(x+dx,y-dy))return false;
@@ -122,25 +123,20 @@ export function worldScenery(c,tick,level,terrainAt=null){
  const key=level.theme;
  // Ancient trunks replace the forest's masonry. Branches and foliage are decorative;
  // the dark bark below follows the exact solid collision silhouette.
- if(key==='woodland')for(const [x,y,w,h,type] of level.terrain){
-  if(type!==2||h<w||y>(level.height||470)-30)continue;
-  const mid=x+w/2;c.save();c.strokeStyle='#20382a';c.lineWidth=Math.max(3,w*.2);c.lineCap='round';
-  for(const side of [-1,1]){c.beginPath();c.moveTo(mid,y+Math.min(h*.35,25));c.lineTo(mid+side*(w*.65+7),y-7);c.lineTo(mid+side*(w*.7+9),y-20);c.stroke();}
-  ellipse(c,mid,y-15,w*.9+10,17,'#163d26');ellipse(c,mid-w*.5-5,y-7,w*.6+8,12,'#205331');ellipse(c,mid+w*.55+4,y-11,w*.55+7,13,'#286039');
-  c.restore();
- }
+ // Hard boundary trunks retain their bark; unsupported canopy stickers are omitted.
  // Local details anchored to solid starting shelves, never floating scenery.
  const placed=[];
  for(const [i,[x,y,w,h,type]] of (level.sceneryShelves||level.terrain).entries()){
-  if((type!==1&&!(key==='beach'&&type===2&&h<65))||w<100||y>(level.height||560)-30)continue;const px=x+Math.min(w*.22,60);if(level.expansion&&placed.length>=2)continue;
+  if((type!==1&&!(key==='beach'&&type===2&&h<65))||w<100||y>(level.height||560)-30)continue;const px=x+Math.min(w*.22,60);if((level.expansion||key==='woodland'||key==='alpine')&&placed.length>=2)continue;
   if(!scenerySupported(level,px,y,terrainAt,['beach','woodland','treehouse'].includes(key)?40:32,['beach','woodland','treehouse'].includes(key)?76:50))continue;
   // One small motif per area, with breathing room around functional items.
   if(key!=='woodland'&&(placed.length>=4||placed.some(p=>Math.abs(p.x-px)<150&&Math.abs(p.y-y)<140)))continue;
-  if((level.objects||[]).some(o=>Math.abs(o.x-px)<65&&Math.abs(o.y-y)<80))continue;
+  if((level.objects||[]).some(o=>Math.abs(o.x-px)<65&&y>=Math.min(o.y,o.top??o.y,o.bottom??o.y)-30&&y<=Math.max(o.y,o.top??o.y,o.bottom??o.y)+80))continue;
   if(Math.abs(level.exitX-px)<65&&Math.abs(level.exitY-y)<85)continue;
   if((level.entrances||[{x:level.spawnX,y:level.spawnY}]).some(e=>Math.abs(e.x-px)<65&&Math.abs(e.y-y)<100))continue;
   placed.push({x:px,y});c.save();c.globalAlpha=.85;
-  if(['woodland','treehouse','highland'].includes(key)){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.025+i)*.055);tree(c,0,0,key==='treehouse'?.8:.65);c.restore();}
+  if(key==='woodland'){woodlandMotif(c,px,y,i);}
+  if(['treehouse','highland'].includes(key)){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.025+i)*.055);tree(c,0,0,key==='treehouse'?.8:.65);c.restore();}
   if(key==='beach'){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.024+i)*.07);tree(c,0,0,.7,true);c.restore();}
   if(['alpine','polar'].includes(key))winterProp(c,px,y,placed.length%2===0);
   if(key==='candy'){c.fillStyle='#d5c7b4';c.fillRect(px-2,y-42,4,42);ellipse(c,px,y-44,16,16,i%2?'#e2a6ba':'#b9d1b6');c.strokeStyle='#f5d6de';c.lineWidth=2;c.beginPath();c.arc(px,y-44,9,0,TAU*1.4);c.stroke();}
@@ -156,4 +152,11 @@ export function worldScenery(c,tick,level,terrainAt=null){
   c.restore();
  }
  // Snow is drawn once, behind the route, by ambientWorld.
+}
+
+function woodlandMotif(c,x,y,variant){
+ c.save();c.translate(x,y);c.lineCap='round';
+ // A few grounded fern fronds and a mushroom replace repetitive lollipop trees.
+ for(let i=0;i<5;i++){const dx=(i-2)*9,dy=-13-Math.sin(i/4*Math.PI)*9;c.strokeStyle='#5e954b';c.lineWidth=1.7;c.beginPath();c.moveTo(0,-1);c.quadraticCurveTo(dx*.3,dy,dx,dy);c.stroke();for(let j=1;j<4;j++){const t=j/4;c.fillStyle=j%2?'#82b05f':'#407b42';ellipse(c,dx*t-3,dy*t,5,1.6,c.fillStyle);}}
+ c.fillStyle='#d8c2a1';c.fillRect(20,-10,3,10);const cap=c.createLinearGradient(0,-19,0,-9);cap.addColorStop(0,variant%2?'#c39368':'#be7451');cap.addColorStop(1,'#69432f');ellipse(c,21,-11,9,6,cap);ellipse(c,18,-14,2,1,'#ead2a0');c.restore();
 }
