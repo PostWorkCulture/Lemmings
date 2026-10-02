@@ -1,3 +1,4 @@
+import {stampBreakableObstacle} from './terrain-readability.js';
 import {CREATURE_MASKS} from './creature-masks.js';
 import {CONNECTED_MASKS} from './connected-masks.js';
 import {CONNECTED_ROUTES,connectedPoint} from './connected-levels.js';
@@ -26,10 +27,19 @@ export function shapeConnected(g){const l=g.level;if(l.connectedStudy===undefine
  for(const q of qs){const f=fields[indexAt(q.x,q.y)],center=(q.x+q.right)/2,half=(q.right-q.x)/2+18;for(const v of f){const t=Math.max(0,Math.min(1,(Math.abs(v[0]-center)-half)/30)),across=Math.max(0,Math.min(1,(v[0]-q.x)/(q.right-q.x))),y=q.leftY+(q.rightY-q.leftY)*across;if(t<1)v[1]=Math.round(y+(v[1]-y)*t);}}
  // Finish profiles before rasterising: overlapping adjustments cannot leave hidden lips.
  profiles.set(l.id,fields.map((f,i)=>base[i][0][0]>base[i].at(-1)[0]?f.toReversed():f));
- for(const field of fields)for(const [x,y] of field){const head=qs.some(q=>x>q.x-50&&x<q.right+50&&Math.abs(y-q.y)<35)?70:35;g.rect(x,y-head,1,head,0);g.rect(x,y,1,14,1);}
+ // The ant nest has generous rounded galleries; retain existing headroom on
+ // the other authored puzzles so ceiling skills and terrain density stay intact.
+ for(const field of fields)for(const [x,y] of field){
+  const fraction=(x-field[0][0])/Math.max(1,field.at(-1)[0]-field[0][0]);
+  const room=l.creature===0?42+Math.round(48*Math.sin(Math.PI*fraction)):35;
+  const nearGap=qs.some(q=>x>q.x-50&&x<q.right+50&&Math.abs(y-q.y)<35);
+  const head=nearGap?Math.max(70,room):room;
+  g.rect(x,y-head,1,head,0);g.rect(x,y,1,14,1);
+ }
+
  for(const o of l.objects.filter(o=>o.type==='ladder')){g.rect(o.x-5,o.top-27,10,o.y-o.top+27,0);g.rect(o.x-9,o.y,19,12,1);const end=o.x+o.dir*12;g.rect(end-8,o.top-27,17,27,0);g.rect(end-8,o.top,17,12,1);}
  for(const shaft of s.shafts){const [x,y0]=connectedPoint(l,shaft),y=Math.round(nearest(profiles.get(l.id),x,y0).y),bottom=connectedPoint(l,[shaft[0],shaft[2]])[1];g.rect(x-12,y+14,24,bottom-y-14,0);}
- for(const wall of s.walls){const {x,y}=connectedObstacle(l,'wall',wall);g.rect(x,y-37,18,51,1);}
+ for(const wall of s.walls){const {x,y}=connectedObstacle(l,'wall',wall);stampBreakableObstacle(g,x,y);}
  for(const q of qs)for(let x=q.x;x<=q.right;x++){const top=Math.min(q.leftY,q.rightY)-35,below=fields.map(f=>pathY(f,x)).filter(y=>y!==null&&y>q.y+25),bottom=Math.min(q.y+(l.creature===undefined?55:20+35*Math.sin(Math.PI*(x-q.x)/(q.right-q.x))),...below.map(y=>y-16));g.rect(x,top,1,bottom-top,0);}
  masks.set(l.id,g.terrain.slice());
 }

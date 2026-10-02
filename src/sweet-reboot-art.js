@@ -1,3 +1,4 @@
+import {illustratedBackdrop,readableTerrain,paintFreshCuts} from './terrain-readability.js';
 const sheets=['01-honeycomb-ribbonfall.png','02-wafer-gummy.png','03-meringue-liquorice.png','04-bonbon-peppermint.png','05-macaron-cathedral.png'];
 import {initialSweetMask,sweetSourceMask,sweetObstacle,pathY} from './sweet-reboot-terrain.js';
 import {SWEET_STUDIES,sweetPoint} from './sweet-reboot-levels.js';
@@ -8,9 +9,10 @@ function texture(level){let tex=paints.get(level.id);if(tex)return tex;const s=S
 export function paintRebootTerrain(c,g){const source=sweetSourceMask(g.level.id),tex=texture(g.level),im=c.createImageData(1000,g.height),d=im.data,pair=palettes[g.level.sweetReboot];const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),base=rgb(pair[0]),light=rgb(pair[1]);
  for(let i=0;i<g.terrain.length;i++){const kind=g.terrain[i];if(!kind)continue;const p=i*4,x=i%1000,y=Math.floor(i/1000);let col;
   if(kind===3)col=y%2?[196,154,41]:[239,210,91];
-  else{col=[tex.data[p],tex.data[p+1],tex.data[p+2]];if(tex.data[p+3]<80||(!source?.[i]&&Math.max(...col)<44)){const grain=((Math.sin(x*12.9898+y*78.233)*43758.5453)%1)*.07;const n=Math.sin(x*.17+y*.23)*.035+Math.sin(y*.15)*.035+grain;col=base.map(v=>v*(1+n));if(g.level.sweetReboot>=8){const seam=y%6===0,crumb=Math.sin(x*3.7+y*8.9)>.93;col=col.map((v,k)=>seam?v*.77:crumb?v*.68:v*.86+light[k]*.14);}}const above=y&&g.terrain[i-1000],below=y<g.height-1&&g.terrain[i+1000];if(!above)col=col.map((v,k)=>v*.55+light[k]*.45);else if(!below)col=col.map(v=>v*.7);}
+  else{col=[tex.data[p],tex.data[p+1],tex.data[p+2]];if(tex.data[p+3]<80||(!source?.[i]&&Math.max(...col)<44)){const grain=((Math.sin(x*12.9898+y*78.233)*43758.5453)%1)*.07;const n=Math.sin(x*.17+y*.23)*.035+Math.sin(y*.15)*.035+grain;col=base.map(v=>v*(1+n));if(g.level.sweetReboot>=8){const seam=y%6===0,crumb=Math.sin(x*3.7+y*8.9)>.93;col=col.map((v,k)=>seam?v*.77:crumb?v*.68:v*.86+light[k]*.14);}}}
   d[p]=col[0];d[p+1]=col[1];d[p+2]=col[2];d[p+3]=255;
- }c.putImageData(im,0,0);
+ }const study=SWEET_STUDIES[g.level.sweetReboot],walls=study.walls.map(w=>sweetObstacle(g.level,'wall',w)),shafts=(study.shafts||[]).map(v=>sweetObstacle(g.level,'shaft',v));
+ readableTerrain(im,g,walls,base,light,shafts);paintFreshCuts(im,g,initialSweetMask(g.level.id),walls,base,light);c.putImageData(im,0,0);
 }
 export function sweetDoors(c,tick,l,spawned,lastSpawnTick){const s=SWEET_STUDIES[l.sweetReboot],im=artwork[s.sheet];if(!im)return;
  for(const [kind,point] of [['entry',s.entry],['exit',s.exit]]){const [x,y]=sweetPoint(point);c.save();const w=kind==='entry'?76:78,h=70;c.beginPath();c.roundRect(x-w*.625/2,y-h*.85,w*.625,h*.85,[w*.625/2,w*.625/2,0,0]);c.clip();c.drawImage(im,point[0]-w/2,s.crop[0]+point[1]-h,w,h,x-w*.625/2,y-h*.85,w*.625,h*.85);
@@ -21,4 +23,7 @@ export function sweetDoors(c,tick,l,spawned,lastSpawnTick){const s=SWEET_STUDIES
  }
 }
 
-export function sweetBackdrop(l){const tex=texture(l),mask=initialSweetMask(l.id),canvas=document.createElement('canvas');canvas.width=1000;canvas.height=l.height;const c=canvas.getContext('2d'),im=c.createImageData(1000,l.height),gaps=SWEET_STUDIES[l.sweetReboot].gaps.map(g=>({...sweetObstacle(l,'gap',[g[0],g[2]]),right:sweetPoint([g[1],g[2]])[0]}));for(let i=0;i<1000*l.height;i++){const p=i*4,x=i%1000,y=Math.floor(i/1000);const cut=gaps.some(g=>x>=g.x&&x<=g.right&&y>=(pathY(g.path,x)??g.y)-20&&y<(pathY(g.path,x)??g.y)+105);const show=!cut&&!mask?.[i]&&tex.data[p+3];for(let k=0;k<3;k++)im.data[p+k]=show?tex.data[p+k]*.76+[16,16,25][k]*.24:[16,16,25][k];im.data[p+3]=255;}c.putImageData(im,0,0);return canvas;}
+export function sweetBackdrop(l){
+ const breaks=SWEET_STUDIES[l.sweetReboot].gaps.map(gap=>{const q=sweetObstacle(l,'gap',[gap[0],gap[2]]),right=sweetPoint([gap[1],gap[2]])[0];return {x:q.x,right,leftY:pathY(q.path,q.x)??q.y,rightY:pathY(q.path,right)??q.y};});
+ return illustratedBackdrop(texture(l),l.height,[16,16,25],breaks);
+}

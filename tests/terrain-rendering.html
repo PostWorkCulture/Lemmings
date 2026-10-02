@@ -2,6 +2,7 @@
 <style>body{background:#141a18;color:#dcf4df;font:16px system-ui;padding:24px}li{margin:12px}</style>
 <h1>Terrain rendering checks</h1><p id="result">Running...</p><ol id="checks"></ol>
 <script type="module">
+import {illustratedBackdrop} from '../src/terrain-readability.js';
 import {Game} from '../src/engine.js';import {CAMPAIGN} from '../src/levels.js';import {renderTerrain,makeBackground} from '../src/art.js';
 const make=height=>{const c=document.createElement('canvas');c.width=1000;c.height=height;return c;};let failed=0,checks=0;
 const check=(label,ok)=>{checks++;const li=document.createElement('li');li.textContent=(ok?'PASS: ':'FAIL: ')+label;document.querySelector('ol').append(li);if(!ok)failed++;};
@@ -19,5 +20,12 @@ for(const l of CAMPAIGN){
 const a=new Game(0),ca=make(a.height);renderTerrain(a,ca);a.reset(14);ca.height=a.height;renderTerrain(a,ca);const b=new Game(14),cb=make(b.height);renderTerrain(b,cb);const pa=pixels(ca),pb=pixels(cb);check('Switching worlds discards previous painted terrain',pa.every((v,i)=>v===pb[i]));
 const g=new Game(0),c=make(g.height);g.terrain.fill(1);renderTerrain(g,c);const pc=pixels(c);let green=0;for(let y=0;y<30;y++)for(let x=200;x<800;x++){const i=(y*1000+x)*4;if(pc[i+1]>pc[i]*1.05&&pc[i+1]>pc[i+2]*1.5)green++;}check('No phantom green stripes on the ceiling',green===0);
 const fresh=new Game(0);fresh.terrain.fill(0);fresh.rect(100,100,300,40,2);fresh.rect(100,140,300,100,1);const fc=make(fresh.height);renderTerrain(fresh,fc);const fp=pixels(fc);green=0;for(let y=140;y<155;y++)for(let x=120;x<380;x++){const i=(y*1000+x)*4;if(fp[i+1]>fp[i]*1.05&&fp[i+1]>fp[i+2]*1.5)green++;}check('No grass strip beneath hard blocks',green===0);
+// Original art remains untouched outside real breaks; feathered bridge edges
+// cannot become brighter than the source, including at fractional coordinates.
+const raw=new ImageData(1000,80);for(let i=0;i<raw.data.length;i+=4)raw.data.set([150,110,60,255],i);
+const natural=illustratedBackdrop(raw,80,[10,10,10],[{x:400,right:451,leftY:30.4,rightY:38.7}]),np=pixels(natural);
+let original=true,bounded=true;for(let y=0;y<80;y++)for(let x=0;x<1000;x++){const p=(y*1000+x)*4;if(x<400||x>451)original&&=np[p]===150&&np[p+1]===110&&np[p+2]===60;bounded&&=np[p]>=10&&np[p]<=150&&np[p+1]>=10&&np[p+1]<=110&&np[p+2]>=10&&np[p+2]<=60;}
+check('Original painting brightness is preserved outside physical crossings',original);
+check('Soft broken bridge edges do not create bright fringe artifacts',bounded);
 document.querySelector('#result').textContent=failed?`${failed} of ${checks} checks failed`:`All ${checks} rendering checks passed`;document.body.dataset.complete='true';document.body.dataset.failed=failed;
 </script>

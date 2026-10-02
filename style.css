@@ -95,3 +95,6 @@ dialog a:hover{color:#e2f7c0}
 .level-info .star-target{margin-left:0;padding-left:22px;border-left:1px solid #454750}
 .level-info .alert-value,#timer.alert-value{color:#ff6666!important}
 @media(max-width:800px){.level-info{gap:14px}.level-info .star-target{padding-left:14px}}
+
+/* Detailed landscape paintings use smooth scaling at full screen width. */
+.viewport>canvas[data-illustrated="true"]{image-rendering:auto}

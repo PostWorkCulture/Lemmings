@@ -12,7 +12,8 @@ import { THEMES } from './levels.js';
 import { WIDTH,HEIGHT } from './engine.js';
 const palettes={1:['#624734','#6c5038','#73583d','#594330','#806243'],2:['#455c59','#4a625d','#526d64','#3d534f'],3:['#b48c56','#c59a61','#d3ac72']};
 function hash(x,y){let a=Math.imul(x+773,y+179)^Math.imul(x,7919);return (a^a>>>11)>>>0;}
-export function character(c,x,y,state='walk',dir=1,tick=0,scale=1) {
+export function character(c,x,y,state='walk',dir=1,tick=0,scale=1,motion=null) {
+  if(state==='ladder'){drawLadderClimb(c,x,y,dir,tick,scale,motion);return;}
   if(state==='stranded') { drawStrandedFace(c,x,y,dir,tick,scale);return; }
   c.save();c.translate(Math.round(x),Math.round(y));c.scale(dir*scale*.75,scale*.75);
   const phase=Math.floor(tick/7)%4,bob=state==='walk'&&phase%2?1:0;
@@ -417,5 +418,36 @@ export function drawStrandedFace(c,x,y,dir,age,scale=1) {
  r(-2,-14,4,2,'#d7a17d');r(-1,-12,2,1,'#6a3c40');
  r(-6,-11,12,10,'#3447a0');r(-5,-11,10,8,'#526fd7');r(-4,-10,3,6,'#7d94ee');
  r(-9,-10,3,6,'#f5cda5');r(6,-10,3,6,'#f5cda5');r(-6,-1,5,2,'#f9dcba');r(1,-1,5,2,'#f9dcba');
+ c.restore();
+}
+
+export function drawLadderClimb(c,x,y,dir,tick,scale=1,motion=null){
+ const age=motion?.ladderStartTick===undefined?12:tick-motion.ladderStartTick;
+ // Turn through a narrow profile into the back view without changing travel speed.
+ if(age<5){c.save();c.translate(x,y);c.scale(1-age*.14,1);character(c,0,0,'walk',dir,0,scale);c.restore();return;}
+ const travel=motion?.ladderStartY===undefined?tick*1.1:Math.abs(motion.ladderStartY-y);
+ const swing=Math.sin(travel*Math.PI/8),bob=Math.abs(swing)*.6;
+ c.save();c.translate(Math.round(x),Math.round(y));c.scale(scale*.75*Math.min(1,.3+(age-5)*.14),scale*.75);
+ const r=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y-bob),w,h);};
+ const skin='#f5d2ad',edge='#142628';
+ // Opposite arm and leg reach together, keeping the body close to the rails.
+ for(const side of [-1,1]){
+  const handY=-17-side*swing*5,footY=-1-Math.max(0,-side*swing)*5;
+  r(side<0?-6:2,-5,4,Math.max(3,footY+6),edge);
+  r(side<0?-5:3,-5,2,Math.max(2,footY+5),'#35499f');
+  r(side<0?-9:4,footY,5,3,edge);r(side<0?-8:5,footY,4,2,skin);
+  // Bent blue sleeves lead to small cream cuffs and hands gripping the ladder.
+  r(side<0?-11:7,handY+2,4,Math.max(3,-10-handY),edge);
+  r(side<0?-10:8,handY+3,2,Math.max(2,-11-handY),'#526fd7');
+  r(side<0?-11:7,handY+1,4,3,'#f3edda');
+  r(side<0?-11:7,handY-1,4,3,skin);r(side<0?-10:8,handY-1,2,1,'#ffead0');
+ }
+ // Back of the tunic and neck: no nose or eyes showing through the ladder.
+ const coat=c.createLinearGradient(-5,0,6,0);coat.addColorStop(0,'#6482e5');coat.addColorStop(.45,'#526fd7');coat.addColorStop(1,'#3447a0');
+ r(-6,-13,12,11,edge);r(-5,-12,10,9,coat);r(-4,-11,2,5,'#91a4ee');r(-4,-4,9,2,'#3348a8');r(-2,-15,4,3,'#d7a17d');
+ // Full green hair cap, with the darker strands at the nape visible from behind.
+ r(-7,-24,14,11,edge);r(-8,-21,16,6,edge);r(-6,-24,12,3,'#7aca50');r(-4,-26,8,3,'#a4e671');
+ r(-7,-21,14,6,'#75c94c');r(-6,-16,12,3,'#56a842');r(-8,-18,3,4,'#59ad45');r(5,-18,3,4,'#46963e');
+ r(-5,-23,4,2,'#b6eb87');r(-6,-20,2,3,'#95df6a');r(2,-20,3,4,'#66b846');r(-3,-16,2,3,'#388940');r(3,-16,2,2,'#388940');
  c.restore();
 }

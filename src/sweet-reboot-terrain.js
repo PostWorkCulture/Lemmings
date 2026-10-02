@@ -1,3 +1,4 @@
+import {stampBreakableObstacle} from './terrain-readability.js';
 import {SWEET_MASKS} from './sweet-reboot-masks.js';
 import {SWEET_STUDIES,sweetPoint} from './sweet-reboot-levels.js';
 export function pathY(points,x){for(let j=1;j<points.length;j++){const a=points[j-1],b=points[j];if(x>=Math.min(a[0],b[0])&&x<=Math.max(a[0],b[0])&&a[0]!==b[0])return a[1]+(b[1]-a[1])*(x-a[0])/(b[0]-a[0]);}return null;}
@@ -27,7 +28,7 @@ export function shapeSweetReboot(g){
  for(const x of [l.spawnX,l.exitX]){const y=x===l.spawnX?l.spawnY:l.exitY;landing(x,y,x===l.spawnX?18:24,x===l.spawnX?20:18);}
  for(const wall of s.walls){const {x,y}=sweetObstacle(l,'wall',wall);landing(x+9,y,55,55);}
  for(const o of l.objects){landing(o.x,o.y,16,24);landing(o.x,o.top,26,24);g.rect(o.x-5,o.top-28,10,o.y-o.top+28,0);g.rect(o.x-8,o.y,17,12,1);}
- for(const wall of s.walls){const {x,y,path}=sweetObstacle(l,'wall',wall);for(let xx=x;xx<x+18;xx++){const floor=y;g.rect(xx,floor-37,1,52,1);}}
+ for(const wall of s.walls){const {x,y,path}=sweetObstacle(l,'wall',wall);stampBreakableObstacle(g,x,y);}
  for(const gap of s.gaps){const x=sweetPoint(gap)[0],right=sweetPoint([gap[1],gap[2]])[0],near=sweetObstacle(l,'gap',[gap[0],gap[2]]);for(let xx=x;xx<=right;xx++){const y=Math.round(pathY(near.path,xx)??near.y);g.rect(xx,y-34,1,105,0);}}
  g.rect(l.exitX-24,l.exitY,49,8,1);
  cache.set(l.id,g.terrain.slice());

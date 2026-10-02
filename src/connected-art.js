@@ -1,25 +1,21 @@
+import {illustratedBackdrop,readableTerrain,paintFreshCuts} from './terrain-readability.js';
 import {CONNECTED_ROUTES} from './connected-levels.js';
-import {initialConnectedMask,connectedSourceMask,connectedCrossing,connectedPaths,pathY} from './connected-terrain.js';
+import {initialConnectedMask,connectedSourceMask,connectedObstacle,connectedCrossing} from './connected-terrain.js';
 const images=new Map(),requested=new Set(),textures=new Map();
-const palettes=[['#242239','#8373aa'],['#716d79','#c5c3cf'],['#ad7540','#f2d193'],['#81705a','#c0c785'],['#8b7d5e','#d4cba4'],['#725239','#e9cf9d']];
+const palettes=[['#242239','#8373aa'],['#716d79','#c5c3cf'],['#ad7540','#f2d193'],['#81705a','#c0c785'],['#8b7d5e','#d4cba4'],['#a45f34','#f2c080']];
 function texture(l){if(textures.has(l.id))return textures.get(l.id);const s=CONNECTED_ROUTES[l.connectedStudy];if(!requested.has(s.file)){requested.add(s.file);const im=new Image();im.src=new URL('../'+s.file,import.meta.url).href;im.decode().then(()=>{images.set(s.file,im);textures.clear();window.dispatchEvent(new CustomEvent('sweet-art-ready',{detail:{connected:true}}));}).catch(()=>console.warn('Landscape artwork could not load: '+s.file));}
  const canvas=document.createElement('canvas');canvas.width=1000;canvas.height=l.height;const c=canvas.getContext('2d'),im=images.get(s.file);if(im)c.drawImage(im,...s.source,20,l.artOffset,960,l.artHeight);const tex=c.getImageData(0,0,1000,l.height);textures.set(l.id,tex);return tex;}
 export function connectedBackground(l){
- const t=texture(l),mask=initialConnectedMask(l.id),canvas=document.createElement('canvas');canvas.width=1000;canvas.height=l.height;const c=canvas.getContext('2d');c.fillStyle=['#0e0b1a','#0b101d','#18131b','#101c1c','#171b16','#101b18'][Math.floor(l.connectedStudy/10)];c.fillRect(0,0,1000,l.height);
- const im=c.getImageData(0,0,1000,l.height),gaps=CONNECTED_ROUTES[l.connectedStudy].gaps.map(g=>connectedCrossing(l,g)),creature=l.creature!==undefined;
- for(let i=0;i<mask.length;i++){const p=i*4,x=i%1000,y=Math.floor(i/1000);if(mask[i]||t.data[p+3]<=90)continue;
-  const gap=gaps.find(g=>{if(x<g.x||x>g.right)return false;const curve=creature?Math.sin(Math.PI*(x-g.x)/(g.right-g.x)):1;return y>=g.y-(creature?5+25*curve:30)&&y<g.y+(creature?20+35*curve:55);});if(gap&&!creature)continue;
-  if(gap){const z=Math.max(0,Math.min(1,(y-gap.y+30)/85)),shade=.17+.23*z;for(let k=0;k<3;k++)im.data[p+k]=t.data[p+k]*shade;continue;}
-  // Habitat chambers retain a softly shaded rear wall, not rectangular black scars.
-  // The solid, bright floor is always drawn separately from this recessed surface.
-  let amount=.3;if(creature){const floors=connectedPaths(l).map(path=>pathY(path,x)).filter(Number.isFinite);const above=Math.min(...floors.filter(v=>v>=y).map(v=>v-y));amount=above<42?.68+.26*Math.min(1,above/42):.94;}
-  for(let k=0;k<3;k++)im.data[p+k]=im.data[p+k]*(1-amount)+t.data[p+k]*amount;
- }
- c.putImageData(im,0,0);return canvas;
+ const base=[[10,9,19],[10,16,25],[22,16,24],[13,24,23],[19,23,16],[31,20,13]][Math.floor(l.connectedStudy/10)];
+ const breaks=CONNECTED_ROUTES[l.connectedStudy].gaps.map(gap=>connectedCrossing(l,gap));
+ return illustratedBackdrop(texture(l),l.height,base,breaks);
 }
-export function paintConnectedTerrain(c,g){const tex=texture(g.level),original=connectedSourceMask(g.level.id),im=c.createImageData(1000,g.height),pair=palettes[Math.floor(g.level.connectedStudy/10)],rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),base=rgb(pair[0]),light=rgb(pair[1]);for(let i=0;i<g.terrain.length;i++){const kind=g.terrain[i];if(!kind)continue;const p=i*4,x=i%1000,y=Math.floor(i/1000);let col=[tex.data[p],tex.data[p+1],tex.data[p+2]];
+export function paintConnectedTerrain(c,g){const tex=texture(g.level),original=connectedSourceMask(g.level.id),im=c.createImageData(1000,g.height),pair=[11,17].includes(g.level.connectedStudy)?['#468fad','#e3f7ff']:palettes[Math.floor(g.level.connectedStudy/10)],rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),base=rgb(pair[0]),light=rgb(pair[1]);for(let i=0;i<g.terrain.length;i++){const kind=g.terrain[i];if(!kind)continue;const p=i*4,x=i%1000,y=Math.floor(i/1000);let col=[tex.data[p],tex.data[p+1],tex.data[p+2]];
  if(kind===3)col=y%2?[205,168,53]:[244,216,108];else{
-  if(!original[i]||tex.data[p+3]<80){let sample=-1;for(const [dx,dy] of [[0,1],[0,3],[0,6],[0,12],[0,20],[0,-1],[0,-4],[8,0],[-8,0],[18,0],[-18,0]]){const sx=x+dx,sy=y+dy,n=sy*1000+sx;if(sx>=0&&sx<1000&&sy>=0&&sy<g.height&&original[n]&&tex.data[n*4+3]>90){sample=n*4;break;}}const grain=Math.sin(x*5.23+y*3.89)*.055+Math.sin(x*.09+Math.sin(y*.04)*3)*.045+Math.sin(y*.19)*.04;col=sample>=0?[0,1,2].map(k=>tex.data[sample+k]*(.94+grain)):base.map(v=>v*(1+grain));if(sample<0){const group=Math.floor(g.level.connectedStudy/10),seam=group===0?(x%72<1||y%40<1):group===2?Math.sin(x*.31)*Math.cos(y*.37)>.92:Math.sin(y*.065+Math.sin(x*.012)*2)>.97;if(seam)col=col.map(v=>v*.76);}}
-  if(y&&!g.terrain[i-1000])col=col.map((v,k)=>v*.7+light[k]*.3);else if(y<g.height-1&&!g.terrain[i+1000])col=col.map(v=>v*.65);
- }im.data.set([...col,255],p);}c.putImageData(im,0,0);}
+  if(!original[i]||tex.data[p+3]<80){let sample=-1;for(const [dx,dy] of [[0,1],[0,3],[0,6],[0,12],[0,20],[0,-1],[0,-4],[8,0],[-8,0],[18,0],[-18,0],[32,0],[-32,0],[48,0],[-48,0],[64,0],[-64,0],[0,-12]]){const sx=x+dx,sy=y+dy,n=sy*1000+sx;if(sx>=0&&sx<1000&&sy>=0&&sy<g.height&&original[n]&&tex.data[n*4+3]>90){sample=n*4;break;}}const grain=Math.sin(x*5.23+y*3.89)*.055+Math.sin(x*.09+Math.sin(y*.04)*3)*.045+Math.sin(y*.19)*.04;col=sample>=0?[0,1,2].map(k=>tex.data[sample+k]*(.94+grain)):base.map(v=>v*(1+grain));if(sample<0){const group=Math.floor(g.level.connectedStudy/10),seam=group===0?(x%72<1||y%40<1):group===2?Math.sin(x*.31)*Math.cos(y*.37)>.92:Math.sin(y*.065+Math.sin(x*.012)*2)>.97;if(seam)col=col.map(v=>v*.76);}}
+
+ }im.data.set([...col,255],p);}
+ const walls=CONNECTED_ROUTES[g.level.connectedStudy].walls.map(w=>connectedObstacle(g.level,'wall',w));
+ const shafts=CONNECTED_ROUTES[g.level.connectedStudy].shafts.map(v=>connectedObstacle(g.level,'shaft',v));
+ readableTerrain(im,g,walls,base,light,shafts);paintFreshCuts(im,g,initialConnectedMask(g.level.id),walls,base,light);c.putImageData(im,0,0);}
 export function connectedDoors(c,tick,l,spawned,lastSpawnTick){for(const o of l.objects.filter(o=>o.type==='turnSign')){c.save();c.translate(o.x,o.y-12);c.scale(o.dir,1);c.fillStyle='#151820';c.fillRect(-10,-7,20,14);c.strokeStyle='#ede9d6';c.lineWidth=2;c.beginPath();c.moveTo(-6,0);c.lineTo(6,0);c.lineTo(2,-4);c.moveTo(6,0);c.lineTo(2,4);c.stroke();c.restore();}const sci=l.connectedStudy<20,frame=sci?'#6f768f':'#aa9169';for(const [x,y,exit] of [[l.spawnX,l.spawnY,false],[l.exitX,l.exitY,true]]){c.save();c.translate(x,y);c.fillStyle='#070b10';c.strokeStyle=frame;c.lineWidth=4;c.beginPath();c.roundRect(-15,-37,30,37,[15,15,0,0]);c.fill();c.stroke();const glow=c.createLinearGradient(0,-32,0,0);glow.addColorStop(0,exit?'#398b49':'#8c5429');glow.addColorStop(1,exit?'#bdff94':'#ffd17b');c.fillStyle=glow;c.beginPath();c.roundRect(-10,-32,20,32,[10,10,0,0]);c.fill();c.strokeStyle=exit?'#c9ffc0':'#ffe5a4';c.lineWidth=1;c.beginPath();c.roundRect(-7,-29,14,27,[7,7,0,0]);c.stroke();if(!exit){const shut=spawned>=l.total?Math.max(0,Math.min(1,(tick-lastSpawnTick-25)/25)):Math.max(0,1-tick/20);c.fillStyle='#2c2931';c.fillRect(-10,-30,20,30*shut);}c.fillStyle=frame;c.fillRect(-19,0,38,4);c.restore();}}

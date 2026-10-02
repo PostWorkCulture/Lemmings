@@ -92,7 +92,7 @@ function renderSkills(){
  }
 }
 function updateLevelUI(){
- canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.add('tall-world');$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';
+ canvas.dataset.illustrated=String(Boolean(game.level.embeddedDoors)); canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.add('tall-world');$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';
  $('#difficulty-label').textContent=game.level.difficulty;$('#difficulty-label').dataset.difficulty=game.level.difficulty.toLowerCase();
  renderSkills();const l=game.level;$('#time-target').textContent=formatTime(l.targetTime);$('#star-total').textContent=l.total;document.title=`Lemmings · ${l.world}`;$('#world-label').textContent=`${l.world.toUpperCase()} · ${String(l.campaignIndex+1).padStart(2,'0')}`;$('h1').textContent=l.name;$('#level-number').textContent=`${l.campaignIndex+1} / ${CAMPAIGN.length}`;$('#target-count').textContent='/'+l.target;$('#help-goal').textContent=`Save ${l.target} of ${l.total}. Watch out for long falls and hazards. There’s no time limit.`;canvas.setAttribute('aria-label',`${l.world}: ${l.name}`);$('#music-status').textContent='';updateMusicUI();
  document.querySelectorAll('[data-help-skill]').forEach(el=>{el.hidden=el.dataset.helpSkill!=='walk'&&!(l.stock[el.dataset.helpSkill]>0);});
@@ -143,7 +143,7 @@ function draw(){
     if(u.state==='exit'){enteringLemming(ctx,u,game.level,game.tick);continue;}
     if(u===hover){ctx.strokeStyle=game.canAssign(u,selected)?'#e1b982':'#d8f7a2';ctx.lineWidth=1;ctx.strokeRect(Math.round(u.x)-12,Math.round(u.y)-30,25,33);ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.moveTo(u.x-3,u.y-35);ctx.lineTo(u.x+3,u.y-35);ctx.lineTo(u.x,u.y-31);ctx.fill();}
     if(u.state==='slide'){ctx.save();ctx.translate(u.x,u.y-5);ctx.rotate(-u.dir*.5);character(ctx,0,5,'fall',u.dir,game.tick);ctx.restore();ctx.fillStyle='#dec18e';for(let i=0;i<4;i++)ctx.fillRect(u.x-u.dir*(5+i*3),u.y-2-(game.tick+i*3)%7,2,2);}
-    else character(ctx,u.x,u.y,u.state,u.dir,u.state==='stranded'?game.tick-u.strandedTick:game.tick);skillEquipment(ctx,u,game.tick);
+    else character(ctx,u.x,u.y,u.state,u.dir,u.state==='stranded'?game.tick-u.strandedTick:game.tick,1,u);skillEquipment(ctx,u,game.tick);
     if(u.state==='block'){ctx.fillStyle='#e8c988';ctx.fillRect(u.x-4,u.y-31,8,2);}
     if(u.state==='build'){ctx.fillStyle='#e8c988';ctx.fillRect(u.x-7,u.y-32,14*(16-u.steps)/16,2);}
   }
