@@ -14,6 +14,9 @@ for(const l of CAMPAIGN){
  const a=new Game(l.id),b=new Game(l.id),ca=make(a.height),cb=make(b.height),mask=a.terrain.slice();
  renderTerrain(a,ca);const first=pixels(ca);renderTerrain(a,ca);const second=pixels(ca);
  check(`${l.campaignIndex+1}. ${l.name}: repaint is stable and preserves collision`,first.every((v,i)=>v===second[i])&&mask.every((v,i)=>v===a.terrain[i]));
+ // Every physical pixel above a hazard must have visible terrain, not an invisible route.
+ let invisible=0;for(let i=0;i<mask.length;i++)if(mask[i]&&Math.floor(i/1000)<a.hazardY&&!first[i*4+3])invisible++;
+ check(`${l.campaignIndex+1}. ${l.name}: all usable solid terrain is visible`,invisible===0);
  for(const [x,y,w,h,type]of [[200,300,48,45,0],[340,340,42,8,3],[600,400,52,44,0],[0,0,7,80,0],[990,0,10,40,0]]){a.rect(x,y,w,h,type);b.rect(x,y,w,h,type);renderTerrain(a,ca);}
  renderTerrain(b,cb);const pa=pixels(ca),pb=pixels(cb);check(`${l.campaignIndex+1}. ${l.name}: excavation matches a fresh render`,pa.every((v,i)=>v===pb[i]));await new Promise(r=>setTimeout(r,0));
 }

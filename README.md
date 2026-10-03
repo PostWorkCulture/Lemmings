@@ -1,6 +1,6 @@
-# Lemmings — twenty little adventures
+# Lemmings — thirty little adventures
 
-A local browser puzzle game with twenty themed levels, original retro music, editable terrain and a compact skill bar.
+A browser puzzle game with 30 levels across Freaky Forest, Mountain Rescue and Lava Land, original retro music, editable terrain and a compact skill bar.
 
 ## Publishing
 
@@ -18,9 +18,9 @@ Run `npm start`, then open http://127.0.0.1:4173. Node.js is the only dependency
 
 ## Levels
 
-Twenty distinct worlds cover woodland, beaches, waterfalls, industry, mountains, tree villages, tombs, asteroids, volcanoes, polar ice, candy, marble, fossils, castles, highlands, circus tents, rooftops, stadiums, a space station and enchanted falls. Nine maps have completely rebuilt interactive routes. See [LEVEL-REVIEW.md](LEVEL-REVIEW.md) for the complete review.
+The campaign contains ten Forest levels (Easy), ten Mountain levels (Medium), and ten Lava levels (Extreme). Each level has 10 lemmings. Their painted terrain is the physical surface used by the simulation. 27 maps fit on one screen; one expedition per world scrolls vertically, with no horizontal scrolling. Illustrated expansion maps are archived outside the active campaign. See [campaign order](docs/campaign-order.md).
 
-Levels unlock in order after meeting rescue targets. Gold stars require a verified, completed 20/20 rescue with no losses. Existing best scores and level access are retained. Difficulty rises to a 20/20 requirement in the final five maps.
+Earn one star for meeting the rescue target, a second for saving everyone, and a third for saving everyone under the target time. Stars from active levels unlock the next two levels. Local and cloud player results retain their original save identities.
 
 ## Controls
 
@@ -30,9 +30,9 @@ Levels unlock in order after meeting rescue targets. Gold stars require a verifi
 - **3 — Builder:** construct 16 ascending steps in the current direction.
 - **4 — Digger:** excavate vertically.
 - **Space:** pause/resume; skills can still be assigned while paused.
-- **F:** toggle 1×/2× gameplay speed.
+- **F:** toggle 1×/3× gameplay speed.
 - **. (full stop):** pause and advance one simulation frame.
-- **Tips:** controls and optional, progressive puzzle hints.
+- **Tips:** optional hints for the current level. Skill instructions are available while paused.
 
 Only skills supplied for the current map appear in the tray. Skill inventories vary by level. There is no time limit. The final result appears only after every lemming is saved or lost, even when the target can no longer be met. It completes after all lemmings are accounted for, so release remaining blockers.
 

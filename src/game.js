@@ -27,7 +27,7 @@ let sceneryTick=0;
 let selected='walk',started=false,paused=false,speed=1,last=0,accumulator=0,renderedRevision=-1,hover=null,pointer=null,toastTimer,hintIndex=0,dialogPause=false;
 function message(text){$('#message').textContent=text;$('#message').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#message').classList.remove('visible'),5000);}
 function select(skill){if(skill!=='walk'&&!(game.stock[skill]>0)&&!(['block','attract'].includes(skill)&&game.units.some(u=>u.state===skill)))return;selected=skill;document.querySelectorAll('.skill').forEach(b=>{const active=b.dataset.skill===skill;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});}
-function start(){impactAudio.unlock();started=true;paused=false;soundtrack.play();$('#intro').classList.add('hidden');$('#result').classList.add('hidden');canvas.focus({preventScroll:true});if(game.level.bottomEntry)$('#viewport').scrollTop=$('#viewport').scrollHeight;sync();}
+function start(){impactAudio.unlock();started=true;paused=false;soundtrack.play();$('#intro').classList.add('hidden');$('#result').classList.add('hidden');canvas.focus({preventScroll:true});if(game.level.bottomEntry&&game.level.scrollMode==='vertical')$('#viewport').scrollTop=$('#viewport').scrollHeight;sync();}
 function reset(levelIndex=game.levelIndex){if(!isUnlocked(levelIndex,starRecords))return;clearTimeout(toastTimer);document.querySelector('#message').classList.remove('visible');soundtrack.pause();game.reset(levelIndex);background=makeBackground(game.level.theme,game.height,game.level);renderedRevision=-1;soundtrack.setLevel(levelIndex);updateLevelUI();started=false;paused=false;speed=1;hover=null;pointer=null;hintIndex=0;$('#hint-copy').textContent='Puzzle hints are optional.';$('#hint').textContent='Show a puzzle hint';accumulator=0;$('#result').classList.add('hidden');$('#intro').classList.remove('hidden');$('#speed').textContent='1\u00d7';$('#speed').setAttribute('aria-label','Speed: normal');$('#speed').classList.remove('active');select('walk');sync();}
 function togglePause(){if(!started)return;if($('#pause-dialog').open){$('#pause-dialog').close();return;}if(paused){paused=false;soundtrack.play();sync();}else openDialog('#pause-dialog');}
 function singleStep(){if(!started||game.result)return;paused=true;soundtrack.pause();game.step();if(game.result)result();sync();}
@@ -92,7 +92,7 @@ function renderSkills(){
  }
 }
 function updateLevelUI(){
- canvas.dataset.illustrated=String(Boolean(game.level.embeddedDoors)); canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.add('tall-world');$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';
+ canvas.dataset.illustrated=String(Boolean(game.level.embeddedDoors)); canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.toggle('tall-world',game.level.scrollMode==='vertical');$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';
  $('#difficulty-label').textContent=game.level.difficulty;$('#difficulty-label').dataset.difficulty=game.level.difficulty.toLowerCase();
  renderSkills();const l=game.level;$('#time-target').textContent=formatTime(l.targetTime);$('#star-total').textContent=l.total;document.title=`Lemmings · ${l.world}`;$('#world-label').textContent=`${l.world.toUpperCase()} · ${String(l.campaignIndex+1).padStart(2,'0')}`;$('h1').textContent=l.name;$('#level-number').textContent=`${l.campaignIndex+1} / ${CAMPAIGN.length}`;$('#target-count').textContent='/'+l.target;$('#help-goal').textContent=`Save ${l.target} of ${l.total}. Watch out for long falls and hazards. There’s no time limit.`;canvas.setAttribute('aria-label',`${l.world}: ${l.name}`);$('#music-status').textContent='';updateMusicUI();
  document.querySelectorAll('[data-help-skill]').forEach(el=>{el.hidden=el.dataset.helpSkill!=='walk'&&!(l.stock[el.dataset.helpSkill]>0);});
@@ -163,7 +163,7 @@ soundtrack.setLevel(game.levelIndex);updateLevelUI();sync();requestAnimationFram
 
 
 $('#viewport').addEventListener('scroll',()=>{pointer=null;hover=null;});
-// Fit terrain to the available width; expose navigation whenever its height overflows.
+// Keep overlays aligned when a fitted map or vertical expedition is resized.
 const viewportResizeObserver=new ResizeObserver(()=>{
  const v=$('#viewport');
  if(game.result){$('#result').style.top=v.scrollTop+'px';$('#result').style.height=v.clientHeight+'px';}

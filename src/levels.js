@@ -211,3 +211,16 @@ for(const fresh of creatureLevels()){const index=CAMPAIGN.findIndex(l=>l.id===fr
 import {rebalancePopulations} from './population-balance.js';
 import {POPULATION_TARGET_TIMES} from './population-times.js';
 rebalancePopulations(CAMPAIGN,POPULATION_TARGET_TIMES);
+
+// Keep only worlds whose painted landforms are the physical terrain itself.
+// Archived maps retain permanent save IDs for recovery, but never participate
+// in selection, progression, star totals or the next-level sequence.
+const activeThemes=new Set(['woodland','alpine','volcano']);
+CAMPAIGN.splice(0,CAMPAIGN.length,...CAMPAIGN.filter(l=>activeThemes.has(l.theme)));
+CHAPTERS.splice(0,CHAPTERS.length,...CHAPTERS.filter(c=>activeThemes.has(c.theme)));
+CAMPAIGN.forEach((level,index)=>{level.campaignIndex=index;});
+export const ARCHIVED_LEVEL_IDS=Object.freeze(LEVELS.filter(l=>!isCampaignLevel(l.id)).map(l=>l.id));
+
+// One vertical expedition per world; all other maps are framed on one screen.
+const scrollingExpeditions=new Set([24,33,38]);
+for(const level of CAMPAIGN)level.scrollMode=scrollingExpeditions.has(level.id)?'vertical':'none';

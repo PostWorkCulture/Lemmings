@@ -29,9 +29,9 @@ test('every new chapter has a majority-terrain map before any construction',()=>
 test('all new maps need intervention rather than rescuing themselves',()=>{
  for(let id=20;id<45;id++){const g=new Game(id);for(let t=0;t<18000&&!g.result;t++)g.step();assert.notEqual(g.result,'win',g.level.name);}
 });
-test('new-level stars and current level survive profile and cloud merges',()=>{
+test('archived expansion scores survive merges without resuming withdrawn levels',()=>{
  const merged=mergeProgress({best:{0:LEVELS[0].total},stars:{0:{stars:3}}},{best:{44:20},perfect:{44:{completed:true,saved:20,total:20,lost:0}},stars:{44:{stars:3,bestPerfectTicks:7000}},currentLevel:44});
- assert.equal(merged.currentLevel,44);assert.equal(merged.stars[44].stars,3);assert.equal(merged.best[44],20);assert.equal(merged.best[0],LEVELS[0].total);
+ assert.equal(merged.currentLevel,0);assert.equal(merged.stars[44].stars,3);assert.equal(merged.best[44],20);assert.equal(merged.best[0],LEVELS[0].total);
  const completed=Object.fromEntries(CAMPAIGN.slice(0,5).map(l=>[l.id,{stars:3}]));
  assert.equal(isUnlocked(20,completed),true);assert.equal(isUnlocked(21,completed),true);assert.equal(isUnlocked(22,completed),false);
 });

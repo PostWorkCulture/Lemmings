@@ -1,5 +1,5 @@
 import {POPULATION_VERSION,migratePopulationProgress} from './population-balance.js';
-import {LEVELS} from './levels.js';
+import {LEVELS,isCampaignLevel} from './levels.js';
 import {migrateStars,isPerfect} from './progress.js';
 export const SAVE_VERSION=2;
 export const SAVE_KEYS=['lemmings-best','lemmings-perfect-v2','lemmings-stars-v1','lemmings-current-level'];
@@ -13,7 +13,7 @@ export function mergeProgress(a={},b={}){
    const perfect=object(source.perfect)[i];if(isPerfect(i,{[i]:perfect}))result.perfect[i]={...perfect};
    const r=object(source.stars)[i];if(Number.isInteger(r?.stars)&&r.stars>=1&&r.stars<=3){const previous=result.stars[i]||{};result.stars[i]={stars:Math.max(previous.stars||0,r.stars)};const times=[previous.bestPerfectTicks,r.bestPerfectTicks].filter(t=>Number.isInteger(t)&&t>=0&&t<100000000);if(times.length)result.stars[i].bestPerfectTicks=Math.min(...times);}
   }
-  if(Number.isInteger(source.currentLevel)&&source.currentLevel>=0&&source.currentLevel<LEVELS.length)result.currentLevel=source.currentLevel;
+  if(isCampaignLevel(source.currentLevel))result.currentLevel=source.currentLevel;
  }
  result.stars=migrateStars(result.best,result.perfect,result.stars);return result;
 }
@@ -47,5 +47,5 @@ export class PlayerStore{
  select(id){if(!this.registry.players.some(p=>p.id===id))throw Error('Player not found.');this.registry.active=id;this.saveRegistry();}
  link(userId){if(this.player.cloudId&&this.player.cloudId!==userId)throw Error('This player is linked to a different account. Select or create another player.');if(this.registry.players.some(p=>p.id!==this.activeId&&p.cloudId===userId))throw Error('This account is already linked to another player on this device.');this.player.cloudId=userId;this.saveRegistry();}
  snapshot(){const read=key=>{try{return JSON.parse(this.getItem(key));}catch{return null;}};return {...mergeProgress({}, {best:read(SAVE_KEYS[0]),perfect:read(SAVE_KEYS[1]),stars:read(SAVE_KEYS[2]),currentLevel:read(SAVE_KEYS[3])}),campaignVersion:SAVE_VERSION,populationVersion:POPULATION_VERSION};}
- merge(remote){if(remote?.campaignVersion!==SAVE_VERSION)return this.snapshot();remote=migratePopulationProgress(remote,LEVELS);const local=this.snapshot(),merged=mergeProgress(remote,local);if(!Object.keys(local.stars).length&&local.currentLevel===0&&Number.isInteger(remote?.currentLevel))merged.currentLevel=remote.currentLevel;for(const [i,field] of ['best','perfect','stars','currentLevel'].entries())this.storage.setItem(this.key(this.activeId,SAVE_KEYS[i]),JSON.stringify(merged[field]));return {...merged,campaignVersion:SAVE_VERSION,populationVersion:POPULATION_VERSION};}
+ merge(remote){if(remote?.campaignVersion!==SAVE_VERSION)return this.snapshot();remote=migratePopulationProgress(remote,LEVELS);const local=this.snapshot(),merged=mergeProgress(remote,local);if(!Object.keys(local.stars).length&&local.currentLevel===0&&isCampaignLevel(remote?.currentLevel))merged.currentLevel=remote.currentLevel;for(const [i,field] of ['best','perfect','stars','currentLevel'].entries())this.storage.setItem(this.key(this.activeId,SAVE_KEYS[i]),JSON.stringify(merged[field]));return {...merged,campaignVersion:SAVE_VERSION,populationVersion:POPULATION_VERSION};}
 }
