@@ -101,6 +101,15 @@ dialog a:hover{color:#e2f7c0}
 
 /* Most journeys fit one screen. Only authored vertical expeditions scroll. */
 .viewport{overflow-x:hidden;overflow-y:hidden;min-width:0}
-.viewport:not(.tall-world)>canvas{width:100%;height:100%;object-fit:contain;touch-action:none}
+.viewport:not(.tall-world)>canvas{width:100%;height:100%;object-fit:fill;touch-action:none}
 .viewport.tall-world{overflow-x:hidden;overflow-y:auto}
 .viewport.tall-world>canvas{width:100%;height:auto;object-fit:initial;touch-action:pan-y}
+
+/* Elastic terrain fills every display; decorative sprites are proportion-corrected in canvas. */
+.viewport>canvas{image-rendering:auto}
+
+/* Portrait phones already use full width: retain terrain proportions instead of pulling it tall. */
+@media(max-width:700px) and (orientation:portrait){
+ .viewport:not(.tall-world){display:flex;align-items:center}
+ .viewport:not(.tall-world)>canvas{height:auto;max-height:100%;flex-shrink:0}
+}

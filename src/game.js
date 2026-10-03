@@ -1,3 +1,4 @@
+import {syncPlayfieldScale,syncPlayfieldBackdrop,playfieldPoint,spriteHitDistance,withNaturalSprite} from './playfield-view.js';
 import {PlayerStore} from './player-store.js';
 import {CloudSave} from './cloud-save.js';
 import {drawDrowning,drawSplats,ImpactAudio} from './impact-effects.js';
@@ -60,8 +61,8 @@ function result(){
   $('#result-copy').textContent=game.result==='win'?`${game.saved} of ${game.level.total} home safely. ${game.saved===game.level.total?'A perfect rescue!':'You did it. Can you bring everyone home next time?'}`:`${game.saved} rescued · ${game.lost} lost. Rescue target: ${game.level.target} of ${game.level.total}.`;
   sync();
 }
-function pick(x,y){return game.units.filter(u=>!['exit','drown'].includes(u.state)).map(u=>({u,d:Math.hypot(u.x-x,(u.y-12)-y)})).filter(o=>o.d<25).sort((a,b)=>Number(!!game.canAssign(a.u,selected))-Number(!!game.canAssign(b.u,selected))||Number(b.u.state===selected&&['block','attract'].includes(selected))-Number(a.u.state===selected&&['block','attract'].includes(selected))||a.d-b.d||a.u.id-b.u.id)[0]?.u||null;}
-function position(e){const b=canvas.getBoundingClientRect();const scale=Math.min(b.width/WIDTH,b.height/canvas.height);return{x:(e.clientX-b.left-(b.width-WIDTH*scale)/2)/scale,y:(e.clientY-b.top-(b.height-canvas.height*scale)/2)/scale};}
+function pick(x,y){return game.units.filter(u=>!['exit','drown'].includes(u.state)).map(u=>({u,d:spriteHitDistance(canvas,{x,y},u.x,u.y)})).filter(o=>o.d<25).sort((a,b)=>Number(!!game.canAssign(a.u,selected))-Number(!!game.canAssign(b.u,selected))||Number(b.u.state===selected&&['block','attract'].includes(selected))-Number(a.u.state===selected&&['block','attract'].includes(selected))||a.d-b.d||a.u.id-b.u.id)[0]?.u||null;}
+function position(e){return playfieldPoint(canvas,e.clientX,e.clientY);}
 canvas.addEventListener('pointermove',e=>{pointer=position(e);hover=pick(pointer.x,pointer.y);});canvas.addEventListener('pointerleave',()=>{pointer=null;hover=null;});
 canvas.addEventListener('pointerdown',e=>{
   if(!started||game.result)return;const p=position(e),u=pick(p.x,p.y);if(!u)return;
@@ -92,7 +93,7 @@ function renderSkills(){
  }
 }
 function updateLevelUI(){
- canvas.dataset.illustrated=String(Boolean(game.level.embeddedDoors)); canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.toggle('tall-world',game.level.scrollMode==='vertical');$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';
+ canvas.dataset.illustrated=String(Boolean(game.level.embeddedDoors)); canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.toggle('tall-world',game.level.scrollMode==='vertical');$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';syncPlayfieldScale(canvas);syncPlayfieldBackdrop($('#viewport'),background);
  $('#difficulty-label').textContent=game.level.difficulty;$('#difficulty-label').dataset.difficulty=game.level.difficulty.toLowerCase();
  renderSkills();const l=game.level;$('#time-target').textContent=formatTime(l.targetTime);$('#star-total').textContent=l.total;document.title=`Lemmings · ${l.world}`;$('#world-label').textContent=`${l.world.toUpperCase()} · ${String(l.campaignIndex+1).padStart(2,'0')}`;$('h1').textContent=l.name;$('#level-number').textContent=`${l.campaignIndex+1} / ${CAMPAIGN.length}`;$('#target-count').textContent='/'+l.target;$('#help-goal').textContent=`Save ${l.target} of ${l.total}. Watch out for long falls and hazards. There’s no time limit.`;canvas.setAttribute('aria-label',`${l.world}: ${l.name}`);$('#music-status').textContent='';updateMusicUI();
  document.querySelectorAll('[data-help-skill]').forEach(el=>{el.hidden=el.dataset.helpSkill!=='walk'&&!(l.stock[el.dataset.helpSkill]>0);});
@@ -129,7 +130,7 @@ loadIconArt().then(()=>{
   for(const icon of document.querySelectorAll('[data-ui-icon]'))uiIcon(icon.getContext('2d'),icon.width,icon.height,icon.dataset.uiIcon);
 }).catch(error=>console.error('Unable to load character icon artwork',error));
 function draw(){
-  ctx.imageSmoothingEnabled=false;ctx.drawImage(background,0,0);
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(background,0,0);
   if(renderedRevision!==game.revision){renderTerrain(game,terrain);renderedRevision=game.revision;}
   if(!game.level.embeddedDoors)hazards(ctx,sceneryTick,game.level.theme,game.height);
   ambientWorld(ctx,sceneryTick,game.level);finaleLandmarks(ctx,sceneryTick,game.level);
@@ -139,13 +140,13 @@ function draw(){
   exitPortal(ctx,game.level,game.tick,game.units.some(u=>u.state==='exit'));
   if(pointer)hover=pick(pointer.x,pointer.y);else hover=null;
   for(const u of game.units){
-    if(u.state==='drown'){drawDrowning(ctx,u,game.tick,character,game.height);continue;}
+    if(u.state==='drown'){withNaturalSprite(ctx,u.x,u.y,()=>drawDrowning(ctx,u,game.tick,character,game.height));continue;}
     if(u.state==='exit'){enteringLemming(ctx,u,game.level,game.tick);continue;}
-    if(u===hover){ctx.strokeStyle=game.canAssign(u,selected)?'#e1b982':'#d8f7a2';ctx.lineWidth=1;ctx.strokeRect(Math.round(u.x)-12,Math.round(u.y)-30,25,33);ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.moveTo(u.x-3,u.y-35);ctx.lineTo(u.x+3,u.y-35);ctx.lineTo(u.x,u.y-31);ctx.fill();}
-    if(u.state==='slide'){ctx.save();ctx.translate(u.x,u.y-5);ctx.rotate(-u.dir*.5);character(ctx,0,5,'fall',u.dir,game.tick);ctx.restore();ctx.fillStyle='#dec18e';for(let i=0;i<4;i++)ctx.fillRect(u.x-u.dir*(5+i*3),u.y-2-(game.tick+i*3)%7,2,2);}
-    else character(ctx,u.x,u.y,u.state,u.dir,u.state==='stranded'?game.tick-u.strandedTick:game.tick,1,u);skillEquipment(ctx,u,game.tick);
-    if(u.state==='block'){ctx.fillStyle='#e8c988';ctx.fillRect(u.x-4,u.y-31,8,2);}
-    if(u.state==='build'){ctx.fillStyle='#e8c988';ctx.fillRect(u.x-7,u.y-32,14*(16-u.steps)/16,2);}
+    if(u===hover)withNaturalSprite(ctx,u.x,u.y,()=>{ctx.strokeStyle=game.canAssign(u,selected)?'#e1b982':'#d8f7a2';ctx.lineWidth=1;ctx.strokeRect(Math.round(u.x)-12,Math.round(u.y)-30,25,33);ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.moveTo(u.x-3,u.y-35);ctx.lineTo(u.x+3,u.y-35);ctx.lineTo(u.x,u.y-31);ctx.fill();});
+    if(u.state==='slide')withNaturalSprite(ctx,u.x,u.y,()=>{ctx.save();ctx.translate(u.x,u.y-5);ctx.rotate(-u.dir*.5);character(ctx,0,5,'fall',u.dir,game.tick);ctx.restore();ctx.fillStyle='#dec18e';for(let i=0;i<4;i++)ctx.fillRect(u.x-u.dir*(5+i*3),u.y-2-(game.tick+i*3)%7,2,2);});
+    else character(ctx,u.x,u.y,u.state,u.dir,u.state==='stranded'?game.tick-u.strandedTick:game.tick,1,u);withNaturalSprite(ctx,u.x,u.y,()=>skillEquipment(ctx,u,game.tick));
+    if(u.state==='block')withNaturalSprite(ctx,u.x,u.y,()=>{ctx.fillStyle='#e8c988';ctx.fillRect(u.x-4,u.y-31,8,2);});
+    if(u.state==='build')withNaturalSprite(ctx,u.x,u.y,()=>{ctx.fillStyle='#e8c988';ctx.fillRect(u.x-7,u.y-32,14*(16-u.steps)/16,2);});
   }
   if(hover&&selected==='build'&&!game.canAssign(hover,'build')){
     ctx.globalAlpha=.4;ctx.fillStyle='#e2c592';for(let i=1;i<=16;i++)ctx.fillRect(hover.x+hover.dir*i*6-4,hover.y-i*2,10,1);ctx.globalAlpha=1;
@@ -165,7 +166,7 @@ soundtrack.setLevel(game.levelIndex);updateLevelUI();sync();requestAnimationFram
 $('#viewport').addEventListener('scroll',()=>{pointer=null;hover=null;});
 // Keep overlays aligned when a fitted map or vertical expedition is resized.
 const viewportResizeObserver=new ResizeObserver(()=>{
- const v=$('#viewport');
+ const v=$('#viewport');syncPlayfieldScale(canvas);
  if(game.result){$('#result').style.top=v.scrollTop+'px';$('#result').style.height=v.clientHeight+'px';}
  pointer=null;hover=null;
 });

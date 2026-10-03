@@ -1,3 +1,4 @@
+import {withNaturalSprite} from './playfield-view.js';
 import {STRANDED_TURN} from './stranded.js';
 import {softenTerrainCorners} from './terrain-finish.js';
 import {connectedBackground,paintConnectedTerrain,connectedDoors} from './connected-art.js';
@@ -13,7 +14,11 @@ import { WIDTH,HEIGHT } from './engine.js';
 const palettes={1:['#624734','#6c5038','#73583d','#594330','#806243'],2:['#455c59','#4a625d','#526d64','#3d534f'],3:['#b48c56','#c59a61','#d3ac72']};
 function hash(x,y){let a=Math.imul(x+773,y+179)^Math.imul(x,7919);return (a^a>>>11)>>>0;}
 export function character(c,x,y,state='walk',dir=1,tick=0,scale=1,motion=null) {
+ return withNaturalSprite(c,x,y,()=>paintCharacter(c,x,y,state,dir,tick,scale,motion));
+}
+function paintCharacter(c,x,y,state,dir,tick,scale,motion) {
   if(state==='ladder'){drawLadderClimb(c,x,y,dir,tick,scale,motion);return;}
+  if(state==='pole'){drawPoleSlide(c,x,y,dir,tick,scale,motion);return;}
   if(state==='stranded') { drawStrandedFace(c,x,y,dir,tick,scale);return; }
   c.save();c.translate(Math.round(x),Math.round(y));c.scale(dir*scale*.75,scale*.75);
   const phase=Math.floor(tick/7)%4,bob=state==='walk'&&phase%2?1:0;
@@ -164,7 +169,7 @@ function paintTerrain(game,canvas) {
   c.putImageData(pixels,0,0); if((game.level.sweetPieces||game.level.bonusSweet!==undefined))paintSweetTerrain(c,game);
   paintSculptedMaterials(c,game);
   // Grass follows the editable surface, including the rim of dug tunnels.
-  if(['forest','woodland','treehouse','highland'].includes(game.level.theme))for(let x=46;x<960;x+=7)for(const y of [...new Set(game.level.terrain.filter(r=>r[4]===1).map(r=>r[1]))])if(terrainAt(x,y)===1&&!terrainAt(x,y-1)){
+  if(['forest','woodland','treehouse','highland'].includes(game.level.theme))for(let x=46;x<960;x+=7)for(const y of [...new Set(game.level.terrain.filter(r=>r[4]===1).map(r=>r[1]))])if([0,1,2,3,4].every(dx=>terrainAt(x+dx,y)===1&&!terrainAt(x+dx,y-1))){
     const h=hash(x,y)%5;c.fillStyle=theme.grass[1];c.fillRect(x,y-3-h,2,3+h);c.fillStyle=theme.grass[0];c.fillRect(x+2,y-2,2,2);
   }
 }
@@ -195,6 +200,9 @@ function entranceArtwork(){
  c.putImageData(pixels,0,0); classicEntrance=sprite;return sprite;
 }
 export function magicalEntrance(c,tick,level,spawned=0,lastSpawnTick=null){
+ return withNaturalSprite(c,level.spawnX,level.spawnY,()=>paintMagicalEntrance(c,tick,level,spawned,lastSpawnTick));
+}
+function paintMagicalEntrance(c,tick,level,spawned,lastSpawnTick){
  const open=hatchOpening(tick,spawned,level.total,lastSpawnTick),sprite=entranceArtwork();
  c.save();c.translate(Math.round(level.spawnX),Math.round(level.spawnY));c.scale(level.rocketScale||1,level.rocketScale||1);c.imageSmoothingEnabled=false;
  if(sprite){
@@ -218,9 +226,7 @@ export function scenery(c,tick,level,spawned=0,lastSpawnTick=null,sceneryTick=ti
   if(level.connectedStudy!==undefined){connectedDoors(c,tick,level,spawned,lastSpawnTick);return;}
   if(level.embeddedDoors){sweetDoors(c,tick,level,spawned,lastSpawnTick);return;}
   worldScenery(c,sceneryTick,level,game?(x,y)=>game.at(x,y):null);
-  if(level.entrances){for(const [i,e] of level.entrances.entries()){const n=level.entrances.length,count=Math.max(0,Math.ceil((spawned-i)/n));magicalEntrance(c,tick,{...level,spawnX:e.x,spawnY:rocketHeight(level,e),rocketScale:i===0?1:.6,total:Math.ceil((level.total-i)/n)},count,count?((count-1)*n+i)*level.interval:null);}}else magicalEntrance(c,tick,{...level,spawnY:level.rocketY||90},spawned,lastSpawnTick);
-  // Golden splayed arch and twin torches from the supplied classic exit reference.
-  exitArch(c,level.exitX,level.exitY,tick);
+  classicDoorways(c,tick,level,spawned,lastSpawnTick);
   if(level.theme==='forest'){
     for(const [x,y,w,,type] of level.terrain)if(type===1&&w>100){mushroom(c,x+32,y,.75);if(w>250)mushroom(c,x+w-75,y,.65);}
     for(const x of [15,32,972,990]){c.strokeStyle='#132e27';c.lineWidth=3;c.beginPath();c.moveTo(x,470);c.lineTo(x-9,415);c.stroke();for(let i=0;i<5;i++){c.fillStyle='#173a2c';c.fillRect(x-20+i,420+i*8,20,4);c.fillRect(x-5,422+i*8,15,4);}}
@@ -228,7 +234,17 @@ export function scenery(c,tick,level,spawned=0,lastSpawnTick=null,sceneryTick=ti
 
 }
 
+// Every retained world uses the same classic entrance and green rescue arch.
+export function classicDoorways(c,tick,level,spawned=0,lastSpawnTick=null){
+  if(level.entrances){for(const [i,e] of level.entrances.entries()){const n=level.entrances.length,count=Math.max(0,Math.ceil((spawned-i)/n));magicalEntrance(c,tick,{...level,spawnX:e.x,spawnY:rocketHeight(level,e),rocketScale:1,total:Math.ceil((level.total-i)/n)},count,count?((count-1)*n+i)*level.interval:null);}}else magicalEntrance(c,tick,{...level,spawnY:level.rocketY||90},spawned,lastSpawnTick);
+  // Golden splayed arch and twin torches from the supplied classic exit reference.
+  exitArch(c,level.exitX,level.exitY,tick);
+}
+
 export function exitArch(c,x,y,tick=0,scale=1) {
+ return withNaturalSprite(c,x,y,()=>paintExitArch(c,x,y,tick,scale));
+}
+function paintExitArch(c,x,y,tick,scale) {
   c.save();c.translate(x,y);c.scale(scale,scale);
   const poly=(points,color)=>{c.fillStyle=color;c.beginPath();points.forEach(([px,py],i)=>i?c.lineTo(px,py):c.moveTo(px,py));c.closePath();c.fill();};
   poly([[-35,0],[-31,-10],[-15,-51],[-9,-57],[10,-57],[17,-51],[34,-7],[37,0]],'#775328');
@@ -325,6 +341,9 @@ function themedBackground(theme){
 }
 
 export function exitPortal(c,level,tick,active){
+ return withNaturalSprite(c,level.exitX,level.exitY,()=>paintExitPortal(c,level,tick,active));
+}
+function paintExitPortal(c,level,tick,active){
   if(!active)return;
   c.save();c.translate(level.exitX,level.exitY);
   if(level.embeddedDoors){c.beginPath();c.roundRect(-7,-26,14,26,[7,7,0,0]);c.clip();}
@@ -347,6 +366,10 @@ function lemmingBack(c,tick){
   c.fillStyle='#f5d4af';c.fillRect(-6,-2,4,2+step);c.fillRect(2,-2,4,3-step);
 }
 export function enteringLemming(c,u,level,tick){
+ const x=u.exitTick<42?u.x:level.exitX,y=u.exitTick<42?u.y:level.exitY;
+ return withNaturalSprite(c,x,y,()=>paintEnteringLemming(c,u,level,tick));
+}
+function paintEnteringLemming(c,u,level,tick){
   const t=u.exitTick;
   c.save();
   if(t<16){
@@ -407,6 +430,9 @@ export function hazards(c,tick,theme,height=HEIGHT){
 }
 
 export function drawStrandedFace(c,x,y,dir,age,scale=1) {
+ return withNaturalSprite(c,x,y,()=>paintStrandedFace(c,x,y,dir,age,scale));
+}
+function paintStrandedFace(c,x,y,dir,age,scale) {
  if(age>=STRANDED_TURN)return;
  // Compress the profile briefly, then open into a front-facing, worried expression.
  if(age<8){c.save();c.translate(x,y);c.scale(1-age/12,1);character(c,0,0,'block',dir,0,scale);c.restore();return;}
@@ -422,6 +448,9 @@ export function drawStrandedFace(c,x,y,dir,age,scale=1) {
 }
 
 export function drawLadderClimb(c,x,y,dir,tick,scale=1,motion=null){
+ return withNaturalSprite(c,x,y,()=>paintLadderClimb(c,x,y,dir,tick,scale,motion));
+}
+function paintLadderClimb(c,x,y,dir,tick,scale,motion){
  const age=motion?.ladderStartTick===undefined?12:tick-motion.ladderStartTick;
  // Turn through a narrow profile into the back view without changing travel speed.
  if(age<5){c.save();c.translate(x,y);c.scale(1-age*.14,1);character(c,0,0,'walk',dir,0,scale);c.restore();return;}
@@ -449,5 +478,33 @@ export function drawLadderClimb(c,x,y,dir,tick,scale=1,motion=null){
  r(-7,-24,14,11,edge);r(-8,-21,16,6,edge);r(-6,-24,12,3,'#7aca50');r(-4,-26,8,3,'#a4e671');
  r(-7,-21,14,6,'#75c94c');r(-6,-16,12,3,'#56a842');r(-8,-18,3,4,'#59ad45');r(5,-18,3,4,'#46963e');
  r(-5,-23,4,2,'#b6eb87');r(-6,-20,2,3,'#95df6a');r(2,-20,3,4,'#66b846');r(-3,-16,2,3,'#388940');r(3,-16,2,2,'#388940');
+ c.restore();
+}
+
+export function drawPoleSlide(c,x,y,dir,tick,scale=1,motion=null){
+ return withNaturalSprite(c,x,y,()=>paintPoleSlide(c,x,y,dir,tick,scale,motion));
+}
+function paintPoleSlide(c,x,y,dir,tick,scale,motion){
+ const age=motion?.poleStartTick===undefined?12:tick-motion.poleStartTick;
+ if(age<5){c.save();c.translate(x,y);c.scale(1-age*.14,1);character(c,0,0,'walk',dir,0,scale);c.restore();return;}
+ const travel=motion?.poleStartY===undefined?tick*1.1:Math.abs(y-motion.poleStartY),grip=Math.sin(travel*Math.PI/24);
+ c.save();c.translate(Math.round(x),Math.round(y));c.scale(scale*.75*Math.min(1,.3+(age-5)*.14),scale*.75);
+ const r=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),w,h);};
+ const edge='#142628',skin='#f5d2ad';
+ // Bent knees wrap inward, feet gripping either side rather than walking in air.
+ r(-8,-7,6,5,edge);r(2,-7,6,5,edge);r(-7,-6,4,3,'#526fd7');r(3,-6,4,3,'#3447a0');
+ r(-5,-3,4,5,edge);r(1,-3,4,5,edge);r(-4,-2,3,3,skin);r(1,-2,3,3,skin);
+ const coat=c.createLinearGradient(-5,0,6,0);coat.addColorStop(0,'#6482e5');coat.addColorStop(.45,'#526fd7');coat.addColorStop(1,'#3447a0');
+ r(-6,-14,12,11,edge);r(-5,-13,10,9,coat);r(-4,-11,2,5,'#91a4ee');r(-2,-16,4,3,'#d7a17d');
+ // Arms curl around the pole; the hands make a small independent re-grip.
+ for(const side of [-1,1]){
+  const handY=-18+(side<0?grip:-grip);
+  r(side<0?-9:6,-15,3,9,edge);r(side<0?-8:6,-14,2,7,'#526fd7');
+  r(side<0?-8:4,handY+2,4,4,'#f3edda');r(side<0?-6:2,handY,4,3,skin);
+ }
+ // Rear hair cap: the lemming looks at the pole, with no forward-facing face.
+ r(-7,-25,14,11,edge);r(-8,-22,16,6,edge);r(-6,-25,12,3,'#7aca50');r(-4,-27,8,3,'#a4e671');
+ r(-7,-22,14,6,'#75c94c');r(-6,-17,12,3,'#56a842');r(-8,-19,3,4,'#59ad45');r(5,-19,3,4,'#46963e');
+ r(-5,-24,4,2,'#b6eb87');r(-6,-21,2,3,'#95df6a');r(2,-21,3,4,'#66b846');r(-3,-17,2,3,'#388940');
  c.restore();
 }

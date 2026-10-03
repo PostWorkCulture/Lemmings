@@ -1,3 +1,4 @@
+import {drawForestTrees} from './forest-trees.js';
 import {chapterBackdrop} from './chapter-art.js';
 import {WORLDS} from './worlds.js';
 const TAU=Math.PI*2;
@@ -121,6 +122,7 @@ function winterProp(c,x,y,sled=false){
 }
 export function worldScenery(c,tick,level,terrainAt=null){
  const key=level.theme;
+ if(key==='woodland'){drawForestTrees(c,tick,level,terrainAt);return;}
  // Ancient trunks replace the forest's masonry. Branches and foliage are decorative;
  // the dark bark below follows the exact solid collision silhouette.
  // Hard boundary trunks retain their bark; unsupported canopy stickers are omitted.
@@ -135,7 +137,6 @@ export function worldScenery(c,tick,level,terrainAt=null){
   if(Math.abs(level.exitX-px)<65&&Math.abs(level.exitY-y)<85)continue;
   if((level.entrances||[{x:level.spawnX,y:level.spawnY}]).some(e=>Math.abs(e.x-px)<65&&Math.abs(e.y-y)<100))continue;
   placed.push({x:px,y});c.save();c.globalAlpha=.85;
-  if(key==='woodland'){woodlandMotif(c,px,y,i);}
   if(['treehouse','highland'].includes(key)){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.025+i)*.055);tree(c,0,0,key==='treehouse'?.8:.65);c.restore();}
   if(key==='beach'){c.save();c.translate(px,y);c.rotate(Math.sin(tick*.024+i)*.07);tree(c,0,0,.7,true);c.restore();}
   if(['alpine','polar'].includes(key))winterProp(c,px,y,placed.length%2===0);
@@ -152,11 +153,4 @@ export function worldScenery(c,tick,level,terrainAt=null){
   c.restore();
  }
  // Snow is drawn once, behind the route, by ambientWorld.
-}
-
-function woodlandMotif(c,x,y,variant){
- c.save();c.translate(x,y);c.lineCap='round';
- // A few grounded fern fronds and a mushroom replace repetitive lollipop trees.
- for(let i=0;i<5;i++){const dx=(i-2)*9,dy=-13-Math.sin(i/4*Math.PI)*9;c.strokeStyle='#5e954b';c.lineWidth=1.7;c.beginPath();c.moveTo(0,-1);c.quadraticCurveTo(dx*.3,dy,dx,dy);c.stroke();for(let j=1;j<4;j++){const t=j/4;c.fillStyle=j%2?'#82b05f':'#407b42';ellipse(c,dx*t-3,dy*t,5,1.6,c.fillStyle);}}
- c.fillStyle='#d8c2a1';c.fillRect(20,-10,3,10);const cap=c.createLinearGradient(0,-19,0,-9);cap.addColorStop(0,variant%2?'#c39368':'#be7451');cap.addColorStop(1,'#69432f');ellipse(c,21,-11,9,6,cap);ellipse(c,18,-14,2,1,'#ead2a0');c.restore();
 }

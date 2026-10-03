@@ -1,0 +1,23 @@
+<!doctype html><meta charset="utf-8"><title>Classic doorway consistency</title>
+<style>body{background:#14211a;color:#edf3e6;font:16px system-ui;padding:24px}li{margin:8px}</style>
+<h1>Classic doorway consistency</h1><p id="result">Running...</p><ol id="checks"></ol>
+<script type="module">
+import {CAMPAIGN,rocketHeight} from '../src/levels.js';
+import {classicDoorways,magicalEntrance,exitArch} from '../src/art.js';
+let checks=0,failed=0;const check=(name,ok)=>{checks++;if(!ok)failed++;const li=document.createElement('li');li.textContent=(ok?'PASS: ':'FAIL: ')+name;document.querySelector('#checks').append(li);};
+const make=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c;};
+const crop=(c,x,y,w,h)=>c.getContext('2d').getImageData(x,y,w,h).data;
+for(const l of CAMPAIGN){
+ const doors=l.entrances?l.entrances.map(e=>({x:e.x,y:rocketHeight(l,e)})):[{x:l.spawnX,y:l.rocketY||90}];
+ for(const open of [false,true]){
+  const tick=open?600:0,scene=make(1000,l.height),c=scene.getContext('2d');
+  classicDoorways(c,tick,l,open?4:0,open?330:null);
+  const entry=make(120,100);magicalEntrance(entry.getContext('2d'),tick,{...CAMPAIGN[0],spawnX:60,spawnY:75},open?1:0,open?0:null);
+  const er=crop(entry,15,25,90,60);
+  for(const [i,d]of doors.entries()){const got=crop(scene,d.x-45,d.y-50,90,60);check(`${l.campaignIndex+1}. Entrance ${i+1}, ${open?'open':'closed'}, matches level 1`,got.every((v,k)=>v===er[k]));}
+  const exit=make(120,100);exitArch(exit.getContext('2d'),60,75,tick);const xr=crop(exit,15,10,90,70),got=crop(scene,l.exitX-45,l.exitY-65,90,70);
+  check(`${l.campaignIndex+1}. Exit matches level 1 at tick ${tick}`,got.every((v,k)=>v===xr[k]));
+ }
+}
+document.querySelector('#result').textContent=failed?`${failed} of ${checks} doorway checks failed`:`All ${checks} doorway checks passed`;document.body.dataset.complete='true';document.body.dataset.failed=String(failed);
+</script>

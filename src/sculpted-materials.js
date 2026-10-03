@@ -1,4 +1,4 @@
-import {exposedSoilDepth} from './terrain-finish.js';
+import {exposedSoilDepth,soilEdgeDistance,soilCoatingCoverage} from './terrain-finish.js';
 // Large material marks, softly bevelled silhouettes and a quiet palette keep
 // the *editable collision surface* in charge. There is no scenic collision art.
 const bases=new WeakMap(),paintedGames=new WeakMap();
@@ -63,22 +63,21 @@ export function paintSculptedMaterials(c,game){
  }
  // Distance to the current, excavated edge gives tunnels the same finish as cliffs.
  const surfaceDepth=exposedSoilDepth(t,w,h);
- const distance=new Uint8Array(size);for(let i=0;i<size;i++)distance[i]=t[i]===1?40:0;
- for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x;if(distance[i])distance[i]=Math.min(distance[i],x?distance[i-1]+1:40,y?distance[i-w]+1:40);}
- for(let y=h-1;y>=0;y--)for(let x=w-1;x>=0;x--){const i=y*w+x;if(distance[i])distance[i]=Math.min(distance[i],x<w-1?distance[i+1]+1:40,y<h-1?distance[i+w]+1:40);}
+ const coating=key==='woodland'||key==='alpine'?soilCoatingCoverage(t,w,h,surfaceDepth):null;
+ const distance=soilEdgeDistance(t,w,h);
  const image=previous?.image||c.getImageData(0,0,w,h),d=image.data;
  if(previous){const fresh=c.getImageData(x0,y0,x1-x0,y1-y0);for(let y=y0;y<y1;y++)d.set(fresh.data.subarray((y-y0)*(x1-x0)*4,(y-y0+1)*(x1-x0)*4),(y*w+x0)*4);}
  for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){
   const p=y*w+x,i=p*4;if(t[p]!==1)continue;
   if(['water','lava'].includes(game.level.hazard)&&y>=game.hazardY)continue;
   let rgb=candy?[d[i],d[i+1],d[i+2]]:[base[p*3],base[p*3+1],base[p*3+2]];
-  const edge=distance[p],up=surfaceDepth[p],bottom=y+1<h&&!t[p+w],left=x&&!t[p-1];
+  const edge=distance[p]/3,up=surfaceDepth[p],bottom=y+1<h&&!t[p+w],left=x&&!t[p-1];
   if(!candy){
-   if(key==='woodland'&&up<13+Math.sin(x*.09)*3){rgb=mix([42,83,31],[121,175,56],clamp(1-up/18,0,1));if(up<3)rgb=[177,208,99];}
+   if(key==='woodland'){const mossDepth=13+Math.sin(x*.09)*3,coverage=clamp((mossDepth+2-up)/4,0,1)*coating[p]/255;let moss=mix([42,83,31],[121,175,56],clamp(1-up/18,0,1));if(up<3)moss=[177,208,99];rgb=mix(rgb,moss,coverage);}
    if(key==='beach'&&up<15)rgb=mix(rgb,[255,228,152],(1-up/18)*.82);
-   if(key==='alpine'&&up<25+Math.sin(x*.031)*9+Math.sin(x*.11)*3){rgb=mix([164,203,218],[247,253,251],Math.pow(clamp(1-up/45,0,1),.55));if(up<3)rgb=[249,254,251];}
+   if(key==='alpine'){const snowDepth=25+Math.sin(x*.031)*9+Math.sin(x*.11)*3,coverage=clamp((snowDepth+3-up)/6,0,1)*coating[p]/255;let snow=mix([164,203,218],[247,253,251],Math.pow(clamp(1-up/45,0,1),.55));if(up<3)snow=[249,254,251];rgb=mix(rgb,snow,coverage);}
   }
-  if(edge<15){const slopeX=(x<w-1?distance[p+1]:edge)-(x?distance[p-1]:edge),slopeY=(y<h-1?distance[p+w]:edge)-(y?distance[p-w]:edge);
+  if(edge<15){const slopeX=((x<w-1?distance[p+1]:distance[p])-(x?distance[p-1]:distance[p]))/3,slopeY=((y<h-1?distance[p+w]:distance[p])-(y?distance[p-w]:distance[p]))/3;
    const light=clamp((slopeX*.35+slopeY*.6),-1,1)*(1-edge/16);
    rgb=light>0?mix(rgb,key==='volcano'?[159,131,153]:[255,242,208],light*(candy?.16:.24)):mix(rgb,[8,16,25],-light*(candy?.22:.38));
   }

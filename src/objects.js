@@ -24,7 +24,7 @@ export function objectInteraction(g,u){
 
   if(o.type==='turnSign'&&Math.abs(u.x-o.x)<14&&Math.abs(u.y-o.y)<8)u.dir=o.dir;
   if(o.type==='ladder'&&Math.abs(u.x-o.x)<3&&Math.abs(u.y-o.y)<4){u.state='ladder';u.object=o;u.x=o.x;u.ladderStartTick=g.tick;u.ladderStartY=u.y;return true;}
-  if(o.type==='pole'&&Math.abs(u.x-o.x)<3&&Math.abs(u.y-o.y)<4){u.state='pole';u.object=o;u.x=o.x;return true;}
+  if(o.type==='pole'&&Math.abs(u.x-o.x)<3&&Math.abs(u.y-o.y)<4){u.state='pole';u.object=o;u.x=o.x;u.poleStartTick=g.tick;u.poleStartY=u.y;return true;}
   if(o.type==='trampoline'&&u.x>=o.x&&u.x<=o.x+o.w&&Math.abs(u.y-o.y)<4){u.state='jump';u.vy=o.vy||-5.4;u.vx=(o.speed||2.4)*(o.dir||u.dir);u.dir=Math.sign(u.vx);u.fallStart=u.y;u.safeJump=true;return true;}
   if(o.type==='switch'&&Math.abs(u.x-o.x)<4&&Math.abs(u.y-o.y)<4){for(const target of o.targets||[o.target])g.disabledObjects.add(target);}
  }

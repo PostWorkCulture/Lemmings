@@ -15,3 +15,12 @@ test('ladders and poles transport walkers to their destination',()=>{for(const t
 test('trampoline launches and safely lands a walker',()=>{const [g,u]=scene();g.level.objects=[{type:'trampoline',x:95,y:300,w:20,dir:1}];g.step();assert.equal(u.state,'jump');for(let i=0;i<90;i++)g.step();assert.equal(g.lost,0);assert.ok(u.x>220);});
 test('switch permanently disables its timed trap and reset restores it',()=>{const [g,u]=scene();g.level.objects=[{type:'switch',x:100,y:300,target:'press'}];g.step();assert.ok(g.disabledObjects.has('press'));assert.equal(isDangerous({id:'press',type:'crusher'},0,g.disabledObjects),false);g.reset();assert.equal(g.disabledObjects.size,0);});
 test('shuttle has stationary boarding windows and reaches both banks',()=>{const o={type:'lift',x:275,y:300,toX:495,toY:300,w:60,period:720};assert.deepEqual(objectPosition(o,0),objectPosition(o,60));assert.equal(objectPosition(o,360).x,495);assert.equal(objectPosition(o,720).x,275);});
+
+test('pole descent records the turn once and retains the authored landing direction',()=>{
+ for(const dir of [-1,1]){
+  const [g,u]=scene();u.dir=dir;g.level.objects=[{type:'pole',x:100,y:300,bottom:360,dir:-1}];g.rect(20,360,90,6,1);
+  g.step();assert.equal(u.state,'pole');assert.equal(u.poleStartTick,g.tick);assert.equal(u.poleStartY,300);const grabbed=u.poleStartTick;
+  for(let n=0;n<12;n++)g.step();assert.equal(u.poleStartTick,grabbed);assert.ok(u.y>300);
+  for(let n=0;n<43;n++)g.step();assert.equal(u.state,'walk');assert.equal(u.dir,-1);assert.equal(u.y,360);
+ }
+});
