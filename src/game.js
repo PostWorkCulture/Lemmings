@@ -9,7 +9,7 @@ import { isUnlocked,starCount,totalStars,earnedStars,migrateStars,recordResult,u
 import { LEVELS,THEMES,CAMPAIGN,nextLevelId } from './levels.js';
 import { Soundtrack,TRACKS } from './music.js';
 import { Game,WIDTH,HEIGHT } from './engine.js';
-import {renderScaleFor,isForestHD,forestTorchGlow} from './forest-hd.js';
+import {renderScaleFor,isForestHD,forestTorchGlow,forestBackdrop} from './forest-hd.js';
 import { character,makeBackground,renderTerrain,scenery,skillIcon,uiIcon,loadIconArt,exitPortal,enteringLemming,hazards } from './art.js';
 const $=s=>document.querySelector(s),canvas=$('#game'),ctx=canvas.getContext('2d');
 const playerStore=new PlayerStore(localStorage);
@@ -22,7 +22,7 @@ function starsMarkup(count){return [1,2,3].map(n=>`<span class="${n<=count?'earn
 let initialLevel=0;try{initialLevel=Number(playerStore.getItem('lemmings-current-level'))||0;}catch{}
 const requestedLevel=Number(new URLSearchParams(location.search).get('level'));if(new URLSearchParams(location.search).has('level')&&isUnlocked(requestedLevel,starRecords))initialLevel=requestedLevel;
 if(!isUnlocked(initialLevel,starRecords))initialLevel=0;
-const game=new Game(initialLevel),terrain=document.createElement('canvas');let background=makeBackground(game.level.theme,game.height,game.level);terrain.width=WIDTH;terrain.height=game.height;
+const game=new Game(initialLevel),terrain=document.createElement('canvas');let background;function levelBackground(){return isForestHD(game.level)?forestBackdrop(game.height):makeBackground(game.level.theme,game.height,game.level);}background=levelBackground();terrain.width=WIDTH;terrain.height=game.height;
 const soundtrack=new Soundtrack($('#soundtrack'));const impactAudio=new ImpactAudio();
 let pendingLevel=null;
 let sceneryTick=0;
@@ -31,7 +31,7 @@ let selected='walk',started=false,paused=false,speed=1,last=0,accumulator=0,rend
 function message(text){$('#message').textContent=text;$('#message').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#message').classList.remove('visible'),5000);}
 function select(skill){if(skill!=='walk'&&!(game.stock[skill]>0)&&!(['block','attract'].includes(skill)&&game.units.some(u=>u.state===skill)))return;selected=skill;document.querySelectorAll('.skill').forEach(b=>{const active=b.dataset.skill===skill;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});}
 function start(){impactAudio.unlock();started=true;paused=false;soundtrack.play();$('#intro').classList.add('hidden');$('#result').classList.add('hidden');canvas.focus({preventScroll:true});if(game.level.bottomEntry&&game.level.scrollMode==='vertical')$('#viewport').scrollTop=$('#viewport').scrollHeight;sync();}
-function reset(levelIndex=game.levelIndex){if(!isUnlocked(levelIndex,starRecords))return;clearTimeout(toastTimer);document.querySelector('#message').classList.remove('visible');soundtrack.pause();game.reset(levelIndex);background=makeBackground(game.level.theme,game.height,game.level);renderedRevision=-1;soundtrack.setLevel(levelIndex);updateLevelUI();started=false;paused=false;speed=1;hover=null;pointer=null;hintIndex=0;$('#hint-copy').textContent='Puzzle hints are optional.';$('#hint').textContent='Show a puzzle hint';accumulator=0;$('#result').classList.add('hidden');$('#intro').classList.remove('hidden');$('#speed').textContent='1\u00d7';$('#speed').setAttribute('aria-label','Speed: normal');$('#speed').classList.remove('active');select('walk');sync();}
+function reset(levelIndex=game.levelIndex){if(!isUnlocked(levelIndex,starRecords))return;clearTimeout(toastTimer);document.querySelector('#message').classList.remove('visible');soundtrack.pause();game.reset(levelIndex);background=levelBackground();renderedRevision=-1;soundtrack.setLevel(levelIndex);updateLevelUI();started=false;paused=false;speed=1;hover=null;pointer=null;hintIndex=0;$('#hint-copy').textContent='Puzzle hints are optional.';$('#hint').textContent='Show a puzzle hint';accumulator=0;$('#result').classList.add('hidden');$('#intro').classList.remove('hidden');$('#speed').textContent='1\u00d7';$('#speed').setAttribute('aria-label','Speed: normal');$('#speed').classList.remove('active');select('walk');sync();}
 function togglePause(){if(!started)return;if($('#pause-dialog').open){$('#pause-dialog').close();return;}if(paused){paused=false;soundtrack.play();sync();}else openDialog('#pause-dialog');}
 function singleStep(){if(!started||game.result)return;paused=true;soundtrack.pause();game.step();if(game.result)result();sync();}
 function toggleSpeed(){speed=speed===1?3:1;$('#speed').textContent=speed+'\u00d7';$('#speed').classList.toggle('active',speed===3);$('#speed').setAttribute('aria-label',speed===1?'Speed: normal':'Speed: 3 times normal');}
@@ -115,7 +115,7 @@ function showLevels(){
   if(level.campaignIndex%10===0){const heading=document.createElement('h3');heading.className='difficulty-heading';heading.textContent=`${level.chapter} · ${level.difficulty} · Levels ${level.campaignIndex+1}-${level.campaignIndex+10}`;list.append(heading);}
   const unlocked=isUnlocked(level.id,starRecords),stars=starCount(starRecords[level.id]);
   const button=document.createElement('button');button.disabled=!unlocked;button.className='level-card'+(level.id===game.levelIndex?' current':'');button.setAttribute('aria-label',`Level ${level.campaignIndex+1}: ${level.name}`);
-  const preview=document.createElement('canvas');preview.width=200;preview.height=94;preview.setAttribute('aria-hidden','true');preview.dataset.sweet=level.sweetReboot??'';preview.dataset.connected=level.connectedStudy??'';previewDrawers.set(preview,()=>{preview.dataset.drawn='1';const previewGame=new Game(level.id),c=preview.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,200,94);const previewScale=Math.min(200/WIDTH,94/level.height);c.translate((200-WIDTH*previewScale)/2,0);c.scale(previewScale,previewScale);c.drawImage(makeBackground(level.theme,level.height,level),0,0);const t=document.createElement('canvas');t.width=WIDTH;t.height=level.height;renderTerrain(previewGame,t);if(!level.embeddedDoors)hazards(c,0,level.theme,level.height);ambientWorld(c,180,level);finaleLandmarks(c,180,level);c.drawImage(t,0,0);drawObjects(c,previewGame);scenery(c,0,level);});button.append(preview);levelPreviewObserver.observe(preview);
+  const preview=document.createElement('canvas');preview.width=200;preview.height=94;preview.setAttribute('aria-hidden','true');preview.dataset.sweet=level.sweetReboot??'';preview.dataset.connected=level.connectedStudy??'';previewDrawers.set(preview,()=>{preview.dataset.drawn='1';const previewGame=new Game(level.id),c=preview.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,200,94);const previewScale=Math.min(200/WIDTH,94/level.height);c.translate((200-WIDTH*previewScale)/2,0);c.scale(previewScale,previewScale);c.drawImage(isForestHD(level)?forestBackdrop(level.height,1):makeBackground(level.theme,level.height,level),0,0);const t=document.createElement('canvas');t.width=WIDTH;t.height=level.height;renderTerrain(previewGame,t);if(!level.embeddedDoors)hazards(c,0,level.theme,level.height);ambientWorld(c,180,level);finaleLandmarks(c,180,level);c.drawImage(t,0,0);drawObjects(c,previewGame);scenery(c,0,level);});button.append(preview);levelPreviewObserver.observe(preview);
   const info=document.createElement('span');const title=document.createElement('strong');title.textContent=`${String(level.campaignIndex+1).padStart(2,'0')} · ${level.name}`;const sub=document.createElement('small');sub.textContent=`${level.difficulty} · ${level.world} · Rescue ${level.target}/${level.total} · 3★ under ${formatTime(level.targetTime)}${best[level.id]?` · Best ${best[level.id]}/${level.total}`:''}`;info.append(title,sub);button.append(info);
   if(!unlocked){sub.textContent=`${level.difficulty} · ${level.world} · ${unlockHint(level.id,starRecords)}`;button.setAttribute('aria-label',`Level ${level.campaignIndex+1}: ${level.name}, locked`);}
   const medal=document.createElement('span');medal.className='level-stars';medal.setAttribute('role','img');medal.setAttribute('aria-label',stars+' of 3 stars');medal.innerHTML=starsMarkup(stars);button.append(medal);
@@ -133,7 +133,7 @@ loadIconArt().then(()=>{
 }).catch(error=>console.error('Unable to load character icon artwork',error));
 function draw(){
   ctx.setTransform(renderScale,0,0,renderScale,0,0);
-  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(background,0,0);
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(background,0,0,WIDTH,background.height*WIDTH/background.width);
   if(renderedRevision!==game.revision){renderTerrain(game,terrain);renderedRevision=game.revision;}
   if(!game.level.embeddedDoors)hazards(ctx,sceneryTick,game.level.theme,game.height);
   ambientWorld(ctx,sceneryTick,game.level);finaleLandmarks(ctx,sceneryTick,game.level);
@@ -209,4 +209,4 @@ $('#signout-player').addEventListener('click',async()=>{try{await cloudSave.sign
 window.addEventListener('online',()=>cloudSave.sync());
 renderPlayers();cloudSave.init();
 
-window.addEventListener('sweet-art-ready',event=>{for(const p of document.querySelectorAll('#level-list canvas[data-drawn]'))if(event.detail.connected?p.dataset.connected!=='':p.dataset.sweet!==''&&Math.floor(Number(p.dataset.sweet)/2)===event.detail.sheet)previewDrawers.get(p)?.();if(game.level.embeddedDoors){background=makeBackground(game.level.theme,game.height,game.level);renderedRevision=-1;}});
+window.addEventListener('sweet-art-ready',event=>{for(const p of document.querySelectorAll('#level-list canvas[data-drawn]'))if(event.detail.connected?p.dataset.connected!=='':p.dataset.sweet!==''&&Math.floor(Number(p.dataset.sweet)/2)===event.detail.sheet)previewDrawers.get(p)?.();if(game.level.embeddedDoors){background=levelBackground();renderedRevision=-1;}});

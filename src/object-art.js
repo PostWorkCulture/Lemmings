@@ -1,5 +1,6 @@
 import {cautionStripes} from './hazard-art.js';
 import {objectPosition,isDangerous} from './objects.js';
+import {forestObject} from './forest-hd.js';
 export const liftRails=o=>[9,o.w-9].map(axle=>({axle,from:[o.x+axle,o.y+12],to:[o.toX+axle,o.toY+12]}));
 // Paired dark and light edges remain legible on sand, snow, foliage and purple stages.
 function apparatusStroke(c,color,width=2){
@@ -13,7 +14,8 @@ export function drawObjects(c,g){
  const badge=(id,x,y)=>{const i=controls.indexOf(id);if(i<0)return;c.save();c.globalAlpha=1;c.fillStyle=['#79e66d','#ff7777','#ffe15a','#ff9cdd'][i%4];c.beginPath();c.arc(x,y,10,0,Math.PI*2);c.fill();c.strokeStyle='#162323';c.lineWidth=3;c.stroke();c.strokeStyle='#fff3dc';c.lineWidth=1;c.stroke();c.fillStyle='#101b1d';c.font='900 13px Arial, sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(String.fromCharCode(65+i),x,y+.5);c.restore();};
  for(const z of g.level.oneWay||[]){c.fillStyle='#e4c787';for(let x=z.x+12;x<z.x+z.w-5;x+=20)for(let y=z.y+15;y<z.y+z.h-10;y+=26){if(g.at(x,y)!==1)continue;c.beginPath();c.moveTo(x+z.dir*5,y);c.lineTo(x-z.dir*4,y-4);c.lineTo(x-z.dir*4,y+4);c.closePath();c.fill();}}
  for(const o of g.level.objects||[]){const p=objectPosition(o,g.tick);c.save();if(o.requires&&!g.disabledObjects.has(o.requires))c.globalAlpha=.35;
-  if(o.type==='lavaPool'){
+  if(forestObject(c,o,g,isDangerous)){}
+  else if(o.type==='lavaPool'){
    // Clip to empty pixels: molten rock never paints over its basin or player-built steps.
    c.beginPath();
    for(let yy=o.y;yy<o.y+o.h;yy++){let start=null;for(let xx=o.x;xx<=o.x+o.w;xx++){const empty=xx<o.x+o.w&&!g.at(xx,yy);if(empty&&start===null)start=xx;if(!empty&&start!==null){c.rect(start,yy,xx-start,1);start=null;}}}

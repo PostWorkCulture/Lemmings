@@ -41,6 +41,8 @@ function noise(x,y){const ix=Math.floor(x),iy=Math.floor(y);let fx=x-ix,fy=y-iy;
 const smooth=(a,b,x)=>{const t=Math.min(1,Math.max(0,(x-a)/(b-a)));return t*t*(3-2*t);};
 // Grey rock luminance is mapped onto the forest's warm soil browns.
 const RAMP=[[43,22,13],[104,58,30],[160,98,46],[214,160,104]];
+const WOOD=[[74,40,18],[138,86,40],[192,136,70],[232,186,112]];
+function wood(t,out){t=Math.min(.999,Math.max(0,t))*3;const i=t|0,f=t-i,a=WOOD[i],b=WOOD[i+1];for(let k=0;k<3;k++)out[k]=a[k]+(b[k]-a[k])*f;return out;}
 function ramp(t,out){t=Math.min(.999,Math.max(0,t))*3;const i=t|0,f=t-i,a=RAMP[i],b=RAMP[i+1];for(let k=0;k<3;k++)out[k]=a[k]+(b[k]-a[k])*f;return out;}
 const LIGHT=(()=>{const v=[-.5,-.75,.55],l=Math.hypot(...v);return v.map(n=>n/l);})();
 // Shading only reads depth to 16 and bevel distance to 8, which keeps dig re-bakes small.
@@ -63,8 +65,8 @@ function stateFor(game,canvas){
 // distance to open air (bevel) and soil depth below the exposed surface (moss cap).
 function computeField(s,t,x0,y0,x1,y1){
  const H=s.H,solid=(x,y)=>{x=x<0?0:x>=WIDTH?WIDTH-1:x;y=y<0?0:y>=H?H-1:y;return t[y*WIDTH+x]?1:0;};
- const w=[1,2,3,2,1];
- for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){let sum=0;for(let j=-2;j<=2;j++)for(let i=-2;i<=2;i++)sum+=w[i+2]*w[j+2]*solid(x+i,y+j);s.occ[y*WIDTH+x]=sum/81;}
+ // A 3×3 tent anti-aliases the outline while keeping 1–2 px builder steps solid.
+ for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){let sum=0;for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++)sum+=(2-Math.abs(i))*(2-Math.abs(j))*solid(x+i,y+j);s.occ[y*WIDTH+x]=sum/16;}
  const wx0=Math.max(0,x0-EDGE_CAP-1),wy0=Math.max(0,y0-EDGE_CAP-1),wx1=Math.min(WIDTH,x1+EDGE_CAP+1),wy1=Math.min(H,y1+EDGE_CAP+1),ww=wx1-wx0,wh=wy1-wy0,d=new Float32Array(ww*wh);
  for(let y=0;y<wh;y++)for(let x=0;x<ww;x++)d[y*ww+x]=t[(y+wy0)*WIDTH+x+wx0]?99:0;
  // Terrain continues past the frame, so the screen edge never gains a bevel.
@@ -93,12 +95,17 @@ function bake(s,game,x0,y0,x1,y1){
   const wy=(oy+.5)/S;
   for(let ox=x0*S;ox<x1*S;ox++){
    const wx=(ox+.5)/S,o=(oy*OW+ox)*4,cell=t[Math.min(H-1,wy|0)*WIDTH+Math.min(WIDTH-1,wx|0)];
-   const occ=bilinear(s.occ,H,wx,wy),aa=.14/S+.01,al=wy>=waterY?0:smooth(.5-aa,.5+aa,occ);
+   const occ=bilinear(s.occ,H,wx,wy),aa=.12/S+.01,al=wy>=waterY?0:smooth(.42-aa,.42+aa,occ);
    const shadow=wy>=waterY?0:.45*bilinear(s.occ,H,wx-4,wy-6)*(1-al);
    if(al<=0){img[o]=6;img[o+1]=14;img[o+2]=11;img[o+3]=Math.round(shadow*255);continue;}
    const wi=Math.min(H-1,wy|0)*WIDTH+Math.min(WIDTH-1,wx|0),depth=s.depth[wi],e=s.edge[wi],gx=s.gx[wi],gy=s.gy[wi],bevel=1-smooth(0,4.5,e);
    let strength;
    if(cell===2){sample(s.stoneC,ox,oy,C);C[0]*=211;C[1]*=225;C[2]*=239;sample(s.stoneN,ox,oy,N);strength=1;}
+   else if(cell===3){
+    // Builder steps are fresh oak planks: stretched grain, seams every brick length.
+    sample(s.earthC,ox*.22,oy*2.6,G);wood((G[0]*.3+G[1]*.59+G[2]*.11-.15)/.6,C);
+    if(((wx%16)+16)%16<.6){C[0]*=.55;C[1]*=.55;C[2]*=.55;}
+    N[0]=N[1]=.5;N[2]=1;strength=0;}
    else{
     // The moss cap's lower edge wanders with the moss texture itself.
     const cap=4+7*sample(s.mossC,ox*1.3,50*S,G)[1];
@@ -265,4 +272,91 @@ export function forestExit(c,tick){
   c.fillStyle=flame;c.beginPath();c.moveTo(tx-3.5,-55);c.quadraticCurveTo(tx-3.5+f*.6,-55-h*.6,tx+f*.8,-55-h);c.quadraticCurveTo(tx+3.5+f*.6,-55-h*.6,tx+3.5,-55);c.closePath();c.fill();
  }
  c.restore();
+}
+
+/* ---------- Forest props: same footprints and gameplay cues, woodland materials ---------- */
+function keyline(c,width,colors){
+ c.save();c.lineJoin='round';c.lineCap='round';
+ c.strokeStyle='#120c08';c.lineWidth=width+2.4;c.stroke();
+ colors.forEach(([color,w])=>{c.strokeStyle=color;c.lineWidth=w;c.stroke();});c.restore();
+}
+function woodStroke(c,x0,x1,light='#d9a463',dark='#7a4a24'){const g=c.createLinearGradient(x0,0,x1,0);g.addColorStop(0,light);g.addColorStop(1,dark);return g;}
+// Returns true when the object was painted in the forest style.
+export function forestObject(c,o,g,isDangerous){
+ if(!isForestHD(g.level))return false;
+ if(o.type==='ladder'){
+  const top=o.top??o.y,bottom=o.bottom??o.y;
+  c.beginPath();for(let y=top;y<=bottom;y+=8){c.moveTo(o.x-5,y);c.lineTo(o.x+5,y);}
+  keyline(c,2,[[woodStroke(c,o.x-5,o.x+5,'#c99a5c','#8b5a2e'),2]]);
+  for(const x of [o.x-5,o.x+5]){c.beginPath();c.moveTo(x,top-6);c.lineTo(x,bottom);keyline(c,2.6,[[woodStroke(c,x-1.5,x+1.5),2.6],['rgba(255,230,180,.35)',.6]]);}
+  c.fillStyle='#d8c697';for(let y=top;y<=bottom;y+=8)for(const x of [o.x-5,o.x+5])c.fillRect(x-1.4,y-.7,2.8,1.4);
+  return true;
+ }
+ if(o.type==='pole'){
+  const top=o.top??o.y,bottom=o.bottom??o.y,x=o.x-5;
+  c.beginPath();c.moveTo(x,top-6);c.lineTo(x,bottom);keyline(c,2.6,[[woodStroke(c,x-1.5,x+1.5,'#e3c9a0','#9a6a3a'),2.6],['rgba(255,245,220,.55)',.7]]);
+  // A twist of ivy marks the top where lemmings grab on.
+  c.strokeStyle='#4f7d2e';c.lineWidth=.8;c.beginPath();for(let i=0;i<=24;i++){const y=top-6+i;c.lineTo(x+Math.sin(i*.7)*1.8,y);}c.stroke();
+  c.fillStyle='#6e9e3c';for(let i=2;i<24;i+=5){c.beginPath();c.ellipse(x+Math.sin(i*.7)*2.4,top-6+i,1.3,.8,i,0,Math.PI*2);c.fill();}
+  return true;
+ }
+ if(o.type==='trampoline'){
+  // A springy toadstool: the cap is the bounce surface, same width and height.
+  const cx=o.x+o.w/2,top=o.y-6;
+  c.fillStyle='#120c08';c.beginPath();c.ellipse(cx,o.y+1,o.w/2+1.5,7.5,0,Math.PI,0);c.lineTo(cx+o.w/2+1.5,o.y+3);c.lineTo(cx-o.w/2-1.5,o.y+3);c.fill();
+  const stem=c.createLinearGradient(cx-5,0,cx+5,0);stem.addColorStop(0,'#f1e3c4');stem.addColorStop(1,'#bba27a');
+  c.fillStyle=stem;c.beginPath();c.moveTo(cx-4,o.y+2);c.quadraticCurveTo(cx-6,o.y+8,cx-7,o.y+11);c.lineTo(cx+7,o.y+11);c.quadraticCurveTo(cx+6,o.y+8,cx+4,o.y+2);c.fill();
+  c.strokeStyle='#120c08';c.lineWidth=.8;c.stroke();
+  c.fillStyle='#5d7f33';c.fillRect(cx-9,o.y+9.5,18,1.6);
+  const cap=c.createRadialGradient(cx-o.w*.15,top,1,cx,o.y,o.w*.6);cap.addColorStop(0,'#ff8a5c');cap.addColorStop(.6,'#d23b2a');cap.addColorStop(1,'#7c1d18');
+  c.fillStyle=cap;c.beginPath();c.ellipse(cx,o.y+1,o.w/2,7,0,Math.PI,0);c.lineTo(cx+o.w/2,o.y+2);c.lineTo(cx-o.w/2,o.y+2);c.fill();
+  c.fillStyle='#e9d6b4';c.fillRect(cx-o.w/2+1,o.y+1,o.w-2,1.6);
+  c.fillStyle='#fff3dc';for(let i=0;i<5;i++){const a=Math.PI*(1.15+i*.17);c.beginPath();c.ellipse(cx+Math.cos(a)*o.w*.33,o.y+1+Math.sin(a)*4.5,1.5,1,0,0,Math.PI*2);c.fill();}
+  return true;
+ }
+ if(o.type==='switch'){
+  const flipped=g.disabledObjects.has(o.target);
+  c.fillStyle=stonePattern||'#6d7568';patterns(c);c.fillStyle=stonePattern||'#6d7568';
+  c.beginPath();c.roundRect(o.x-7,o.y-8,14,8,[2,2,0,0]);c.fill();c.strokeStyle='#120c08';c.lineWidth=.9;c.stroke();
+  c.fillStyle='rgba(255,230,180,.25)';c.fillRect(o.x-6,o.y-7.5,12,1);
+  c.beginPath();c.moveTo(o.x,o.y-6);c.lineTo(o.x+(flipped?6:-6),o.y-20);keyline(c,2.4,[[woodStroke(c,o.x-6,o.x+6,'#e0b070','#8b5a2e'),2.4]]);
+  c.fillStyle='#2a2522';c.beginPath();c.arc(o.x+(flipped?6:-6),o.y-20,2.2,0,Math.PI*2);c.fill();c.fillStyle='#b7a27a';c.beginPath();c.arc(o.x+(flipped?5.4:-6.6),o.y-20.6,.8,0,Math.PI*2);c.fill();
+  return true;
+ }
+ if(o.type==='crusher'){
+  const active=isDangerous(o,g.tick,g.disabledObjects),y=active?o.y+o.h-18:o.y,cx=o.x+o.w/2;
+  // Iron chain from the anchor to the press.
+  c.strokeStyle='#120c08';c.lineWidth=4;c.beginPath();c.moveTo(cx,o.y);c.lineTo(cx,y);c.stroke();
+  c.strokeStyle='#8d8a84';c.lineWidth=1.4;for(let yy=o.y;yy<y;yy+=4){c.beginPath();c.ellipse(cx,yy+2,1.4,2,0,0,Math.PI*2);c.stroke();}
+  // Banded oak log head with iron teeth; the amber band keeps the danger cue.
+  const log=c.createLinearGradient(0,y,0,y+12);log.addColorStop(0,'#b07a42');log.addColorStop(.5,'#7c4e28');log.addColorStop(1,'#4a2c15');
+  c.fillStyle=log;c.beginPath();c.roundRect(o.x,y,o.w,12,3);c.fill();c.strokeStyle='#120c08';c.lineWidth=1;c.stroke();
+  c.strokeStyle='rgba(40,22,10,.6)';c.lineWidth=.4;for(let k=0;k<3;k++){c.beginPath();c.moveTo(o.x+2,y+3+k*3);c.bezierCurveTo(o.x+o.w*.3,y+4+k*3,o.x+o.w*.7,y+2+k*3,o.x+o.w-2,y+3+k*3);c.stroke();}
+  for(const bx of [o.x+4,o.x+o.w-7]){c.fillStyle='#3a3633';c.fillRect(bx,y,3,12);c.fillStyle=active?'#f2b233':'#a58a4a';c.fillRect(bx,y+4,3,2);}
+  c.fillStyle='#2a2522';c.fillRect(o.x+1,y+11,o.w-2,2);
+  c.fillStyle=active?'#d9d4c8':'#8d8a84';for(let x=o.x+2;x<o.x+o.w-3;x+=8){c.beginPath();c.moveTo(x,y+13);c.lineTo(x+4,y+13);c.lineTo(x+2,y+18);c.closePath();c.fill();c.strokeStyle='#120c08';c.lineWidth=.6;c.stroke();}
+  return true;
+ }
+ return false;
+}
+
+// A quiet 2× night-forest backdrop: distant trunks in mist, kept low-contrast
+// so the playable silhouettes stay in charge.
+export function forestBackdrop(height,scale=RENDER_SCALE){
+ const canvas=document.createElement('canvas');canvas.width=WIDTH*scale;canvas.height=height*scale;const c=canvas.getContext('2d');c.scale(scale,scale);
+ const sky=c.createLinearGradient(0,0,0,height);sky.addColorStop(0,'#0b1d1b');sky.addColorStop(.55,'#122822');sky.addColorStop(1,'#1a3329');c.fillStyle=sky;c.fillRect(0,0,WIDTH,height);
+ const moon=c.createRadialGradient(640,70,4,640,70,260);moon.addColorStop(0,'rgba(200,220,170,.16)');moon.addColorStop(.25,'rgba(170,200,150,.06)');moon.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=moon;c.fillRect(0,0,WIDTH,height);
+ const rnd=(i,k)=>lattice(i*7+k,k*13+3);
+ [['#10241f',.55,26,9],['#0e211c',.75,18,13],['#0c1d19',1,14,17]].forEach(([color,alpha,count,width],layer)=>{
+  c.globalAlpha=alpha;c.fillStyle=color;
+  for(let i=0;i<count;i++){
+   const x=(i+rnd(i,layer)*.8)*(WIDTH+120)/count-60,w=width*(.6+rnd(i,layer+5)*.8),lean=(rnd(i,layer+9)-.5)*14;
+   c.beginPath();c.moveTo(x-w*.6,height+2);c.bezierCurveTo(x-w*.4,height*.6,x+lean-w*.35,height*.3,x+lean-w*.3,-2);c.lineTo(x+lean+w*.3,-2);c.bezierCurveTo(x+lean+w*.35,height*.3,x+w*.4,height*.6,x+w*.6,height+2);c.fill();
+   for(let b=0;b<2;b++){const by=height*(.15+rnd(i,layer+b*3)*.5),dir=b?1:-1;c.beginPath();c.moveTo(x+lean*.5,by);c.quadraticCurveTo(x+dir*w*1.6,by-w*.8,x+dir*w*(2.6+rnd(i,b)*1.5),by-w*1.8);c.lineWidth=w*.22;c.strokeStyle=color;c.stroke();}
+  }
+ });
+ c.globalAlpha=1;
+ for(let k=0;k<4;k++){const y=height*(.35+k*.18),m=c.createLinearGradient(0,y-30,0,y+30);m.addColorStop(0,'rgba(120,160,130,0)');m.addColorStop(.5,'rgba(120,160,130,.045)');m.addColorStop(1,'rgba(120,160,130,0)');c.fillStyle=m;c.fillRect(0,y-30,WIDTH,60);}
+ c.fillStyle='rgba(194,210,154,.035)';c.beginPath();c.moveTo(600,0);c.lineTo(680,0);c.lineTo(420,height);c.lineTo(270,height);c.fill();
+ return canvas;
 }
