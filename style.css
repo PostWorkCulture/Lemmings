@@ -113,3 +113,6 @@ dialog a:hover{color:#e2f7c0}
  .viewport:not(.tall-world){display:flex;align-items:center}
  .viewport:not(.tall-world)>canvas{height:auto;max-height:100%;flex-shrink:0}
 }
+
+/* High-definition worlds already draw at 2x: let the browser filter smoothly. */
+.viewport>canvas[data-hd="true"]{image-rendering:auto}

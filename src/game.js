@@ -9,6 +9,7 @@ import { isUnlocked,starCount,totalStars,earnedStars,migrateStars,recordResult,u
 import { LEVELS,THEMES,CAMPAIGN,nextLevelId } from './levels.js';
 import { Soundtrack,TRACKS } from './music.js';
 import { Game,WIDTH,HEIGHT } from './engine.js';
+import {renderScaleFor,isForestHD,forestTorchGlow} from './forest-hd.js';
 import { character,makeBackground,renderTerrain,scenery,skillIcon,uiIcon,loadIconArt,exitPortal,enteringLemming,hazards } from './art.js';
 const $=s=>document.querySelector(s),canvas=$('#game'),ctx=canvas.getContext('2d');
 const playerStore=new PlayerStore(localStorage);
@@ -25,6 +26,7 @@ const game=new Game(initialLevel),terrain=document.createElement('canvas');let b
 const soundtrack=new Soundtrack($('#soundtrack'));const impactAudio=new ImpactAudio();
 let pendingLevel=null;
 let sceneryTick=0;
+let renderScale=1;
 let selected='walk',started=false,paused=false,speed=1,last=0,accumulator=0,renderedRevision=-1,hover=null,pointer=null,toastTimer,hintIndex=0,dialogPause=false;
 function message(text){$('#message').textContent=text;$('#message').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#message').classList.remove('visible'),5000);}
 function select(skill){if(skill!=='walk'&&!(game.stock[skill]>0)&&!(['block','attract'].includes(skill)&&game.units.some(u=>u.state===skill)))return;selected=skill;document.querySelectorAll('.skill').forEach(b=>{const active=b.dataset.skill===skill;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});}
@@ -93,7 +95,7 @@ function renderSkills(){
  }
 }
 function updateLevelUI(){
- canvas.dataset.illustrated=String(Boolean(game.level.embeddedDoors)); canvas.height=game.height;terrain.height=game.height;$('#viewport').classList.toggle('tall-world',game.level.scrollMode==='vertical');$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';syncPlayfieldScale(canvas);syncPlayfieldBackdrop($('#viewport'),background);
+ canvas.dataset.illustrated=String(Boolean(game.level.embeddedDoors)); renderScale=renderScaleFor(game.level);canvas.dataset.renderScale=String(renderScale);canvas.dataset.hd=String(renderScale>1);canvas.width=WIDTH*renderScale;canvas.height=game.height*renderScale;terrain.width=WIDTH*renderScale;terrain.height=game.height*renderScale;renderedRevision=-1;$('#viewport').classList.toggle('tall-world',game.level.scrollMode==='vertical');$('#viewport').scrollTop=0;$('#viewport').style.overflowY='';syncPlayfieldScale(canvas);syncPlayfieldBackdrop($('#viewport'),background);
  $('#difficulty-label').textContent=game.level.difficulty;$('#difficulty-label').dataset.difficulty=game.level.difficulty.toLowerCase();
  renderSkills();const l=game.level;$('#time-target').textContent=formatTime(l.targetTime);$('#star-total').textContent=l.total;document.title=`Lemmings · ${l.world}`;$('#world-label').textContent=`${l.world.toUpperCase()} · ${String(l.campaignIndex+1).padStart(2,'0')}`;$('h1').textContent=l.name;$('#level-number').textContent=`${l.campaignIndex+1} / ${CAMPAIGN.length}`;$('#target-count').textContent='/'+l.target;$('#help-goal').textContent=`Save ${l.target} of ${l.total}. Watch out for long falls and hazards. There’s no time limit.`;canvas.setAttribute('aria-label',`${l.world}: ${l.name}`);$('#music-status').textContent='';updateMusicUI();
  document.querySelectorAll('[data-help-skill]').forEach(el=>{el.hidden=el.dataset.helpSkill!=='walk'&&!(l.stock[el.dataset.helpSkill]>0);});
@@ -130,14 +132,16 @@ loadIconArt().then(()=>{
   for(const icon of document.querySelectorAll('[data-ui-icon]'))uiIcon(icon.getContext('2d'),icon.width,icon.height,icon.dataset.uiIcon);
 }).catch(error=>console.error('Unable to load character icon artwork',error));
 function draw(){
+  ctx.setTransform(renderScale,0,0,renderScale,0,0);
   ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(background,0,0);
   if(renderedRevision!==game.revision){renderTerrain(game,terrain);renderedRevision=game.revision;}
   if(!game.level.embeddedDoors)hazards(ctx,sceneryTick,game.level.theme,game.height);
   ambientWorld(ctx,sceneryTick,game.level);finaleLandmarks(ctx,sceneryTick,game.level);
-  ctx.drawImage(terrain,0,0);drawObjects(ctx,game);scenery(ctx,game.tick,game.level,game.spawned,game.lastSpawnTick,sceneryTick,game);
+  ctx.drawImage(terrain,0,0,WIDTH,game.height);drawObjects(ctx,game);scenery(ctx,game.tick,game.level,game.spawned,game.lastSpawnTick,sceneryTick,game);
   if(game.level.theme==='woodland')for(let i=0;i<16;i++){const t=game.tick/100+i*4,x=80+(i*67)%870+Math.sin(t)*8,y=65+(i*47)%260+Math.cos(t*.7)*5;ctx.globalAlpha=.2+(Math.sin(t)+1)*.2;ctx.fillStyle='#e5db91';ctx.fillRect(x,y,2,2);}ctx.globalAlpha=1;
   drawSplats(ctx,game.effects,game.tick);impactAudio.consume([...game.effects,...game.soundEvents],soundtrack.volume,soundtrack.muted);
   exitPortal(ctx,game.level,game.tick,game.units.some(u=>u.state==='exit'));
+  if(isForestHD(game.level))forestTorchGlow(ctx,game.level,sceneryTick);
   if(pointer)hover=pick(pointer.x,pointer.y);else hover=null;
   for(const u of game.units){
     if(u.state==='drown'){withNaturalSprite(ctx,u.x,u.y,()=>drawDrowning(ctx,u,game.tick,character,game.height));continue;}

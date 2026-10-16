@@ -11,7 +11,9 @@ export function syncPlayfieldBackdrop(viewport,background){
 }
 export function playfieldPoint(canvas,clientX,clientY){
  const rect=canvas.getBoundingClientRect();
- return {x:(clientX-rect.left)*canvas.width/rect.width,y:(clientY-rect.top)*canvas.height/rect.height};
+ // High-definition worlds draw at a multiple of the world grid; points stay in world units.
+ const k=Number(canvas.dataset?.renderScale)||1;
+ return {x:(clientX-rect.left)*canvas.width/rect.width/k,y:(clientY-rect.top)*canvas.height/rect.height/k};
 }
 export function spriteHitDistance(canvas,point,x,y,offsetY=-12){
  const scale=scales.get(canvas)||{x:1,y:1},uniform=Math.min(scale.x,scale.y);

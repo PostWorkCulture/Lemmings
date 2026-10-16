@@ -1,6 +1,10 @@
 import {LEVELS} from '../src/levels.js';
 // Five original DOS/FM-inspired arrangements; no audio sampled from the reference video.
-import { writeFileSync, readFileSync } from 'node:fs';
+import { writeFileSync, readFileSync, mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+const masters=mkdtempSync(join(tmpdir(),'lemmings-masters-'));
 export const SCORES=[
  {file:'mossy-hollows',title:'Little Green Parade',bpm:116,root:48,tone:'reed',progress:[0,3,4,0,5,3,4,0],phrases:[[0,2,4,4,5,4,2,1],[3,3,5,7,6,5,3,2],[4,6,8,7,6,4,2,1],[2,1,0,0,2,4,2,-1],[5,7,9,8,7,5,4,2],[3,5,7,5,6,5,3,1],[4,4,6,8,7,6,4,1],[2,4,2,1,0,0,0,-1]]},
  {file:'sunstone-ruins',title:'Sunstone Stroll',bpm:128,root:50,tone:'pluck',progress:[0,4,5,3,0,3,4,0],phrases:[[4,2,0,2,4,-1,7,6],[6,4,1,4,6,8,7,-1],[5,7,9,7,5,4,2,4],[3,5,6,5,3,-1,2,1],[0,4,7,4,2,4,0,2],[3,3,5,6,7,5,3,-1],[4,6,8,6,4,1,2,1],[0,2,4,2,0,0,-1,-1]]},
@@ -70,6 +74,8 @@ for(const [scoreIndex,score] of SCORES.entries()){
  // Very short wrap blend removes an artificial file-boundary click.
  const seam=64;for(let j=0;j<seam;j++)for(let ch=0;ch<2;ch++){const end=(length-1-j)*4+ch*2,begin=j*4+ch*2,fade=j/seam;pcm.writeInt16LE(Math.round(pcm.readInt16LE(end)*fade),end);pcm.writeInt16LE(Math.round(pcm.readInt16LE(begin)*fade),begin);}
  const header=Buffer.alloc(44);header.write('RIFF');header.writeUInt32LE(36+pcm.length,4);header.write('WAVEfmt ',8);header.writeUInt32LE(16,16);header.writeUInt16LE(1,20);header.writeUInt16LE(2,22);header.writeUInt32LE(SR,24);header.writeUInt32LE(SR*4,28);header.writeUInt16LE(4,32);header.writeUInt16LE(16,34);header.write('data',36);header.writeUInt32LE(pcm.length,40);
- writeFileSync(`assets/audio/${score.file}.wav`,Buffer.concat([header,pcm]));report.push({title:score.title,file:`assets/audio/${score.file}.wav`,seconds:+duration.toFixed(2),peak:+peak.toFixed(3),rms:+Math.sqrt(sum/(length*2)).toFixed(3)});
+ writeFileSync(join(masters,`${score.file}.wav`),Buffer.concat([header,pcm]));report.push({title:score.title,file:`assets/audio/${score.file}.mp3`,seconds:+duration.toFixed(2),peak:+peak.toFixed(3),rms:+Math.sqrt(sum/(length*2)).toFixed(3)});
 }
 writeFileSync('assets/audio/manifest.json',JSON.stringify(process.argv.includes('--new')?[...JSON.parse(readFileSync('assets/audio/manifest.json')).filter(r=>!report.some(n=>n.file===r.file)),...report]:report,null,2));console.log(JSON.stringify(report,null,2));
+// WAV masters are encoded to MP3 (needs ffmpeg) so the published site stays small.
+execFileSync('node',['scripts/encode-audio.mjs',masters],{stdio:'inherit'});

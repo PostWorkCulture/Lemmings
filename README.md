@@ -42,7 +42,7 @@ Twenty original 32-bar stereo compositions, inspired by the bright DOS/FM direct
 
 Music starts on **Play level** and continues on the results screen. Pause/resume remains available after completion. Choosing another level stops the old track; opening and closing the level menu from the results screen keeps it playing. During an active run, music pauses with gameplay, menus or a hidden tab. Fast-forward does not change the music tempo. The **♫** control opens mute and volume settings, which persist in this browser. Audio is local and needs no streaming service or network connection once the app is loaded.
 
-`npm run compose` rebuilds the WAV files from `scripts/compose-music.mjs`. `assets/audio/manifest.json` records track durations and measured peak/RMS levels. The server supplies the audio MIME type and byte-range support.
+`npm run compose` rebuilds the soundtrack from `scripts/compose-music.mjs`: it renders WAV masters to a temporary folder, then `scripts/encode-audio.mjs` encodes them to MP3 with ffmpeg (VBR, 22 kHz stereo). `assets/audio/manifest.json` records track durations and measured peak/RMS levels. The server supplies the audio MIME type and byte-range support.
 
 ## Checks
 
