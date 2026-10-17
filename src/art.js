@@ -4,7 +4,8 @@ import {softenTerrainCorners} from './terrain-finish.js';
 import {connectedBackground,paintConnectedTerrain,connectedDoors} from './connected-art.js';
 import {paintRebootTerrain,sweetDoors,sweetBackdrop} from './sweet-reboot-art.js';
 import {paintSculptedMaterials} from './sculpted-materials.js';
-import {isForestHD,paintForestTerrain,forestHatch,forestExit} from './forest-hd.js';
+import {isHD,paintHDTerrain} from './hd-terrain.js';
+import {hdHatch,hdExit} from './hd-art.js';
 import {paintSweetTerrain} from './expansion-art.js';
 import {CLASSIC_ENTRANCE} from './classic-entrance.js';
 import {rocketHeight} from './levels.js';
@@ -76,7 +77,7 @@ export function makeBackground(theme='forest',height=HEIGHT,level=null) {
   return canvas;
 }
 export function renderTerrain(game,canvas) {
-  if(isForestHD(game.level)){paintForestTerrain(game,canvas);return;}
+  if(isHD(game.level)){paintHDTerrain(game,canvas);return;}
   paintTerrain(game,canvas);
   softenTerrainCorners(canvas.getContext('2d'),game);
 }
@@ -207,7 +208,7 @@ export function magicalEntrance(c,tick,level,spawned=0,lastSpawnTick=null){
 function paintMagicalEntrance(c,tick,level,spawned,lastSpawnTick){
  const open=hatchOpening(tick,spawned,level.total,lastSpawnTick),sprite=entranceArtwork();
  c.save();c.translate(Math.round(level.spawnX),Math.round(level.spawnY));c.scale(level.rocketScale||1,level.rocketScale||1);c.imageSmoothingEnabled=false;
- if(isForestHD(level))forestHatch(c,open);
+ if(isHD(level))hdHatch(c,open,level);
  else if(sprite){
   // Fully open is the exact original entrance, lifted from the supplied reference.
   if(open>=.999)c.drawImage(sprite,-36,-46);
@@ -241,7 +242,7 @@ export function scenery(c,tick,level,spawned=0,lastSpawnTick=null,sceneryTick=ti
 export function classicDoorways(c,tick,level,spawned=0,lastSpawnTick=null){
   if(level.entrances){for(const [i,e] of level.entrances.entries()){const n=level.entrances.length,count=Math.max(0,Math.ceil((spawned-i)/n));magicalEntrance(c,tick,{...level,spawnX:e.x,spawnY:rocketHeight(level,e),rocketScale:1,total:Math.ceil((level.total-i)/n)},count,count?((count-1)*n+i)*level.interval:null);}}else magicalEntrance(c,tick,{...level,spawnY:level.rocketY||90},spawned,lastSpawnTick);
   // Golden splayed arch and twin torches from the supplied classic exit reference.
-  if(isForestHD(level))withNaturalSprite(c,level.exitX,level.exitY,()=>{c.save();c.translate(level.exitX,level.exitY);forestExit(c,tick);c.restore();});
+  if(isHD(level))withNaturalSprite(c,level.exitX,level.exitY,()=>{c.save();c.translate(level.exitX,level.exitY);hdExit(c,tick,level);c.restore();});
   else exitArch(c,level.exitX,level.exitY,tick);
 }
 

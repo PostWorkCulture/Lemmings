@@ -56,6 +56,8 @@ Music starts on **Play level** and continues on the results screen. Pause/resume
 - `src/engine.js`: fixed-step simulation and editable terrain.
 - `src/art.js`: pixel characters, backgrounds, exit and icons.
 - `src/game.js`: input, display, level navigation and progress.
+- `src/hd-terrain.js`: 2× textured terrain for Freaky Forest, Mountain Rescue and Lava Land (CC0 ambientCG maps in `assets/terrain/hd/`, loaded per world on demand).
+- `src/hd-art.js`: matching hatches, exits, props, backdrops, fliers and lava for those worlds.
 - `src/music.js`: soundtrack playback and preferences.
 - `tests/campaign.test.js`: complete winning routes and campaign verification.
 

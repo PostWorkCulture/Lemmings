@@ -1,7 +1,8 @@
 import {rocketHeight} from './levels.js';
 import {skyBalloon,mountainWeather,driftingClouds} from './chapter-art.js';
 import {drawWaterfalls} from './waterfall-art.js';
-import {isForestHD,forestBat,forestOwl} from './forest-hd.js';
+import {isHD,hdWorld} from './hd-terrain.js';
+import {hdBat,hdOwl,hdChough,hdEmbers} from './hd-art.js';
 // Ambient world life is drawn behind the playable terrain and never changes collision.
 const TAU = Math.PI * 2;
 const wrap = (n, span) => ((n % span) + span) % span;
@@ -100,10 +101,13 @@ export function ambientWorld(c,tick,level) {
  for(let row=0;row<1;row++){
   const seed=row*.13;
   if(row===0&&['woodland','beach','alpine','treehouse','highland','castle','sports','marble'].includes(key)){
-   if(isForestHD(level)){
+   if(isHD(level)&&hdWorld(level)==='woodland'){
     // Night forest: two fluttering bats and one gliding owl share the skyline lane.
-    for(let i=0;i<2;i++){const x=wrap(t*(.9+i*.15)+i*520+seed,1120)-60,y=30+i*18+Math.sin(t*.05+i*2)*7;if(clearSky(level,x,y))forestBat(c,x,y,t*.13+i*3);}
-    {const x=wrap(-t*.34+700,1160)-80,y=40+Math.sin(t*.012)*6;if(clearSky(level,x,y))forestOwl(c,x,y,t*.06);}
+    for(let i=0;i<2;i++){const x=wrap(t*(.9+i*.15)+i*520+seed,1120)-60,y=30+i*18+Math.sin(t*.05+i*2)*7;if(clearSky(level,x,y))hdBat(c,x,y,t*.13+i*3);}
+    {const x=wrap(-t*.34+700,1160)-80,y=40+Math.sin(t*.012)*6;if(clearSky(level,x,y))hdOwl(c,x,y,t*.06);}
+   }else if(isHD(level)&&hdWorld(level)==='alpine'){
+    // Alpine choughs wheel along the skyline in place of gulls.
+    for(let i=0;i<3;i++){const x=wrap(t*(.55+i*.08)+i*335+seed,1120)-60,y=28+i*14+Math.sin(t*.018+i)*5;if(clearSky(level,x,y))hdChough(c,x,y,t*.12+i);}
    }else for(let i=0;i<3;i++){const x=wrap(t*(.62+i*.07)+i*335+seed,1120)-60;skyBird(c,level,x,26+i*14+Math.sin(t*.018+i)*5,t*.13+i,key==='beach'||key==='alpine');}
   }
   if(['woodland','treehouse','highland'].includes(key)) {
@@ -118,6 +122,7 @@ export function ambientWorld(c,tick,level) {
    if(key==='volcano')for(let i=0;i<13;i++){const p=wrap(t*.65+i*33,270);oval(c,70+i*77+Math.sin(p*.04)*12,row+300-p,2,3,'#eeb879');}
   }
   if(['polar','alpine'].includes(key)&&row===0)mountainWeather(c,t,height);
+  if(key==='volcano'&&row===0&&isHD(level))hdEmbers(c,t,height);
   if(key==='egypt') {
    if(row===0)for(let i=0;i<3;i++){const x=wrap(t*.38+i*340,1100)-50;skyBird(c,level,x,25+i*14,t*.045+i,false);}
    for(let i=0;i<12;i++){c.fillStyle='#ebc98870';c.fillRect(wrap(i*87+t*1.5,1000),row+150+i*8+Math.sin(t*.018+i)*5,16,1);}
