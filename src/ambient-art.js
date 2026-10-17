@@ -1,6 +1,7 @@
 import {rocketHeight} from './levels.js';
 import {skyBalloon,mountainWeather,driftingClouds} from './chapter-art.js';
 import {drawWaterfalls} from './waterfall-art.js';
+import {isForestHD,forestBat,forestOwl} from './forest-hd.js';
 // Ambient world life is drawn behind the playable terrain and never changes collision.
 const TAU = Math.PI * 2;
 const wrap = (n, span) => ((n % span) + span) % span;
@@ -99,7 +100,11 @@ export function ambientWorld(c,tick,level) {
  for(let row=0;row<1;row++){
   const seed=row*.13;
   if(row===0&&['woodland','beach','alpine','treehouse','highland','castle','sports','marble'].includes(key)){
-   for(let i=0;i<3;i++){const x=wrap(t*(.62+i*.07)+i*335+seed,1120)-60;skyBird(c,level,x,26+i*14+Math.sin(t*.018+i)*5,t*.13+i,key==='beach'||key==='alpine');}
+   if(isForestHD(level)){
+    // Night forest: two fluttering bats and one gliding owl share the skyline lane.
+    for(let i=0;i<2;i++){const x=wrap(t*(.9+i*.15)+i*520+seed,1120)-60,y=30+i*18+Math.sin(t*.05+i*2)*7;if(clearSky(level,x,y))forestBat(c,x,y,t*.13+i*3);}
+    {const x=wrap(-t*.34+700,1160)-80,y=40+Math.sin(t*.012)*6;if(clearSky(level,x,y))forestOwl(c,x,y,t*.06);}
+   }else for(let i=0;i<3;i++){const x=wrap(t*(.62+i*.07)+i*335+seed,1120)-60;skyBird(c,level,x,26+i*14+Math.sin(t*.018+i)*5,t*.13+i,key==='beach'||key==='alpine');}
   }
   if(['woodland','treehouse','highland'].includes(key)) {
    for(let i=0;i<7;i++){const x=wrap(120+i*153+t*.42,1080)-40,y=row+80+wrap(i*27+t*.2,200);c.save();c.translate(x,y);c.rotate(t*.035+i);oval(c,0,0,5,2,'#c2b86c');c.restore();}

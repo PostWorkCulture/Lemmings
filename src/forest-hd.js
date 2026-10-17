@@ -360,3 +360,27 @@ export function forestBackdrop(height,scale=RENDER_SCALE){
  c.fillStyle='rgba(194,210,154,.035)';c.beginPath();c.moveTo(600,0);c.lineTo(680,0);c.lineTo(420,height);c.lineTo(270,height);c.fill();
  return canvas;
 }
+
+/* ---------- Night fliers: bats and an owl replace the daytime birds ---------- */
+export function forestBat(c,x,y,t){
+ const flap=Math.sin(t*2.6),span=11,lift=flap*4.5;
+ c.save();c.translate(x,y+Math.sin(t*.9)*3);c.fillStyle='#0b0f10';c.strokeStyle='rgba(150,170,150,.35)';c.lineWidth=.5;
+ for(const s of [-1,1]){c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(s*span*.4,-3-lift,s*span,-1-lift*1.2);
+  c.lineTo(s*span*.8,1-lift*.6);c.quadraticCurveTo(s*span*.65,0,s*span*.55,2-lift*.4);c.quadraticCurveTo(s*span*.4,1,s*span*.3,3-lift*.2);c.quadraticCurveTo(s*span*.15,2,0,3);c.closePath();c.fill();c.stroke();}
+ c.beginPath();c.ellipse(0,1.2,1.6,2.4,0,0,Math.PI*2);c.fill();
+ c.beginPath();c.moveTo(-1.2,-.6);c.lineTo(-.8,-2.4);c.lineTo(-.2,-.8);c.moveTo(1.2,-.6);c.lineTo(.8,-2.4);c.lineTo(.2,-.8);c.fill();
+ c.restore();
+}
+export function forestOwl(c,x,y,t){
+ // Long glides with an occasional slow beat.
+ const beat=Math.max(0,Math.sin(t*.55))**3,lift=Math.sin(t*1.7)*5*beat,span=17;
+ c.save();c.translate(x,y);
+ const wing=c.createLinearGradient(0,-6,0,6);wing.addColorStop(0,'#9a8668');wing.addColorStop(1,'#5b4a36');c.fillStyle=wing;
+ for(const s of [-1,1]){c.beginPath();c.moveTo(s*2,-1);c.quadraticCurveTo(s*span*.5,-4-lift,s*span,-1-lift);c.quadraticCurveTo(s*span*.9,2-lift*.5,s*span*.75,2.5-lift*.3);
+  for(let f=0;f<3;f++)c.lineTo(s*span*(.62-f*.12),3.4-lift*.2+(f%2?-.8:0));c.quadraticCurveTo(s*4,3,s*2,2);c.closePath();c.fill();}
+ c.fillStyle='#7d6a50';c.beginPath();c.ellipse(0,1,3.4,4.2,0,0,Math.PI*2);c.fill();
+ c.fillStyle='#d9c9a6';c.beginPath();c.ellipse(0,-1.6,2.7,2.3,0,0,Math.PI*2);c.fill();
+ c.fillStyle='#f2c94c';for(const s of [-1,1]){c.beginPath();c.arc(s*1.1,-1.9,.7,0,Math.PI*2);c.fill();}
+ c.fillStyle='#1a1410';for(const s of [-1,1]){c.beginPath();c.arc(s*1.1,-1.9,.3,0,Math.PI*2);c.fill();}
+ c.restore();
+}
