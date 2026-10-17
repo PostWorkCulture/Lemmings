@@ -10,7 +10,7 @@ import { LEVELS,THEMES,CAMPAIGN,nextLevelId } from './levels.js';
 import { Soundtrack,TRACKS } from './music.js';
 import { Game,WIDTH,HEIGHT } from './engine.js';
 import {renderScaleFor,isHD,ensureHD,preloadHD,hdTorchGlow} from './hd-terrain.js';
-import {hdBackdrop,hdLavaSea} from './hd-art.js';
+import {hdBackdrop,hdLavaSea,hdSnowfield} from './hd-art.js';
 import { character,makeBackground,renderTerrain,scenery,skillIcon,uiIcon,loadIconArt,exitPortal,enteringLemming,hazards } from './art.js';
 const $=s=>document.querySelector(s),canvas=$('#game'),ctx=canvas.getContext('2d');
 const playerStore=new PlayerStore(localStorage);
@@ -139,7 +139,7 @@ function draw(){
   ctx.setTransform(renderScale,0,0,renderScale,0,0);
   ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(background,0,0,WIDTH,background.height*WIDTH/background.width);
   if(renderedRevision!==game.revision){renderTerrain(game,terrain);renderedRevision=game.revision;}
-  if(!game.level.embeddedDoors){hazards(ctx,sceneryTick,game.level.theme,game.height);hdLavaSea(ctx,game.level,sceneryTick,game.height);}
+  if(!game.level.embeddedDoors){hazards(ctx,sceneryTick,game.level.theme,game.height);hdLavaSea(ctx,game.level,sceneryTick,game.height);hdSnowfield(ctx,game.level,game.height);}
   ambientWorld(ctx,sceneryTick,game.level);finaleLandmarks(ctx,sceneryTick,game.level);
   ctx.drawImage(terrain,0,0,WIDTH,game.height);drawObjects(ctx,game);scenery(ctx,game.tick,game.level,game.spawned,game.lastSpawnTick,sceneryTick,game);
   if(game.level.theme==='woodland')for(let i=0;i<16;i++){const t=game.tick/100+i*4,x=80+(i*67)%870+Math.sin(t)*8,y=65+(i*47)%260+Math.cos(t*.7)*5;ctx.globalAlpha=.2+(Math.sin(t)+1)*.2;ctx.fillStyle='#e5db91';ctx.fillRect(x,y,2,2);}ctx.globalAlpha=1;

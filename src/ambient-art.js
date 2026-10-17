@@ -2,7 +2,7 @@ import {rocketHeight} from './levels.js';
 import {skyBalloon,mountainWeather,driftingClouds} from './chapter-art.js';
 import {drawWaterfalls} from './waterfall-art.js';
 import {isHD,hdWorld} from './hd-terrain.js';
-import {hdBat,hdOwl,hdChough,hdEmbers} from './hd-art.js';
+import {hdBat,hdOwl,hdChough,hdEmbers,hdLeaf,hdMoth} from './hd-art.js';
 // Ambient world life is drawn behind the playable terrain and never changes collision.
 const TAU = Math.PI * 2;
 const wrap = (n, span) => ((n % span) + span) % span;
@@ -111,8 +111,14 @@ export function ambientWorld(c,tick,level) {
    }else for(let i=0;i<3;i++){const x=wrap(t*(.62+i*.07)+i*335+seed,1120)-60;skyBird(c,level,x,26+i*14+Math.sin(t*.018+i)*5,t*.13+i,key==='beach'||key==='alpine');}
   }
   if(['woodland','treehouse','highland'].includes(key)) {
+   if(isHD(level)){
+    // Drifting leaves turn over as they fall; a pale moth flutters in the dusk.
+    for(let i=0;i<7;i++){const x=wrap(120+i*153+t*.42,1080)-40,y=row+80+wrap(i*27+t*.2,200);hdLeaf(c,x,y,t*.035+i,Math.cos(t*.05+i*1.3),i);}
+    hdMoth(c,330+Math.sin(t*.018)*55,row+145+Math.cos(t*.026)*20,t*.2);
+   }else{
    for(let i=0;i<7;i++){const x=wrap(120+i*153+t*.42,1080)-40,y=row+80+wrap(i*27+t*.2,200);c.save();c.translate(x,y);c.rotate(t*.035+i);oval(c,0,0,5,2,'#c2b86c');c.restore();}
    butterfly(c,330+Math.sin(t*.018)*55,row+145+Math.cos(t*.026)*20,t*.2,'#d9bc82');
+   }
   }
   if(key==='highland'){const shelves=level.terrain.filter(r=>r[4]===1&&r[2]>160&&r[1]>row+140&&r[1]<row+330&&r[1]<height-30);const shelf=shelves.find(r=>r[0]<785&&r[0]+r[2]>785)||shelves[0];if(shelf){const x=Math.min(shelf[0]+shelf[2]-45,Math.max(shelf[0]+45,785));windmill(c,x,shelf[1]-83,t+seed);}}
   if(key==='factory') {for(const g of factoryGears(level,row))factoryGear(c,g,t);for(let i=0;i<6;i++){const p=wrap(t*.4+i*22,150);oval(c,500+Math.sin(p*.025)*18,row+190-p,9+p*.1,7+p*.07,'#aab7ae25');}}

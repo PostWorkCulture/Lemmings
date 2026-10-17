@@ -11,25 +11,28 @@ const WOOD=[[74,40,18],[138,86,40],[192,136,70],[232,186,112]];
 export const PROFILES={
  woodland:{
   maps:['rock051','moss002','rock064'],
-  earth:{map:'rock051',tile:200,ramp:[[43,22,13],[104,58,30],[160,98,46],[214,160,104]],lo:.18,span:.55,n:.85},
-  cap:{map:'moss002',tile:120,tint:[268,268,268],min:4,vary:7,varyFrom:'texture',lip:[205,232,122],band:true,n:.6},
-  hard:{map:'rock064',tile:140,tint:[211,225,239],n:1},
-  planks:WOOD,shadow:[6,14,11],light:{amb:.35,dif:.85},fringe:'grass'
+  earth:{map:'rock051',tile:200,ramp:[[62,36,20],[142,86,46],[202,138,74],[242,198,140]],lo:.18,span:.55,n:.85},
+  cap:{map:'moss002',tile:120,tint:[330,330,300],min:4,vary:7,varyFrom:'texture',lip:[205,232,122],band:true,n:.6},
+  hard:{map:'rock064',tile:140,tint:[258,260,246],n:1},
+  planks:WOOD,shadow:[6,14,11],light:{amb:.38,dif:.85},fringe:'grass',
+  rim:{color:[235,190,120],strength:.58,width:4.5},outline:[4,9,7]
  },
  alpine:{
   maps:['rock058','snow010a','rock030'],
   earth:{map:'rock058',tile:200,ramp:[[40,90,130],[90,150,195],[160,210,235],[230,246,252]],lo:.18,span:.5,n:.7},
   cap:{map:'snow010a',tile:160,tint:[250,254,262],min:11,vary:7,varyFrom:'noise',lip:[255,255,255],band:true,n:.45,onHard:true},
-  hard:{map:'rock030',tile:180,ramp:[[30,34,44],[62,68,82],[104,110,124]],lo:.15,span:.5,n:1},
-  planks:WOOD,shadow:[8,16,26],light:{amb:.35,dif:.85},fringe:'icicles'
+  hard:{map:'rock030',tile:180,ramp:[[50,56,70],[88,96,114],[136,144,160]],lo:.15,span:.5,n:1},
+  planks:WOOD,shadow:[8,16,26],light:{amb:.35,dif:.85},fringe:'icicles',
+  rim:{color:[205,235,255],strength:.3,width:3},outline:[5,10,20]
  },
  volcano:{
   maps:['rock035','lava004','snow014','rock030'],
-  earth:{map:'rock035',tile:200,ramp:[[16,13,17],[38,32,38],[68,60,64],[106,96,96]],lo:.05,span:.35,n:.85},
+  earth:{map:'rock035',tile:200,ramp:[[44,38,40],[90,80,80],[138,126,120],[188,174,166]],lo:.05,span:.35,n:.85},
   ember:{map:'lava004',tile:220,thr:.085,color:[255,110,40],amount:.9},
   cap:{map:'snow014',tile:160,tint:[150,145,140],min:2,vary:3,varyFrom:'noise',lip:[190,180,170],band:false,n:.3,onHard:true},
-  hard:{map:'rock030',tile:180,ramp:[[44,46,52],[82,84,92],[126,128,134]],lo:.15,span:.5,n:1},
-  planks:WOOD,shadow:[20,6,6],light:{amb:.3,dif:.85},fringe:null
+  hard:{map:'rock030',tile:180,ramp:[[58,60,66],[100,102,110],[148,150,156]],lo:.15,span:.5,n:1},
+  planks:WOOD,shadow:[20,6,6],light:{amb:.32,dif:.85},fringe:null,
+  rim:{color:[180,165,155],strength:.75,width:5,under:[255,112,44],underStrength:1.2},outline:[8,3,3]
  }
 };
 // Which HD world a level belongs to, whether or not its maps have loaded yet.
@@ -105,8 +108,6 @@ function stateFor(game,canvas){
 // distance to open air (bevel) and depth below the exposed surface (cap).
 function computeField(s,t,x0,y0,x1,y1){
  const H=s.H,solid=(x,y)=>{x=x<0?0:x>=WIDTH?WIDTH-1:x;y=y<0?0:y>=H?H-1:y;return t[y*WIDTH+x]?1:0;};
- // A 3×3 tent anti-aliases the outline while keeping 1–2 px builder steps solid.
- for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){let sum=0;for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++)sum+=(2-Math.abs(i))*(2-Math.abs(j))*solid(x+i,y+j);s.occ[y*WIDTH+x]=sum/16;}
  const wx0=Math.max(0,x0-EDGE_CAP-1),wy0=Math.max(0,y0-EDGE_CAP-1),wx1=Math.min(WIDTH,x1+EDGE_CAP+1),wy1=Math.min(H,y1+EDGE_CAP+1),ww=wx1-wx0,wh=wy1-wy0,d=new Float32Array(ww*wh);
  for(let y=0;y<wh;y++)for(let x=0;x<ww;x++)d[y*ww+x]=t[(y+wy0)*WIDTH+x+wx0]?99:0;
  // Terrain continues past the frame, so the screen edge never gains a bevel.
@@ -118,6 +119,29 @@ function computeField(s,t,x0,y0,x1,y1){
  // Bevel direction: the gradient of distance-to-air.
  const ed=(x,y)=>s.edge[(y<0?0:y>=H?H-1:y)*WIDTH+(x<0?0:x>=WIDTH?WIDTH-1:x)];
  for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){const i=y*WIDTH+x;s.gx[i]=(ed(x+1,y)-ed(x-1,y))/2;s.gy[i]=(ed(x,y+1)-ed(x,y-1))/2;}
+ // Display occupancy. Thick ground uses a 7×7 tent, which rounds convex corners
+ // by about one world pixel; thin features (builder steps, 1–3 px ledges) keep a
+ // 3×3 tent so they stay solid. Collision is untouched either way.
+ const R=11,ax0=Math.max(0,x0-R),ay0=Math.max(0,y0-R),ax1=Math.min(WIDTH,x1+R),ay1=Math.min(H,y1+R),aw=ax1-ax0,ah=ay1-ay0;
+ const run=new Uint8Array(aw*ah),thick=new Uint8Array(aw*ah),thin=new Uint8Array(aw*ah),near=new Uint8Array(aw*ah);
+ const at=(x,y)=>t[(y+ay0)*WIDTH+x+ax0]?1:0;
+ // Horizontal and vertical solid run lengths (capped at 8) decide thick vs thin.
+ for(let y=0;y<ah;y++){let n=0;for(let x=0;x<aw;x++){n=at(x,y)?Math.min(n+1,8):0;run[y*aw+x]=n;}n=0;for(let x=aw-1;x>=0;x--){n=at(x,y)?Math.min(n+1,8):0;const i=y*aw+x;run[i]=Math.min(8,run[i]+n-1>0?run[i]+n-1:0);}}
+ const hr=run.slice();
+ for(let x=0;x<aw;x++){let n=0;for(let y=0;y<ah;y++){n=at(x,y)?Math.min(n+1,8):0;run[y*aw+x]=n;}n=0;for(let y=ah-1;y>=0;y--){n=at(x,y)?Math.min(n+1,8):0;const i=y*aw+x;const v=run[i]+n-1;thick[i]=at(x,y)&&hr[i]>=6&&v>=6?1:0;thin[i]=at(x,y)&&!thick[i]?1:0;}}
+ // Air within 3 px of thick ground (and clear of thin features) also rounds.
+ const dil=(src,out)=>{const tmp=new Uint8Array(aw*ah);for(let y=0;y<ah;y++)for(let x=0;x<aw;x++){let m=0;for(let k=-3;k<=3&&!m;k++){const xx=x+k;if(xx>=0&&xx<aw)m=src[y*aw+xx];}tmp[y*aw+x]=m;}
+  for(let y=0;y<ah;y++)for(let x=0;x<aw;x++){let m=0;for(let k=-3;k<=3&&!m;k++){const yy=y+k;if(yy>=0&&yy<ah)m=tmp[yy*aw+x];}out[y*aw+x]=m;}};
+ const nearThick=new Uint8Array(aw*ah);dil(thick,nearThick);dil(thin,near);
+ const W7=[1,2,3,4,3,2,1];
+ for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){
+  const li=(y-ay0)*aw+(x-ax0),solidHere=t[y*WIDTH+x]?1:0,round=solidHere?thick[li]:nearThick[li]&&!near[li];
+  let sum=0;
+  // Deep inside solid ground the outline filter is always fully covered.
+  if(solidHere&&s.edge[y*WIDTH+x]>=4){s.occ[y*WIDTH+x]=1;continue;}
+  if(round){for(let j=-3;j<=3;j++)for(let i=-3;i<=3;i++)sum+=W7[i+3]*W7[j+3]*solid(x+i,y+j);s.occ[y*WIDTH+x]=sum/256;}
+  else{for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++)sum+=(2-Math.abs(i))*(2-Math.abs(j))*solid(x+i,y+j);s.occ[y*WIDTH+x]=sum/16;}
+ }
  for(let x=x0;x<x1;x++){const ys=Math.max(0,y0-DEPTH_CAP-1);let v=ys===0?DEPTH_CAP:0;
   for(let y=ys;y<y1;y++){const i=y*WIDTH+x;v=t[i]?Math.min(v+1,DEPTH_CAP):0;if(y>=y0)s.depth[i]=v;}}
 }
@@ -135,14 +159,16 @@ function capColor(s,cp,ox,oy,depth){
  return cp.n;
 }
 function bake(s,game,x0,y0,x1,y1){
- const {S,H,P}=s,t=game.terrain,img=s.image.data,OW=WIDTH*S,torches=exitTorches(game.level),cut=cutLine(game),sh=P.shadow,cp=P.cap,ep=P.earth,hp=P.hard,em=P.ember,lt=P.light;
+ const {S,H,P}=s,t=game.terrain,img=s.image.data,OW=WIDTH*S,torches=exitTorches(game.level),cut=cutLine(game),sh=P.shadow,cp=P.cap,ep=P.earth,hp=P.hard,em=P.ember,lt=P.light,rim=P.rim,ol=P.outline||sh;
  for(let oy=y0*S;oy<y1*S;oy++){
   const wy=(oy+.5)/S;
   for(let ox=x0*S;ox<x1*S;ox++){
    const wx=(ox+.5)/S,o=(oy*OW+ox)*4,wi=Math.min(H-1,wy|0)*WIDTH+Math.min(WIDTH-1,wx|0),cell=t[wi];
    const occ=bilinear(s.occ,H,wx,wy),aa=.12/S+.01,al=wy>=cut?0:smooth(.42-aa,.42+aa,occ);
    const shadow=wy>=cut?0:.45*bilinear(s.occ,H,wx-4,wy-6)*(1-al);
-   if(al<=0){img[o]=sh[0];img[o+1]=sh[1];img[o+2]=sh[2];img[o+3]=Math.round(shadow*255);continue;}
+   // A soft dark keyline just outside every silhouette separates it from the backdrop.
+   const ring=wy>=cut?0:smooth(.05,.3,occ)*(1-al)*.6;
+   if(al<=0){const A=Math.max(shadow,ring),k=ring>shadow?1:0;img[o]=k?ol[0]:sh[0];img[o+1]=k?ol[1]:sh[1];img[o+2]=k?ol[2]:sh[2];img[o+3]=Math.round(A*255);continue;}
    const depth=s.depth[wi],e=s.edge[wi],gx=s.gx[wi],gy=s.gy[wi],bevel=1-smooth(0,4.5,e);
    // The cap's lower edge wanders with its own texture or with slow noise.
    const cap=cp.min+cp.vary*(cp.varyFrom==='texture'?sample(s.capC,ox*1.3,50*S,G)[1]:noise(wx/18,7.3));
@@ -173,6 +199,10 @@ function bake(s,game,x0,y0,x1,y1){
    let warm=0;for(const [tx,ty] of torches){const dx=tx-wx,dy=ty-wy;if(dx>130||dx<-130||dy>130||dy<-130)continue;const d=Math.sqrt(dx*dx+dy*dy+1600);if(d<130)warm+=Math.max(0,(nx*dx+ny*dy+nz*40)/d)*(1-d/130)**2*1.3;}
    let r=C[0]*(lit+warm),g=C[1]*(lit+warm*.7),b=C[2]*(lit+warm*.4);
    if(glow){r+=em.color[0]*glow;g+=em.color[1]*glow;b+=em.color[2]*glow;}
+   // Rim light on sides and undersides (tops already carry the cap's bright lip).
+   if(rim&&e<rim.width){const gl=Math.sqrt(gx*gx+gy*gy)||1,down=-gy/gl,edgeK=1-smooth(0,rim.width,e);
+    const side=Math.min(1,Math.max(0,down*.6+.6))*rim.strength*edgeK;r+=rim.color[0]*side;g+=rim.color[1]*side;b+=rim.color[2]*side;
+    if(rim.under&&down>0){const u=down*rim.underStrength*edgeK;r+=rim.under[0]*u;g+=rim.under[1]*u;b+=rim.under[2]*u;}}
    const A=al+shadow*(1-al),k=al/A;
    img[o]=r*k+sh[0]*(1-k);img[o+1]=g*k+sh[1]*(1-k);img[o+2]=b*k+sh[2]*(1-k);img[o+3]=Math.round(A*255);
   }
@@ -216,9 +246,9 @@ export function paintHDTerrain(game,canvas){
   const T=16,cols=Math.ceil(WIDTH/T),dirty=new Set();
   for(let i=0;i<t.length;i++)if(t[i]!==s.snap[i]){dirty.add(Math.floor(i/WIDTH/T)*cols+Math.floor(i%WIDTH/T));s.snap[i]=t[i];}
   if(!dirty.size)return;
-  // Affected output: blur ±2, bevel ±8, cap depth below, shadow +4/+6.
+  // Affected output: rounding window ±14, bevel ±8, cap depth below, shadow +4/+6.
   for(const tile of dirty){const tx=tile%cols*T,ty=Math.floor(tile/cols)*T;
-   rects.push([Math.max(0,tx-11),Math.max(0,ty-11),Math.min(WIDTH,tx+T+15),Math.min(H,ty+T+DEPTH_CAP+9)]);}
+   rects.push([Math.max(0,tx-16),Math.max(0,ty-16),Math.min(WIDTH,tx+T+18),Math.min(H,ty+T+DEPTH_CAP+12)]);}
   // Overlapping tile rectangles merge so shared margins are only baked once.
   for(let merged=true;merged;){merged=false;
    for(let i=0;i<rects.length&&!merged;i++)for(let j=i+1;j<rects.length;j++){const a=rects[i],b=rects[j];
